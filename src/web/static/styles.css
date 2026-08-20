@@ -149,7 +149,7 @@ i.critical { background: var(--critical); } i.high { background: var(--high); } 
 .cause-node { position: relative; min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
 .cause-node:not(:last-child)::after { content: "→"; position: absolute; right: -17px; top: 50%; color: var(--violet); font-size: 17px; transform: translateY(-50%); }
 .cause-node span { display: block; margin-bottom: 8px; color: var(--subtle); font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
-.cause-node strong { display: block; margin-bottom: 6px; font-size: 12px; line-height: 1.35; }
+.cause-node strong { display: block; min-width: 0; margin-bottom: 6px; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; word-break: break-word; }
 .cause-node p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.45; word-break: break-word; }
 .cause-node.danger { border-color: rgba(255,93,122,.22); background: linear-gradient(145deg, rgba(255,93,122,.09), transparent); }
 

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="RootCause Blockchain Security — consola local watch-only para aplicaciones blockchain: contratos, proxies, oráculos, puentes, gobernanza y dependencias. Aplicación de escritorio para Windows, cero dependencias, cero telemetría, nunca claves privadas." />
+  <meta property="og:title" content="RootCause Blockchain Security — consola watch-only multi-chain" />
+  <meta property="og:description"
+    content="Puedes tener las claves perfectas y perderlo todo igual. Inventario de controles, motor causal determinista y evidencia exportable. Todo local. Telemetría: cero." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://vladimiracunadev-create.github.io/rootcause-blockchain-security/" />
+  <meta property="og:image"
+    content="https://vladimiracunadev-create.github.io/rootcause-blockchain-security/img/panel-resumen.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>RootCause Blockchain Security</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════  NAV  ═══════════════════════════════ -->
+  <header class="nav">
+    <div class="nav-inner">
+      <span class="nav-logo">
+        <svg width="22" height="22" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+          <path d="M26 42 64 20l38 22v44L64 108 26 86Z" fill="none" stroke="#7c5cff" stroke-width="9" />
+          <path d="m26 42 38 23 38-23M64 65v43" fill="none" stroke="#2bd8c5" stroke-width="9" />
+          <circle cx="64" cy="65" r="12" fill="#f4f6ff" />
+        </svg>
+        RootCause Blockchain
+      </span>
+      <nav class="nav-links">
+        <a href="#que-ve">Qué ve</a>
+        <a href="#reglas">Reglas</a>
+        <a href="#prueba">La prueba</a>
+        <a href="#honestidad">Honestidad</a>
+        <a href="#instalar">Descargar</a>
+        <a href="#familia">Familia</a>
+        <a href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security" class="btn-nav">Ver en
+          GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════  HERO  ══════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="ascii-block">
+        <pre>
+██████╗  ██████╗  ██████╗ ████████╗ ██████╗  █████╗ ██╗   ██╗███████╗███████╗
+██╔══██╗██╔═══██╗██╔═══██╗╚══██╔══╝██╔════╝ ██╔══██╗██║   ██║██╔════╝██╔════╝
+██████╔╝██║   ██║██║   ██║   ██║   ██║      ███████║██║   ██║███████╗█████╗
+██╔══██╗██║   ██║██║   ██║   ██║   ██║      ██╔══██║██║   ██║╚════██║██╔══╝
+██║  ██║╚██████╔╝╚██████╔╝   ██║   ╚██████╗ ██║  ██║╚██████╔╝███████║███████╗
+╚═╝  ╚═╝ ╚═════╝  ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝
+             B L O C K C H A I N   S E C U R I T Y
+</pre>
+      </div>
+
+      <p class="hero-sub">
+        En una cadena programable puedes tener <strong>las claves perfectas</strong> y perderlo todo igual:<br />
+        porque una EOA olvidada seguía siendo <code>owner</code> de un proxy, porque un oráculo dejó de
+        actualizarse,<br />
+        o porque un puente con quorum 2-de-3 tenía <strong>los tres firmantes en la misma nube</strong>.<br />
+        Eso es lo que esta consola vigila —<strong>sin custodiar una sola clave</strong>.
+      </p>
+
+      <div class="badges">
+        <img
+          src="https://github.com/vladimiracunadev-create/rootcause-blockchain-security/actions/workflows/ci.yml/badge.svg"
+          alt="Estado de CI" />
+        <img src="https://img.shields.io/badge/node-%E2%89%A5%2022.12-green.svg" alt="Node 22.12 o superior" />
+        <img src="https://img.shields.io/badge/dependencias-0-success.svg" alt="Cero dependencias" />
+        <img src="https://img.shields.io/badge/telemetr%C3%ADa-cero-success.svg" alt="Telemetría cero" />
+        <img src="https://img.shields.io/badge/claves%20privadas-nunca-success.svg" alt="Nunca claves privadas" />
+        <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="Licencia MIT" />
+      </div>
+
+      <div class="hero-cta">
+        <a href="#instalar" class="btn-primary">⬇ Descargar para Windows</a>
+        <a href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security" class="btn-ghost">⌂ Código
+          fuente</a>
+      </div>
+
+      <p class="hero-tagline"><em>Diagnóstico primero. Intervención después.</em></p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════  QUÉ VE  ════════════════════════════ -->
+  <section id="que-ve" class="section">
+    <div class="container">
+      <h2 class="section-title">🔍 Qué ve, y qué te dice</h2>
+      <p class="section-sub">Un semáforo que <strong>siempre explica por qué está en el color en que está</strong>: la
+        ruta causal completa, de la condición sistémica al impacto, con la evidencia pública que la sostiene.</p>
+
+      <div class="shot">
+        <img src="img/panel-resumen.png"
+          alt="Panel de postura de seguridad: riesgo causal consolidado en 100 sobre 100 con exposición crítica, cuatro métricas de inventario multi-chain, la ruta causal de la condición al impacto y el estado del observador RPC" />
+      </div>
+      <p class="shot-caption">Postura de seguridad · el panel que se abre al arrancar.</p>
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">🔑</div>
+          <h3>Privilegios que nadie vigila</h3>
+          <p>Un rol crítico controlado por una <strong>EOA</strong>, un multisig con umbral débil, un
+            <code>upgrade</code> sin demora mínima, un timelock por debajo de política. Son las condiciones que
+            convierten un error en una pérdida total, y no aparecen en ningún log.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📡</div>
+          <h3>Oráculos y puentes</h3>
+          <p>Feeds concentrados sin fallback, datos <strong>vencidos respecto de su heartbeat</strong>, puentes con
+            quorum insuficiente o con operadores que solo parecen independientes. La dependencia externa es la
+            superficie que más dinero ha costado en este ecosistema.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🧬</div>
+          <h3>Procedencia del código</h3>
+          <p>Bytecode desplegado que no se puede relacionar con fuente, compilador ni artefacto revisado. Y
+            dependencias sin fijar o sin evidencia de procedencia: <strong>la cadena de suministro que auditas
+              empieza por la tuya</strong>.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🚨</div>
+          <h3>Cambios y salidas de valor</h3>
+          <p>Un cambio privilegiado <strong>sin aprobación registrada</strong> y una salida de valor fuera de
+            política. La aprobación se compara por hash: no basta con que alguien diga que estaba autorizado.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🛰️</div>
+          <h3>Integridad del observador</h3>
+          <p>Un observador caído, conectado al <strong>chain ID equivocado</strong> o atrasado no es un detalle
+            técnico: es una ceguera. El producto lo trata como incidente, no como un aviso al pie.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔗</div>
+          <h3>Multi-chain sin SDKs</h3>
+          <p>Adaptador EVM de solo lectura incluido. Solana, Cosmos, Substrate y cualquier otra red envían hechos ya
+            normalizados a la API. El motor causal <strong>no depende de ningún SDK de cadena</strong>.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════  INCIDENTES  ════════════════════════ -->
+  <section class="section alt">
+    <div class="container">
+      <h2 class="section-title">🧩 Incidentes con causa raíz, no alertas sueltas</h2>
+      <p class="section-sub">Cada hallazgo abre con lo que un operador necesita para decidir: explicación, causa raíz,
+        evidencia conservada y remediación segura. Nada que haya que interpretar.</p>
+
+      <div class="shot-grid">
+        <div>
+          <div class="shot">
+            <img src="img/panel-incidentes.png"
+              alt="Lista de incidentes: once hallazgos ordenados por severidad, cada uno con su código BLK, la entidad afectada y una explicación en una línea" />
+          </div>
+          <p class="shot-caption">Once incidentes del estado de demostración, ordenados por severidad.</p>
+        </div>
+        <div>
+          <div class="shot">
+            <img src="img/incidente-detalle.png"
+              alt="Detalle del incidente BLK-ACCESS-001: control administrativo concentrado en una EOA, con explicación, causa raíz, evidencia con projectId y dirección, y dos pasos de remediación segura" />
+          </div>
+          <p class="shot-caption">El detalle: causa raíz, evidencia y remediación.</p>
+        </div>
+      </div>
+
+      <div class="shot-grid">
+        <div>
+          <div class="shot">
+            <img src="img/panel-inventario.png"
+              alt="Inventario multi-chain: dos proyectos con su cadena y criticidad, contadores de contratos, oráculos, puentes y dependencias, y las direcciones públicas de cada contrato" />
+          </div>
+          <p class="shot-caption">Inventario: solo procedencia y controles verificables.</p>
+        </div>
+        <div>
+          <div class="shot">
+            <img src="img/panel-controles.png"
+              alt="Catálogo de nueve controles de defensa, de la procedencia de bytecode a la integridad del observador, y el núcleo RootCause compartido con Bitcoin Defense" />
+          </div>
+          <p class="shot-caption">Nueve controles, catorce detecciones deterministas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════  REGLAS  ════════════════════════════ -->
+  <section id="reglas" class="section">
+    <div class="container">
+      <h2 class="section-title">📋 Las catorce detecciones, sin letra pequeña</h2>
+      <p class="section-sub">Reglas deterministas con umbral explícito. Ninguna puntuación opaca, ningún modelo que no
+        pueda explicar su veredicto. Un gate de CI impide que esta tabla se desincronice del motor.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Control</th>
+              <th>Detección</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>BLK-CONTRACT-001</code></td><td>SC-PROVENANCE</td><td>Fuente desplegada sin procedencia verificada</td></tr>
+            <tr><td><code>BLK-ACCESS-001</code></td><td>ADMIN-CONTAINMENT</td><td>Admin crítico controlado por una EOA</td></tr>
+            <tr><td><code>BLK-ACCESS-002</code></td><td>ADMIN-CONTAINMENT</td><td>Multisig administrativo con umbral débil</td></tr>
+            <tr><td><code>BLK-UPGRADE-001</code></td><td>ADMIN-CONTAINMENT</td><td>Upgrade sin demora mínima</td></tr>
+            <tr><td><code>BLK-ORACLE-001</code></td><td>ORACLE-RESILIENCE</td><td>Oráculo concentrado y sin fallback</td></tr>
+            <tr><td><code>BLK-ORACLE-002</code></td><td>ORACLE-RESILIENCE</td><td>Feed vencido respecto de su heartbeat</td></tr>
+            <tr><td><code>BLK-BRIDGE-001</code></td><td>BRIDGE-QUORUM</td><td>Puente con quorum u operadores insuficientes</td></tr>
+            <tr><td><code>BLK-GOV-001</code></td><td>GOVERNANCE-DELAY</td><td>Timelock de gobernanza inferior a política</td></tr>
+            <tr><td><code>BLK-SUPPLY-001</code></td><td>SUPPLY-CHAIN</td><td>Dependencia no fijada o sin procedencia</td></tr>
+            <tr><td><code>BLK-EVENT-001</code></td><td>CHANGE-APPROVAL</td><td>Cambio privilegiado sin aprobación registrada</td></tr>
+            <tr><td><code>BLK-FUNDS-001</code></td><td>VALUE-EGRESS</td><td>Salida de valor anómala no aprobada</td></tr>
+            <tr><td><code>BLK-NODE-001</code></td><td>OBSERVER-INTEGRITY</td><td>Observador RPC no disponible</td></tr>
+            <tr><td><code>BLK-NODE-002</code></td><td>OBSERVER-INTEGRITY</td><td>RPC conectado al chain ID equivocado</td></tr>
+            <tr><td><code>BLK-NODE-003</code></td><td>OBSERVER-INTEGRITY</td><td>Observador atrasado</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════  LA PRUEBA  ═════════════════════════ -->
+  <section id="prueba" class="section alt">
+    <div class="container">
+      <h2 class="section-title">✅ La prueba, no la promesa</h2>
+      <p class="section-sub">Cualquiera puede escribir «no guardo tus claves» en un README. Aquí cada afirmación tiene
+        un script que la comprueba y un job de CI que lo ejecuta en cada push, sobre la aplicación en marcha.</p>
+
+      <div class="proof-list">
+        <div class="proof-item">
+          <span class="proof-check">✓</span>
+          <p><strong>No acepta material secreto.</strong> El gate arranca el servidor real y le envía claves privadas,
+            mnemónicos, keystores, tokens de proveedor y URLs con credenciales. Todas deben ser rechazadas con
+            <code>422</code>. Si una pasa, el build cae.</p>
+        </div>
+        <div class="proof-item">
+          <span class="proof-check">✓</span>
+          <p><strong>No puede firmar ni gastar.</strong> La allowlist JSON-RPC se comprueba por su efecto, no por su
+            texto: <code>eth_sendRawTransaction</code>, <code>eth_sign</code>, <code>personal_unlockAccount</code> y
+            compañía deben ser rechazados.</p>
+        </div>
+        <div class="proof-item">
+          <span class="proof-check">✓</span>
+          <p><strong>Cero dependencias, cero orígenes remotos.</strong> Si alguien añade un paquete npm, un CDN en el
+            panel, un proveedor RPC alojado o abre la CSP, el build cae. El árbol de dependencias se verifica además
+            por una segunda vía independiente.</p>
+        </div>
+        <div class="proof-item">
+          <span class="proof-check">✓</span>
+          <p><strong>El paquete de escritorio arranca con contenido.</strong> CI empaqueta la aplicación, ejecuta el
+            <code>.cmd</code> real que usa el usuario y comprueba que sirve inventario. <em>Una aplicación que abre
+              vacía es el fallo que nadie detecta a tiempo.</em></p>
+        </div>
+        <div class="proof-item">
+          <span class="proof-check">✓</span>
+          <p><strong>El runtime empaquetado es el oficial.</strong> El <code>node.exe</code> se descarga de nodejs.org
+            y se verifica por SHA-256 contra <code>SHASUMS256.txt</code> antes de entrar en el paquete. El hash queda
+            registrado dentro, en <code>BUILD-INFO.json</code>.</p>
+        </div>
+        <div class="proof-item">
+          <span class="proof-check">✓</span>
+          <p><strong>La documentación no miente.</strong> Un gate comprueba que ningún documento enlaza a un archivo
+            inexistente, y otro que las reglas del motor, el catálogo de controles, la política y el README describen
+            exactamente el mismo conjunto.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════  HONESTIDAD  ════════════════════════ -->
+  <section id="honestidad" class="section">
+    <div class="container">
+      <h2 class="section-title">⚠️ Lo que NO hace</h2>
+      <p class="section-sub">Un producto de seguridad que solo enumera lo que sabe hacer es un folleto. Estos son los
+        límites reales, escritos por quien lo construyó.</p>
+
+      <div class="honesty">
+        <ul>
+          <li><strong>Un inventario no demuestra que un contrato esté libre de vulnerabilidades.</strong> Esto no es
+            un auditor ni un verificador formal.</li>
+          <li><strong>Un RPC puede mentir o estar comprometido.</strong> Los eventos críticos requieren una segunda
+            fuente independiente. El producto vigila la integridad del observador, pero no puede probar que dice la
+            verdad.</li>
+          <li><strong>No ejecuta la respuesta.</strong> Una pausa o una rotación solo ayudan si la arquitectura
+            on-chain las permite y las claves de respuesta siguen seguras. Eso lo hace una persona, con su runbook.</li>
+          <li><strong>Los umbrales incluidos son ejemplos</strong> y deben adaptarse al riesgo real del sistema.</li>
+          <li><strong>El watchtower solo vigila mientras el panel está abierto.</strong> Para vigilancia continua, el
+            camino soportado es el despliegue self-hosted.</li>
+          <li><strong>Los binarios no están firmados con certificado de código.</strong> SmartScreen puede advertir en
+            la primera ejecución. La verificación disponible hoy es el hash publicado.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════  INSTALAR  ══════════════════════════ -->
+  <section id="instalar" class="section alt">
+    <div class="container">
+      <h2 class="section-title">⬇️ Descargar y empezar</h2>
+      <p class="section-sub">Ninguno de los dos formatos requiere Node.js instalado, ni permisos de administrador, ni
+        conexión a Internet en tiempo de ejecución.</p>
+
+      <div class="install-block">
+        <h3>Instalador para Windows · uso normal</h3>
+        <p>Instala por usuario y crea los accesos directos. <code>…-win-x64-setup.exe</code></p>
+        <p style="margin-top:.7rem">
+          <a href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security/releases/latest"
+            class="btn-primary">Ir a la última versión</a>
+        </p>
+      </div>
+
+      <div class="install-block">
+        <h3>Portable · descomprimir y ejecutar</h3>
+        <p>Para equipos donde no se instala software, auditoría, o uso desde una unidad extraíble.
+          <code>…-win-x64-portable.zip</code></p>
+      </div>
+
+      <div class="install-block">
+        <h3>Verificar la descarga</h3>
+        <p>Cada release incluye <code>SHA256SUMS.txt</code>. Compara el resultado con la línea correspondiente.</p>
+        <pre><code>Get-FileHash .\RootCause-Blockchain-Security-0.1.0-win-x64-setup.exe -Algorithm SHA256</code></pre>
+      </div>
+
+      <div class="install-block">
+        <h3>Desde el código fuente</h3>
+        <p>Node.js 22.12 o superior. No instala nada más.</p>
+        <pre><code>git clone https://github.com/vladimiracunadev-create/rootcause-blockchain-security
+cd rootcause-blockchain-security
+corepack enable
+pnpm start</code></pre>
+        <p style="margin-top:.6rem">Abre <code>http://127.0.0.1:8790</code>. Arranca en modo demostración: datos
+          ficticios y todo en memoria.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════  FAMILIA  ═══════════════════════════ -->
+  <section id="familia" class="section">
+    <div class="container">
+      <h2 class="section-title">🧩 La familia RootCause</h2>
+      <p class="section-sub">Seis ediciones, una misma idea: cualquier distorsión anómala de los recursos, la
+        configuración o el control puede ser el primer indicio de que algo está ocurriendo.</p>
+
+      <p class="family-line">Inspectors — ¿este dispositivo se está comportando raro?</p>
+      <div class="family-grid">
+        <div class="family-card">
+          <h4><a href="https://github.com/vladimiracunadev-create/rootcause-windows-inspector">Windows Inspector</a>
+          </h4>
+          <p>Rust + egui · persistencia, defensas, procesos y red en Windows 10/11.</p>
+        </div>
+        <div class="family-card">
+          <h4><a href="https://github.com/vladimiracunadev-create/rootcause-macos-inspector">macOS Inspector</a></h4>
+          <p>Rust + egui · LaunchAgents, Gatekeeper, SIP, TCC y firewall en macOS 13+.</p>
+        </div>
+        <div class="family-card">
+          <h4><a href="https://github.com/vladimiracunadev-create/rootcause-web-inspector">Web Inspector</a></h4>
+          <p>Extensión MV3 + Node · cookies, sesiones, extensiones, descargas y permisos.</p>
+        </div>
+        <div class="family-card">
+          <h4><a href="https://github.com/vladimiracunadev-create/rootcause-mobile-inspector">Mobile Inspector</a>
+          </h4>
+          <p>Flutter · permisos de app, consumo y superficie móvil.</p>
+        </div>
+      </div>
+
+      <p class="family-line">Digital Assets — ¿este sistema de valor está bien controlado?</p>
+      <div class="family-grid">
+        <div class="family-card">
+          <h4><a href="https://github.com/vladimiracunadev-create/rootcause-bitcoin-defense">Bitcoin Defense</a></h4>
+          <p>UTXO, wallets, firmantes, PSBT y Bitcoin Core. Procedencia de las claves.</p>
+        </div>
+        <div class="family-card current">
+          <h4>Blockchain Security · estás aquí</h4>
+          <p>Contratos, proxies, oráculos, puentes, gobernanza y cadena de suministro.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════  FOOTER  ════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security">Código fuente</a>
+        <a
+          href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security/blob/main/docs/INDEX.md">Documentación</a>
+        <a
+          href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security/blob/main/docs/ADR-0001-plataforma-y-lenguaje.md">Decisión
+          de plataforma</a>
+        <a
+          href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security/blob/main/docs/BLOCKCHAIN-Y-BITCOIN.md">Blockchain
+          y Bitcoin</a>
+        <a
+          href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security/blob/main/SECURITY.md">Seguridad</a>
+        <a
+          href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security/releases">Versiones</a>
+      </div>
+      <p>RootCause Blockchain Security · MIT · Vladimir Acuña</p>
+      <p style="margin-top:.4rem">Watch-only. Nunca pide claves privadas, mnemónicos ni credenciales. No firma ni
+        envía transacciones.</p>
+    </div>
+  </footer>
+
+</body>
+
+</html>

@@ -9,3 +9,7 @@ coverage/
 # Artefactos de empaquetado de Windows: se generan, no se versionan.
 build/
 packaging/windows/rootcause.ico
+
+# La landing reutiliza las capturas de docs/img: el workflow de Pages las copia
+# al ensamblar el sitio, en vez de versionarlas dos veces.
+landing/img/

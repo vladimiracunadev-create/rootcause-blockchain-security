@@ -1,0 +1,223 @@
+/* ═══════════════════════════════════════════════════════════
+   RootCause Blockchain Security — Landing Page
+   Mismo sistema de diseño que las demás ediciones RootCause,
+   con la paleta propia del panel (violeta + teal sobre azul
+   profundo). Dark theme. Monospace accents. Cero dependencias.
+   ═══════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #080c18;
+  --bg-alt:    #0b1020;
+  --bg-card:   #10172a;
+  --bg-card-2: #151e34;
+  --border:    rgba(153, 171, 214, .14);
+  --border-s:  rgba(153, 171, 214, .27);
+  --accent:    #7c5cff;
+  --accent-h:  #9a83ff;
+  --teal:      #2bd8c5;
+  --green:     #41d696;
+  --yellow:    #f1cd63;
+  --orange:    #ff9c5a;
+  --red:       #ff5d7a;
+  --txt:       #f4f6ff;
+  --txt-sec:   #95a1bd;
+  --txt-mut:   #6e7994;
+  --mono:      'Cascadia Code', 'Fira Code', 'Consolas', ui-monospace, monospace;
+  --sans:      -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --radius:    10px;
+  --shadow:    0 18px 50px rgba(0, 0, 0, .5);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent-h); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  font-family: var(--mono);
+  font-size: .85em;
+  background: rgba(124, 92, 255, .12);
+  color: #c3b4ff;
+  padding: .1em .38em;
+  border-radius: 4px;
+}
+
+pre { font-family: var(--mono); font-size: .82em; line-height: 1.55; overflow-x: auto; }
+pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+img { max-width: 100%; height: auto; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ── nav ──────────────────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8, 12, 24, .92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  max-width: 1100px; margin: 0 auto; padding: .75rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+
+.nav-logo {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-weight: 700; font-size: .95rem; letter-spacing: -.01em;
+}
+
+.nav-links { display: flex; align-items: center; gap: 1.15rem; flex-wrap: wrap; }
+.nav-links a { color: var(--txt-sec); font-size: .85rem; }
+.nav-links a:hover { color: var(--txt); text-decoration: none; }
+
+.btn-nav {
+  padding: .38rem .8rem; border: 1px solid var(--border-s); border-radius: 7px;
+  color: var(--txt) !important; font-weight: 600;
+}
+.btn-nav:hover { border-color: var(--accent); background: rgba(124, 92, 255, .12); }
+
+/* ── hero ─────────────────────────────────────────────── */
+.hero {
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  background:
+    radial-gradient(900px 420px at 50% -10%, rgba(124, 92, 255, .18), transparent 70%),
+    radial-gradient(700px 380px at 85% 10%, rgba(43, 216, 197, .10), transparent 70%),
+    var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-inner { max-width: 940px; margin: 0 auto; }
+
+.ascii-block { overflow-x: auto; margin-bottom: 1.6rem; }
+.ascii-block pre {
+  display: inline-block; text-align: left;
+  color: var(--accent); font-size: clamp(5px, 1.15vw, 11px); line-height: 1.05;
+}
+
+.hero-sub { color: var(--txt-sec); font-size: 1.02rem; line-height: 1.8; margin-bottom: 1.6rem; }
+.hero-sub strong { color: var(--txt); }
+
+.badges { display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; margin-bottom: 1.8rem; }
+.badges img { height: 20px; }
+
+.hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; margin-bottom: 1.4rem; }
+
+.btn-primary, .btn-ghost {
+  display: inline-block; padding: .68rem 1.35rem; border-radius: 8px;
+  font-weight: 600; font-size: .92rem;
+}
+.btn-primary { background: var(--accent); color: #fff !important; border: 1px solid var(--accent); }
+.btn-primary:hover { background: var(--accent-h); text-decoration: none; }
+.btn-ghost { border: 1px solid var(--border-s); color: var(--txt) !important; }
+.btn-ghost:hover { border-color: var(--accent); background: rgba(124, 92, 255, .1); text-decoration: none; }
+
+.hero-tagline { color: var(--txt-mut); font-size: .9rem; }
+
+/* ── sections ─────────────────────────────────────────── */
+.section { padding: 3.5rem 0; border-bottom: 1px solid var(--border); }
+.section.alt { background: var(--bg-alt); }
+
+.section-title { font-size: 1.6rem; letter-spacing: -.02em; margin-bottom: .5rem; }
+.section-sub { color: var(--txt-sec); font-size: .95rem; margin-bottom: 2rem; max-width: 760px; }
+
+/* ── shots ────────────────────────────────────────────── */
+.shot {
+  margin: 1.5rem 0 .6rem;
+  border: 1px solid var(--border-s); border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow);
+  background: var(--bg-card);
+}
+.shot img { display: block; width: 100%; }
+.shot-caption { color: var(--txt-mut); font-size: .82rem; margin-bottom: 2rem; }
+
+.shot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; }
+.shot-grid .shot { margin: 0 0 .5rem; }
+
+/* ── cards ────────────────────────────────────────────── */
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.1rem; }
+
+.feature-card {
+  padding: 1.35rem; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-card);
+}
+.feature-card h3 { font-size: 1.02rem; margin-bottom: .5rem; }
+.feature-card p { color: var(--txt-sec); font-size: .89rem; }
+.feature-icon { font-size: 1.5rem; margin-bottom: .55rem; }
+
+/* ── tables ───────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+th, td { padding: .7rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--bg-card-2); color: var(--txt-sec); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+tr:last-child td { border-bottom: none; }
+td code { white-space: nowrap; }
+
+/* ── proof list ───────────────────────────────────────── */
+.proof-list { display: grid; gap: .7rem; }
+.proof-item {
+  display: flex; gap: .85rem; align-items: flex-start;
+  padding: .9rem 1.1rem; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-card);
+}
+.proof-check { color: var(--green); font-weight: 700; flex-shrink: 0; }
+.proof-item p { font-size: .89rem; color: var(--txt-sec); }
+.proof-item strong { color: var(--txt); }
+
+/* ── honesty ──────────────────────────────────────────── */
+.honesty {
+  padding: 1.4rem 1.6rem; border: 1px solid rgba(255, 156, 90, .28); border-radius: var(--radius);
+  background: rgba(255, 156, 90, .06);
+}
+.honesty ul { margin: .7rem 0 0 1.1rem; }
+.honesty li { color: var(--txt-sec); font-size: .89rem; margin-bottom: .45rem; }
+
+/* ── install ──────────────────────────────────────────── */
+.install-block {
+  padding: 1.2rem 1.4rem; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-card); margin-bottom: 1rem;
+}
+.install-block h3 { font-size: 1rem; margin-bottom: .55rem; }
+.install-block pre {
+  padding: .8rem 1rem; border-radius: 7px; background: #05070f;
+  border: 1px solid var(--border); color: var(--teal); margin-top: .6rem;
+}
+
+/* ── family ───────────────────────────────────────────── */
+.family-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+.family-card {
+  padding: 1.1rem; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-card);
+}
+.family-card.current { border-color: var(--accent); background: rgba(124, 92, 255, .09); }
+.family-card h4 { font-size: .95rem; margin-bottom: .3rem; }
+.family-card p { color: var(--txt-sec); font-size: .83rem; }
+.family-line {
+  margin: 1.8rem 0 .9rem; color: var(--teal);
+  font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+}
+
+/* ── footer ───────────────────────────────────────────── */
+.footer { padding: 2.5rem 0; color: var(--txt-mut); font-size: .85rem; text-align: center; }
+.footer a { color: var(--txt-sec); }
+.footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+
+/* ── responsive ───────────────────────────────────────── */
+@media (max-width: 720px) {
+  .nav-links a:not(.btn-nav) { display: none; }
+  .hero { padding: 2.5rem 1rem 2rem; }
+  .section { padding: 2.5rem 0; }
+  .shot-grid { grid-template-columns: 1fr; }
+}

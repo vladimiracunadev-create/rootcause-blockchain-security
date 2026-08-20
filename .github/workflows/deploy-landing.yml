@@ -1,0 +1,104 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Deploy Landing Page — RootCause Blockchain Security
+#
+# Publica la pagina de producto en GitHub Pages, con el mismo esquema que el
+# resto de la familia RootCause.
+#
+# Dos detalles propios de este repositorio:
+#
+#   1. El sitio se ENSAMBLA, no se sube tal cual: las capturas del producto
+#      viven una sola vez en docs/img (donde las usa el README) y se copian
+#      aqui al construir. Versionarlas dos veces seria pedirle a git que
+#      guarde 780 KB de PNG duplicados en cada cambio de captura.
+#
+#   2. Antes de publicar se verifica que la pagina no referencia ninguna
+#      imagen que no exista. Una landing con un hueco gris es peor que no
+#      tener landing: es la primera impresion del producto.
+# ─────────────────────────────────────────────────────────────────────────────
+name: Deploy Landing Page
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "landing/**"
+      - "docs/img/**"
+      - ".github/workflows/deploy-landing.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publicar en GitHub Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Ensamblar el sitio
+        run: |
+          mkdir -p site
+          cp -r landing/. site/
+          mkdir -p site/img
+          cp docs/img/*.png site/img/
+          echo "  archivos publicados:"
+          find site -type f | sort | sed 's/^/    /'
+
+      # Una imagen rota en la pagina de producto es la primera impresion del
+      # proyecto. Se comprueba antes de publicar, no despues.
+      - name: Verificar que no hay imagenes rotas
+        run: |
+          missing=0
+          for ref in $(grep -oE 'src="[^"]+\.(png|svg|jpg)"' site/index.html | sed 's/src="//; s/"//'); do
+            case "$ref" in
+              http*) continue ;;
+            esac
+            if [ ! -f "site/$ref" ]; then
+              echo "  FALTA: $ref"
+              missing=1
+            else
+              echo "  ok: $ref"
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "La landing referencia imagenes que no existen."
+            exit 1
+          fi
+
+      # Toda imagen necesita texto alternativo: una landing que no se puede
+      # leer con lector de pantalla no esta terminada.
+      - name: Verificar texto alternativo en las imagenes
+        run: |
+          total=$(grep -oE '<img[^>]*>' site/index.html | wc -l)
+          conalt=$(grep -oE '<img[^>]*alt="[^"]+"[^>]*>' site/index.html | wc -l)
+          echo "  $conalt de $total imagenes con alt"
+          if [ "$total" -ne "$conalt" ]; then
+            echo "Hay imagenes sin texto alternativo."
+            exit 1
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

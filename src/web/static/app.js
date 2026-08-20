@@ -209,19 +209,34 @@ async function reload() {
   render();
 }
 
-function switchView(name) {
-  const titles = {
-    overview: "Postura de seguridad",
-    incidents: "Incidentes",
-    inventory: "Inventario multi-chain",
-    controls: "Controles de defensa"
-  };
-  document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.dataset.view === name));
-  document.querySelectorAll(".nav-item").forEach((item) => item.classList.toggle("active", item.dataset.viewTarget === name));
-  document.querySelector("#view-title").textContent = titles[name] || titles.overview;
+const VIEW_TITLES = {
+  overview: "Postura de seguridad",
+  incidents: "Incidentes",
+  inventory: "Inventario multi-chain",
+  controls: "Controles de defensa"
+};
+
+// La vista viaja en el hash para que el panel sea marcable: un operador puede
+// dejar abierta la pestaña de incidentes y recargar sin volver al resumen, y
+// una captura de documentacion apunta siempre a la misma pantalla.
+function viewFromHash(hash) {
+  const name = String(hash || "").replace(/^#/, "");
+  return Object.hasOwn(VIEW_TITLES, name) ? name : "overview";
+}
+
+function switchView(name, updateHash = true) {
+  const view = Object.hasOwn(VIEW_TITLES, name) ? name : "overview";
+  document.querySelectorAll(".view").forEach((entry) => entry.classList.toggle("active", entry.dataset.view === view));
+  document.querySelectorAll(".nav-item").forEach((item) => item.classList.toggle("active", item.dataset.viewTarget === view));
+  document.querySelector("#view-title").textContent = VIEW_TITLES[view];
   document.body.classList.remove("menu-open");
+  if (updateHash && viewFromHash(window.location.hash) !== view) {
+    window.location.hash = view === "overview" ? "" : view;
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+window.addEventListener("hashchange", () => switchView(viewFromHash(window.location.hash), false));
 
 function showIncident(id) {
   const incident = model.summary?.incidents.find((entry) => entry.id === id);
@@ -308,6 +323,7 @@ document.querySelector("#acknowledge-button").addEventListener("click", async (e
   document.querySelector("#incident-dialog").close();
 });
 
+switchView(viewFromHash(window.location.hash), false);
 reload().catch((error) => toast(error.message, true));
 
 if ("serviceWorker" in navigator) {

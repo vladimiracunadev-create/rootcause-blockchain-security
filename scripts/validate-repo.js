@@ -22,7 +22,12 @@ const requiredFiles = [
   "packaging/windows/build-portable.ps1",
   "packaging/windows/make-icon.ps1",
   "packaging/windows/RootCause-Blockchain-Security.iss",
-  "packaging/windows/launcher/RootCause-Blockchain-Security.cmd"
+  "packaging/windows/launcher/RootCause-Blockchain-Security.cmd",
+  "docs/INDEX.md",
+  "docs/FAMILIA_ROOTCAUSE.md",
+  "docs/img/panel-resumen.png",
+  "landing/index.html",
+  "landing/assets/style.css"
 ];
 
 const errors = [];
