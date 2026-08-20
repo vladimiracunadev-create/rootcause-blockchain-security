@@ -1,0 +1,26 @@
+{
+  "version": "2026-08-20",
+  "minimumUpgradeDelaySeconds": 86400,
+  "minimumGovernanceTimelockSeconds": 172800,
+  "maximumObserverLagBlocks": 8,
+  "abnormalOutflowUsd": 250000,
+  "minimumOracleProviders": 2,
+  "minimumBridgeIndependentOperators": 3,
+  "minimumBridgeThresholdRatio": 0.6667,
+  "rules": [
+    "BLK-CONTRACT-001",
+    "BLK-ACCESS-001",
+    "BLK-ACCESS-002",
+    "BLK-UPGRADE-001",
+    "BLK-ORACLE-001",
+    "BLK-ORACLE-002",
+    "BLK-BRIDGE-001",
+    "BLK-GOV-001",
+    "BLK-SUPPLY-001",
+    "BLK-EVENT-001",
+    "BLK-FUNDS-001",
+    "BLK-NODE-001",
+    "BLK-NODE-002",
+    "BLK-NODE-003"
+  ]
+}

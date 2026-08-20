@@ -1,0 +1,11 @@
+node_modules/
+data/*.json
+data/*.tmp
+.env
+.DS_Store
+coverage/
+*.log
+
+# Artefactos de empaquetado de Windows: se generan, no se versionan.
+build/
+packaging/windows/rootcause.ico

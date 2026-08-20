@@ -1,0 +1,14 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+
+# Los lanzadores de Windows deben conservar CRLF: cmd.exe interpreta mal los
+# bloques multilinea si el archivo llega con finales de linea Unix.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.iss text eol=crlf
+packaging/windows/*.txt text eol=crlf
+packaging/windows/launcher/*.txt text eol=crlf

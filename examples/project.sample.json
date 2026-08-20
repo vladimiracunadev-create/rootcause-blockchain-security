@@ -1,0 +1,39 @@
+{
+  "name": "Treasury Protocol",
+  "chain": {
+    "family": "evm",
+    "network": "mainnet",
+    "chainId": "1"
+  },
+  "environment": "production",
+  "criticality": "critical",
+  "contracts": [
+    {
+      "name": "TreasuryVault",
+      "address": "0x1111111111111111111111111111111111111111",
+      "kind": "vault",
+      "verifiedSource": true,
+      "upgradeable": true,
+      "upgradeDelaySeconds": 172800,
+      "admin": {
+        "type": "multisig",
+        "owners": 5,
+        "threshold": 3
+      }
+    }
+  ],
+  "oracles": [],
+  "bridges": [],
+  "dependencies": [
+    {
+      "name": "openzeppelin-contracts",
+      "version": "5.1.0",
+      "pinned": true,
+      "provenanceVerified": true
+    }
+  ],
+  "governance": {
+    "model": "multisig",
+    "timelockSeconds": 172800
+  }
+}

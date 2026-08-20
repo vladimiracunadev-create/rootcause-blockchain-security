@@ -1,0 +1,229 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Release — aplicacion de Windows
+#
+# Se dispara con un tag `v*` y publica un GitHub Release con:
+#   - RootCause-Blockchain-Security-<version>-win-x64-portable.zip  (descomprimir y usar)
+#   - RootCause-Blockchain-Security-<version>-win-x64-setup.exe     (instalador por usuario)
+#   - SHA256SUMS.txt                                                (integridad)
+#
+# Reglas de la casa:
+#   - Las puertas de calidad corren ANTES de empaquetar: un tag no puede
+#     publicar un artefacto que no supero los invariantes de seguridad.
+#   - Cada artefacto se ARRANCA antes de subirse. Un binario que compila y pesa
+#     lo esperado puede instalarse vacio; eso solo se descubre ejecutandolo.
+#   - Sin actions de terceros: la release la crea `gh` con el token del propio
+#     workflow.
+#
+# `workflow_dispatch` permite ensayar el empaquetado completo sin crear un tag:
+# construye y verifica, pero no publica nada.
+# ─────────────────────────────────────────────────────────────────────────────
+name: Release Windows
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Empaquetar, verificar y publicar
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Node LTS
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      # ── Puertas de calidad ────────────────────────────────────────────────
+      - name: Validacion del repositorio
+        run: node scripts/validate-repo.js
+
+      - name: Tests
+        run: node --test
+
+      - name: Claim solo-local
+        run: node scripts/check-local-only.js
+
+      - name: Invariantes de seguridad
+        run: node scripts/check-security-claims.js
+
+      - name: Reglas y catalogo coherentes
+        run: node scripts/check-rule-coverage.js
+
+      - name: Documentacion coherente
+        run: node scripts/check-docs.js
+
+      # ── La version del tag debe coincidir con package.json ────────────────
+      - name: Comprobar coherencia de version
+        id: version
+        shell: powershell
+        run: |
+          $manifestVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          "version=$manifestVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "package.json: $manifestVersion"
+          if ($env:GITHUB_REF_TYPE -eq "tag") {
+            $tagVersion = $env:GITHUB_REF_NAME.TrimStart("v")
+            Write-Host "tag: $tagVersion"
+            if ($tagVersion -ne $manifestVersion) {
+              throw "El tag $env:GITHUB_REF_NAME no coincide con la version $manifestVersion de package.json."
+            }
+          }
+
+      # ── Empaquetado ───────────────────────────────────────────────────────
+      - name: Generar el icono desde codigo
+        shell: powershell
+        run: .\packaging\windows\make-icon.ps1
+
+      - name: Empaquetar edicion portable
+        shell: powershell
+        run: .\packaging\windows\build-portable.ps1
+
+      - name: Instalar Inno Setup
+        shell: powershell
+        run: choco install innosetup --yes --no-progress
+
+      - name: Compilar instalador
+        shell: powershell
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $iscc = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            $iscc = Join-Path $env:ProgramFiles "Inno Setup 6\ISCC.exe"
+          }
+          if (-not (Test-Path $iscc)) { throw "No se encontro ISCC.exe tras instalar Inno Setup." }
+          & $iscc "/DAppVersion=$version" "packaging\windows\RootCause-Blockchain-Security.iss"
+          if ($LASTEXITCODE -ne 0) { throw "La compilacion del instalador fallo." }
+
+      # ── Verificacion de los artefactos ────────────────────────────────────
+      - name: Instalar en silencio y arrancar la aplicacion instalada
+        shell: powershell
+        env:
+          ROOTCAUSE_OPEN_BROWSER: "0"
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $setup = "build\installer\RootCause-Blockchain-Security-$version-win-x64-setup.exe"
+          if (-not (Test-Path $setup)) { throw "No se genero el instalador: $setup" }
+
+          $target = Join-Path $env:LOCALAPPDATA "RootCauseVerify"
+          Start-Process -FilePath $setup -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/DIR=$target" -Wait
+          $launcher = Join-Path $target "RootCause Blockchain Security.cmd"
+          if (-not (Test-Path $launcher)) { throw "La instalacion silenciosa no dejo el lanzador en $target" }
+
+          # El fallo clasico: el instalador corre, el acceso directo aparece y
+          # la aplicacion abre sin contenido porque los datos no se empaquetaron.
+          $env:PORT = "8801"
+          $process = Start-Process -FilePath $launcher -PassThru -WindowStyle Hidden
+          try {
+            $summary = $null
+            foreach ($attempt in 1..30) {
+              try {
+                $summary = Invoke-RestMethod -Uri "http://127.0.0.1:8801/api/summary" -TimeoutSec 3
+                if ($summary) { break }
+              } catch { Start-Sleep -Seconds 1 }
+            }
+            if (-not $summary) { throw "La aplicacion instalada no respondio en 30 segundos." }
+            if ($summary.totals.projects -lt 1) { throw "La aplicacion instalada arranco sin inventario." }
+            Write-Host "  instalada y funcionando: $($summary.totals.projects) proyectos, riesgo $($summary.risk.score)"
+          }
+          finally {
+            Get-Process node -ErrorAction SilentlyContinue |
+              Where-Object { $_.Path -like "*RootCauseVerify*" } |
+              Stop-Process -Force -ErrorAction SilentlyContinue
+            if ($process -and -not $process.HasExited) {
+              Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            }
+          }
+
+      - name: Generar SHA256SUMS.txt
+        shell: powershell
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $artifacts = @(
+            "build\RootCause-Blockchain-Security-$version-win-x64-portable.zip",
+            "build\installer\RootCause-Blockchain-Security-$version-win-x64-setup.exe"
+          )
+          $lines = foreach ($artifact in $artifacts) {
+            if (-not (Test-Path $artifact)) { throw "Artefacto faltante: $artifact" }
+            $hash = (Get-FileHash -Path $artifact -Algorithm SHA256).Hash.ToLowerInvariant()
+            $size = [math]::Round((Get-Item $artifact).Length / 1MB, 2)
+            Write-Host "  $([System.IO.Path]::GetFileName($artifact))  $size MB  $hash"
+            "$hash  $([System.IO.Path]::GetFileName($artifact))"
+          }
+          $lines | Set-Content -Path "build\SHA256SUMS.txt" -Encoding ascii
+
+      - name: Publicar artefactos del workflow
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rootcause-blockchain-security-windows-${{ github.run_number }}
+          path: |
+            build/*.zip
+            build/installer/*.exe
+            build/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      # ── Publicacion ───────────────────────────────────────────────────────
+      - name: Crear el GitHub Release
+        if: github.ref_type == 'tag'
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $tag = $env:GITHUB_REF_NAME
+          $portable = "RootCause-Blockchain-Security-$version-win-x64-portable.zip"
+          $setup = "RootCause-Blockchain-Security-$version-win-x64-setup.exe"
+          $backtick = [char]0x60
+          $fence = "$backtick$backtick$backtick"
+
+          # Las notas se componen como lista de lineas: un here-string de
+          # PowerShell no sobrevive dentro de un bloque YAML indentado.
+          $notes = @(
+            "## RootCause Blockchain Security $tag",
+            "",
+            "Aplicacion local watch-only para inventariar aplicaciones blockchain, detectar",
+            "fallas de control y producir incidentes con causa raiz, evidencia y runbook.",
+            "",
+            "### Descargas",
+            "",
+            "| Artefacto | Para quien |",
+            "| --- | --- |",
+            "| $backtick$setup$backtick | Instalacion normal en Windows, sin permisos de administrador |",
+            "| $backtick$portable$backtick | Uso portable: descomprimir y ejecutar, sin instalar nada |",
+            "",
+            "Ambos incluyen el motor Node.js oficial, verificado por SHA-256 al empaquetar.",
+            "No hay dependencias de terceros y la aplicacion no sale a Internet.",
+            "",
+            "### Verificar la descarga",
+            "",
+            ($fence + "powershell"),
+            "Get-FileHash .\$setup -Algorithm SHA256",
+            $fence,
+            "",
+            "Compara el resultado con SHA256SUMS.txt.",
+            "",
+            "### Recordatorio",
+            "",
+            "La aplicacion nunca pide claves privadas, mnemonicos ni credenciales de proveedor,",
+            "y no firma ni envia transacciones. El observador JSON-RPC es de solo lectura y",
+            "apunta a localhost salvo que se habilite explicitamente un destino remoto.",
+            "Lee SECURITY.md antes de usarla con datos reales."
+          )
+          $notesPath = Join-Path $env:RUNNER_TEMP "notes.md"
+          $notes | Set-Content -Path $notesPath -Encoding utf8
+
+          gh release create $tag "build\$portable" "build\installer\$setup" "build\SHA256SUMS.txt" --title "RootCause Blockchain Security $tag" --notes-file $notesPath --verify-tag
+          if ($LASTEXITCODE -ne 0) { throw "No se pudo crear el release." }

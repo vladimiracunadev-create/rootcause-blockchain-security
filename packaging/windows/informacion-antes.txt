@@ -1,0 +1,42 @@
+RootCause Blockchain Security - antes de instalar
+=================================================
+
+Que hace esta aplicacion
+------------------------
+Inventaria las aplicaciones blockchain que operas -contratos, proxies y
+upgrades, oraculos, puentes, gobernanza y dependencias-, evalua sus controles
+contra politicas versionadas y levanta incidentes con causa raiz, evidencia y
+runbook de remediacion.
+
+Que NO hace, por diseno
+-----------------------
+- No pide ni almacena claves privadas, mnemonicos, keystores, credenciales de
+  proveedor RPC, firmas pendientes ni transacciones sin publicar. Si se las
+  envias, las rechaza.
+- No firma transacciones, no las construye y no las transmite.
+- No sale a Internet: el panel se sirve en 127.0.0.1 y no consulta servicios de
+  terceros. La conexion opcional a un nodo EVM es local y de SOLO LECTURA,
+  restringida por una allowlist de metodos.
+
+Que se instala
+--------------
+Una carpeta con el codigo de la aplicacion y el motor Node.js oficial,
+verificado por SHA-256 al empaquetar. No se instalan dependencias de terceros,
+no se registran servicios y no se modifica el arranque de Windows.
+
+Donde quedan tus datos
+----------------------
+En %LOCALAPPDATA%\RootCause\blockchain-security, cifrados con AES-256-GCM
+cuando activas el modo persistente. La clave la generas tu y no se guarda junto
+a los datos. Si la pierdes, no hay recuperacion posible.
+
+Limites honestos
+----------------
+Un inventario no demuestra que un contrato este libre de vulnerabilidades. Un
+RPC puede mentir o estar comprometido, y los eventos criticos requieren una
+segunda fuente independiente. Esta aplicacion no sustituye una auditoria, una
+verificacion formal, un monitoreo economico ni un proceso profesional de
+respuesta a incidentes.
+
+Codigo fuente, modelo de amenazas y politica de seguridad:
+https://github.com/vladimiracunadev-create/rootcause-blockchain-security

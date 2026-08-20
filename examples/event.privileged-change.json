@@ -1,0 +1,9 @@
+{
+  "type": "privileged_role_change",
+  "projectId": "replace-with-project-id",
+  "contractAddress": "0x1111111111111111111111111111111111111111",
+  "actor": "0x9999999999999999999999999999999999999999",
+  "approvalHash": "",
+  "blockNumber": 21000000,
+  "source": "evm-log"
+}

@@ -1,0 +1,31 @@
+# La aplicacion no tiene dependencias npm a proposito, asi que aqui solo se
+# vigila lo unico que si es codigo de terceros ejecutandose en este proyecto:
+# las GitHub Actions. Estan pinneadas a commit SHA y Dependabot es quien
+# propone subirlas, con su nota de version al lado.
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: America/Santiago
+    # Agrupado a proposito: `codeql-action/init` y `codeql-action/analyze` son
+    # el MISMO action y tienen que subir juntos. Si Dependabot los propone por
+    # separado, el PR que solo mueve uno deja el workflow con dos versiones
+    # incompatibles y CodeQL falla sin que nadie haya roto nada.
+    groups:
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
+      actions-oficiales:
+        patterns:
+          - "actions/*"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencias
+      - github-actions

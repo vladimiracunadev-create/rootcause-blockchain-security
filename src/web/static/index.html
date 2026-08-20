@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1020" />
+    <meta name="description" content="RootCause Blockchain Security — observabilidad causal multi-chain sin custodia." />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>RootCause Blockchain Security</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegación principal">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span><strong>RootCause</strong><small>Blockchain Security</small></span>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item active" data-view-target="overview">
+            <span class="nav-icon">⌁</span><span>Postura</span>
+          </button>
+          <button class="nav-item" data-view-target="incidents">
+            <span class="nav-icon">!</span><span>Incidentes</span><b id="nav-incident-count">0</b>
+          </button>
+          <button class="nav-item" data-view-target="inventory">
+            <span class="nav-icon">◇</span><span>Inventario</span>
+          </button>
+          <button class="nav-item" data-view-target="controls">
+            <span class="nav-icon">✓</span><span>Controles</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="mode-card">
+            <span class="pulse-dot"></span>
+            <div><small>Modo de ejecución</small><strong id="mode-label">Cargando</strong></div>
+          </div>
+          <p>Watch-only · Sin claves · Sin firma</p>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <button class="menu-button" id="menu-button" aria-label="Abrir navegación">☰</button>
+          <div>
+            <p class="eyebrow">RootCause Digital Assets</p>
+            <h1 id="view-title">Postura de seguridad</h1>
+          </div>
+          <div class="top-actions">
+            <button class="button ghost" id="refresh-node-button">Actualizar RPC</button>
+            <button class="button primary" id="scan-button"><span>↻</span> Ejecutar análisis</button>
+          </div>
+        </header>
+
+        <div class="content">
+          <section class="view active" data-view="overview">
+            <div class="status-strip">
+              <div class="risk-visual" id="risk-visual">
+                <div><strong id="risk-score">—</strong><small>/ 100</small></div>
+              </div>
+              <div class="risk-copy">
+                <p class="eyebrow">Riesgo causal consolidado</p>
+                <h2 id="risk-heading">Calculando postura…</h2>
+                <p id="risk-description">Correlacionando configuración, eventos y observadores.</p>
+              </div>
+              <div class="severity-pills" aria-label="Hallazgos por severidad">
+                <span><i class="critical"></i><b id="count-critical">0</b> críticos</span>
+                <span><i class="high"></i><b id="count-high">0</b> altos</span>
+                <span><i class="medium"></i><b id="count-medium">0</b> medios</span>
+              </div>
+            </div>
+
+            <div class="metric-grid">
+              <article class="metric-card"><span>Proyectos vigilados</span><strong id="metric-projects">—</strong><small>Activos multi-chain</small></article>
+              <article class="metric-card"><span>Contratos</span><strong id="metric-contracts">—</strong><small>Direcciones públicas</small></article>
+              <article class="metric-card"><span>Oráculos + puentes</span><strong id="metric-dependencies">—</strong><small>Dependencias críticas</small></article>
+              <article class="metric-card"><span>Incidentes activos</span><strong id="metric-incidents">—</strong><small id="incident-delta">Requieren revisión</small></article>
+            </div>
+
+            <div class="overview-grid">
+              <article class="panel causal-panel">
+                <div class="panel-heading">
+                  <div><p class="eyebrow">Ruta causal prioritaria</p><h3>De la condición al impacto</h3></div>
+                  <span class="live-chip">Evidencia enlazada</span>
+                </div>
+                <div class="causal-flow" id="causal-flow">
+                  <div class="skeleton tall"></div>
+                </div>
+              </article>
+
+              <article class="panel node-panel">
+                <div class="panel-heading">
+                  <div><p class="eyebrow">Observador primario</p><h3>Salud de cadena</h3></div>
+                  <span class="status-chip" id="node-status">Consultando</span>
+                </div>
+                <dl class="node-facts" id="node-facts">
+                  <div><dt>Chain ID</dt><dd>—</dd></div>
+                  <div><dt>Bloque</dt><dd>—</dd></div>
+                  <div><dt>Cliente</dt><dd>—</dd></div>
+                  <div><dt>Último check</dt><dd>—</dd></div>
+                </dl>
+                <div class="trust-boundary"><span>◉</span><p><strong>Frontera segura</strong>RPC de lectura, localhost por defecto y sin métodos de firma.</p></div>
+              </article>
+            </div>
+
+            <article class="panel">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Atención inmediata</p><h3>Incidentes principales</h3></div>
+                <button class="text-button" data-view-target="incidents">Ver todos →</button>
+              </div>
+              <div class="incident-list compact" id="priority-incidents"></div>
+            </article>
+          </section>
+
+          <section class="view" data-view="incidents">
+            <div class="section-intro"><div><p class="eyebrow">Detección determinista</p><h2>Incidentes y evidencia</h2></div><p>Selecciona un incidente para ver causa raíz, evidencia y remediación.</p></div>
+            <div class="filter-row" role="group" aria-label="Filtrar incidentes">
+              <button class="filter active" data-filter="active">Activos</button>
+              <button class="filter" data-filter="critical">Críticos</button>
+              <button class="filter" data-filter="all">Todos</button>
+            </div>
+            <div class="incident-list" id="all-incidents"></div>
+          </section>
+
+          <section class="view" data-view="inventory">
+            <div class="section-intro"><div><p class="eyebrow">Superficie pública</p><h2>Inventario multi-chain</h2></div><p>Sin secretos, firmas ni credenciales. Solo procedencia y controles verificables.</p></div>
+            <div class="project-grid" id="project-grid"></div>
+          </section>
+
+          <section class="view" data-view="controls">
+            <div class="section-intro"><div><p class="eyebrow">Defensa estructural</p><h2>Catálogo de controles</h2></div><p>Objetivos preventivos compartidos por adaptadores y cadenas.</p></div>
+            <div class="control-grid" id="control-grid"></div>
+            <article class="panel separation-card">
+              <div><span class="product-icon bitcoin">₿</span><h3>Bitcoin Defense</h3><p>UTXO, wallets, firmantes, PSBT, multisig y Bitcoin Core.</p></div>
+              <span class="separation-line"><i></i>núcleo RootCause compartido<i></i></span>
+              <div><span class="product-icon chain">⌬</span><h3>Blockchain Security</h3><p>Contratos, puentes, oráculos, gobernanza y supply chain.</p></div>
+            </article>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <dialog id="incident-dialog">
+      <form method="dialog" class="dialog-shell">
+        <div class="dialog-heading"><div><p class="eyebrow" id="dialog-code">INCIDENTE</p><h2 id="dialog-title">Detalle</h2></div><button class="close-button" value="cancel" aria-label="Cerrar">×</button></div>
+        <div id="dialog-content"></div>
+        <div class="dialog-actions"><button class="button ghost" value="cancel">Cerrar</button><button class="button primary" type="button" id="acknowledge-button">Reconocer incidente</button></div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

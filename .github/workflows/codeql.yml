@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CodeQL — analisis estatico de seguridad
+#
+# El repositorio no tiene dependencias, asi que el unico codigo que puede
+# fallar es el propio. CodeQL busca ahi: inyeccion, path traversal, uso
+# incorrecto de criptografia y patrones de red peligrosos.
+#
+# Corre en cada push a main, en cada PR y semanalmente, porque las consultas de
+# CodeQL mejoran aunque el codigo no cambie.
+# ─────────────────────────────────────────────────────────────────────────────
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Lunes a las 06:41 UTC. Un minuto poco redondo reparte mejor la carga, y
+    # no coincide con el del repositorio hermano.
+    - cron: "41 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analizar JavaScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+
+      - name: Analizar
+        uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+        with:
+          category: "/language:javascript-typescript"

@@ -1,0 +1,59 @@
+{
+  "version": "2026-08-20",
+  "controls": [
+    {
+      "id": "SC-PROVENANCE",
+      "title": "Procedencia de bytecode y compilación",
+      "objective": "Relacionar el código desplegado con fuente, compilador y artefactos revisados.",
+      "rules": ["BLK-CONTRACT-001"]
+    },
+    {
+      "id": "ADMIN-CONTAINMENT",
+      "title": "Contención de privilegios",
+      "objective": "Evitar que una sola clave pueda actualizar, pausar o retirar valor.",
+      "rules": ["BLK-ACCESS-001", "BLK-ACCESS-002", "BLK-UPGRADE-001"]
+    },
+    {
+      "id": "ORACLE-RESILIENCE",
+      "title": "Resiliencia de oráculos",
+      "objective": "Detectar concentración, datos vencidos y ausencia de fallback.",
+      "rules": ["BLK-ORACLE-001", "BLK-ORACLE-002"]
+    },
+    {
+      "id": "BRIDGE-QUORUM",
+      "title": "Seguridad de puentes",
+      "objective": "Verificar umbral, independencia operacional y mecanismos de pausa.",
+      "rules": ["BLK-BRIDGE-001"]
+    },
+    {
+      "id": "GOVERNANCE-DELAY",
+      "title": "Retardo de gobernanza",
+      "objective": "Dar tiempo suficiente para detectar y responder a cambios privilegiados.",
+      "rules": ["BLK-GOV-001"]
+    },
+    {
+      "id": "SUPPLY-CHAIN",
+      "title": "Cadena de suministro",
+      "objective": "Fijar dependencias y conservar evidencia de procedencia.",
+      "rules": ["BLK-SUPPLY-001"]
+    },
+    {
+      "id": "CHANGE-APPROVAL",
+      "title": "Aprobación de cambios privilegiados",
+      "objective": "Exigir que todo cambio de rol o permiso tenga una aprobación registrada antes de ejecutarse.",
+      "rules": ["BLK-EVENT-001"]
+    },
+    {
+      "id": "VALUE-EGRESS",
+      "title": "Salida de valor",
+      "objective": "Detectar movimientos de valor fuera de política y sin aprobación previa.",
+      "rules": ["BLK-FUNDS-001"]
+    },
+    {
+      "id": "OBSERVER-INTEGRITY",
+      "title": "Integridad del observador",
+      "objective": "Garantizar que la fuente de hechos on-chain está disponible, en la red correcta y al día.",
+      "rules": ["BLK-NODE-001", "BLK-NODE-002", "BLK-NODE-003"]
+    }
+  ]
+}

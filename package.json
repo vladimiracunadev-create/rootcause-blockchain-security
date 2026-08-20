@@ -1,0 +1,38 @@
+{
+  "name": "rootcause-blockchain-security",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Watch-only multi-chain application security, causal analysis and incident response desktop app for RootCause.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "lint": "node scripts/validate-repo.js",
+    "check": "node scripts/validate-repo.js && node --test && node scripts/check-local-only.js && node scripts/check-security-claims.js && node scripts/check-rule-coverage.js && node scripts/check-docs.js",
+    "check:local-only": "node scripts/check-local-only.js",
+    "check:security": "node scripts/check-security-claims.js",
+    "check:rules": "node scripts/check-rule-coverage.js",
+    "check:docs": "node scripts/check-docs.js",
+    "generate:data-key": "node scripts/generate-key.js",
+    "seed:demo": "node scripts/seed-demo.js",
+    "package:windows": "powershell -ExecutionPolicy Bypass -File packaging/windows/make-icon.ps1 && powershell -ExecutionPolicy Bypass -File packaging/windows/build-portable.ps1"
+  },
+  "keywords": [
+    "blockchain",
+    "smart-contract-security",
+    "root-cause-analysis",
+    "watch-only",
+    "incident-response",
+    "web3-security",
+    "desktop-app",
+    "windows",
+    "local-first",
+    "zero-dependencies"
+  ],
+  "license": "MIT"
+}

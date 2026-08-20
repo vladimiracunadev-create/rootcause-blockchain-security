@@ -1,0 +1,65 @@
+RootCause Blockchain Security - edicion portable para Windows
+=============================================================
+
+Que es
+------
+Un panel local watch-only para inventariar aplicaciones blockchain (contratos,
+proxies, oraculos, puentes, gobernanza y dependencias), detectar fallas de
+control y producir incidentes con causa raiz, evidencia y runbook.
+
+No custodia claves, no firma transacciones y no las transmite. Si le envias
+material secreto -clave privada, mnemonico, keystore, token de proveedor-, lo
+rechaza con un error explicito.
+
+Como se usa
+-----------
+1. Ejecuta "RootCause Blockchain Security.cmd".
+2. Se abre http://127.0.0.1:8790 en tu navegador por defecto.
+3. Cierra la ventana de consola para detener la aplicacion.
+
+La primera vez arranca en modo demostracion con datos ficticios y todo en
+memoria: nada se escribe en disco.
+
+Datos reales
+------------
+1. Ejecuta "Generar clave de datos.cmd".
+2. Crea %LOCALAPPDATA%\RootCause\blockchain-security\config.cmd con:
+       set "DEMO_MODE=false"
+       set "ROOTCAUSE_DATA_KEY=valor-generado"
+3. Vuelve a ejecutar el lanzador. El estado se cifra con AES-256-GCM en
+   %LOCALAPPDATA%\RootCause\blockchain-security\data.
+
+Observador EVM (opcional, solo lectura)
+---------------------------------------
+Anade a config.cmd:
+       set "EVM_RPC_URL=http://127.0.0.1:8545"
+       set "EVM_EXPECTED_CHAIN_ID=1"
+       set "WATCHTOWER_ENABLED=true"
+
+La aplicacion solo puede invocar metodos JSON-RPC de lectura. Cualquier metodo
+de firma, envio o desbloqueo se rechaza antes de salir a la red. Un endpoint
+remoto exige ademas EVM_ALLOW_REMOTE_RPC=true y sale de la postura por defecto:
+tu inventario pasaria a ser visible para ese proveedor.
+
+Otras cadenas
+-------------
+Solana, Cosmos, Substrate y cualquier otra red pueden enviar hechos ya
+normalizados a POST /api/observe/event. El motor de reglas no depende de ningun
+SDK de cadena.
+
+Que incluye esta carpeta
+------------------------
+  runtime\node.exe   Motor Node.js oficial, verificado por SHA-256 al empaquetar
+  src\               Codigo de la aplicacion
+  config\            Politicas y catalogo de controles versionados
+  scripts\           Utilidades (clave de datos, validacion, invariantes)
+  docs\              Arquitectura, modelo de amenazas, runbooks, decisiones
+  examples\          Proyectos y eventos publicos ficticios
+
+Desinstalar
+-----------
+Borra esta carpeta. Los datos del usuario viven aparte, en
+%LOCALAPPDATA%\RootCause\blockchain-security.
+
+Codigo fuente y avisos de seguridad:
+https://github.com/vladimiracunadev-create/rootcause-blockchain-security

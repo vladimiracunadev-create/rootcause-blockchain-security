@@ -1,0 +1,244 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CI — RootCause Blockchain Security
+#
+# Seis puertas, y ninguna es decorativa:
+#
+#   1. calidad        → validacion del repositorio y tests en tres sistemas
+#                       operativos y dos versiones de Node.
+#   2. solo-local     → el claim de distribucion: cero dependencias, cero
+#                       origenes remotos, cero proveedores RPC alojados,
+#                       CSP self-only.
+#   3. invariantes    → el claim del producto: arranca la aplicacion REAL y
+#                       comprueba que rechaza claves, mutaciones sin cabecera
+#                       y RPC remoto; y que la allowlist JSON-RPC sigue siendo
+#                       de solo lectura.
+#   4. reglas         → el catalogo de controles y las reglas del motor no
+#                       pueden divergir en silencio: cada codigo BLK-* que el
+#                       motor emite tiene que existir en el catalogo y en el
+#                       README.
+#   5. app-windows    → empaqueta la edicion de escritorio y la ARRANCA para
+#                       comprobar que sirve el panel con inventario dentro. Un
+#                       ZIP del tamano esperado no prueba que la aplicacion
+#                       funcione.
+#   6. documentacion  → los enlaces internos de los documentos existen.
+#
+# Robustez: actions oficiales pinneadas a commit SHA, permisos minimos,
+# concurrency con cancelacion y timeouts explicitos. No se ejecuta `npm ci`
+# ni `pnpm install`: este repositorio no tiene dependencias a proposito, asi
+# que CI nunca toca la red de un registro de paquetes.
+# ─────────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calidad:
+    name: Validacion y tests (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22 cubre el minimo que declara package.json (>=22.12); 24 es la rama
+        # actual. Windows va primero porque es el destino principal.
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        node: ["22", "24"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Node ${{ matrix.node }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Validacion del repositorio
+        run: node scripts/validate-repo.js
+
+      - name: Tests
+        run: node --test
+
+  solo-local:
+    name: Solo local — cero dependencias, cero origenes remotos
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Node LTS
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      # Si alguien introduce una dependencia npm, un SDK de cadena, un CDN en
+      # el dashboard o abre la CSP, este paso tumba el build.
+      - name: Verificar el claim "solo local"
+        run: node scripts/check-local-only.js
+
+      # Segunda red de seguridad, independiente del script anterior.
+      - name: Verificar que no hay arbol de dependencias
+        run: |
+          test ! -f package-lock.json || (echo "package-lock.json no deberia existir" && exit 1)
+          test ! -d node_modules || (echo "node_modules no deberia existir" && exit 1)
+          npm ls --all --json | node -e "
+            let raw = '';
+            process.stdin.on('data', (chunk) => { raw += chunk; });
+            process.stdin.on('end', () => {
+              const deps = JSON.parse(raw).dependencies ?? {};
+              if (Object.keys(deps).length > 0) {
+                console.error('Dependencias instaladas:', Object.keys(deps).join(', '));
+                process.exit(1);
+              }
+              process.stderr.write('  arbol de dependencias vacio\n');
+            });
+          "
+
+  invariantes:
+    name: Invariantes de seguridad (aplicacion en marcha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Node LTS
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      # Arranca el servidor real y lo golpea con peticiones hostiles: claves
+      # privadas, mnemonicos, keystores, tokens de proveedor, mutaciones sin
+      # cabecera local y peticiones cross-site. Todas deben ser rechazadas.
+      - name: Claves, RPC y cabeceras
+        run: node scripts/check-security-claims.js
+
+      # La allowlist JSON-RPC no puede crecer hacia metodos que firman o
+      # gastan. Este grep es deliberadamente tonto y por eso no se le escapa
+      # nada.
+      - name: Ningun metodo RPC de firma o envio en el codigo
+        run: |
+          if grep -rnE '"(eth_sendTransaction|eth_sendRawTransaction|eth_sign|eth_signTypedData[a-zA-Z0-9_]*|eth_signTransaction|eth_accounts|personal_[a-zA-Z]+|miner_[a-zA-Z]+|admin_[a-zA-Z]+)"' src/; then
+            echo "Se encontro un metodo JSON-RPC capaz de firmar o mover fondos en src/"
+            exit 1
+          fi
+          echo "  ningun metodo de firma o envio presente"
+
+  reglas:
+    name: Reglas y catalogo de controles coherentes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Node LTS
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      # Una regla que emite un codigo ausente del catalogo produce un incidente
+      # sin control asociado: el operador ve el sintoma y no encuentra que
+      # arreglar. Y un README que no lista la regla la vuelve invisible.
+      - name: Cada codigo BLK-* existe en el catalogo y en el README
+        run: node scripts/check-rule-coverage.js
+
+  app-windows:
+    name: Aplicacion de Windows (empaquetar y arrancar)
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Generar el icono desde codigo
+        shell: powershell
+        run: .\packaging\windows\make-icon.ps1
+
+      # El empaquetador descarga el node.exe oficial, verifica su SHA-256 y
+      # arranca la aplicacion con ESE runtime antes de comprimir nada.
+      - name: Empaquetar edicion portable
+        shell: powershell
+        run: .\packaging\windows\build-portable.ps1
+
+      # Prueba de humo del lanzador de escritorio real: el .cmd que ejecuta el
+      # usuario, no una invocacion artificial de node.
+      - name: Arrancar el lanzador y pedir el panel
+        shell: powershell
+        env:
+          PORT: "8799"
+          ROOTCAUSE_OPEN_BROWSER: "0"
+        run: |
+          $app = "build\portable\RootCause-Blockchain-Security"
+          $launcher = Join-Path $app "RootCause Blockchain Security.cmd"
+          $process = Start-Process -FilePath $launcher -PassThru -WindowStyle Hidden
+          try {
+            $ready = $false
+            foreach ($attempt in 1..30) {
+              try {
+                $health = Invoke-RestMethod -Uri "http://127.0.0.1:8799/api/health" -TimeoutSec 3
+                if ($health.service -eq "rootcause-blockchain-security") { $ready = $true; break }
+              } catch { Start-Sleep -Seconds 1 }
+            }
+            if (-not $ready) { throw "El lanzador no sirvio /api/health en 30 segundos." }
+            Write-Host "  health OK"
+
+            $panel = Invoke-WebRequest -Uri "http://127.0.0.1:8799/" -UseBasicParsing -TimeoutSec 5
+            if ($panel.Content -notmatch "RootCause Blockchain Security") {
+              throw "El panel no contiene el titulo de la aplicacion."
+            }
+            Write-Host "  panel OK ($($panel.RawContentLength) bytes)"
+
+            # El estado de demostracion tiene que llegar al usuario: una app que
+            # arranca vacia es exactamente el fallo que nadie detecta a tiempo.
+            $summary = Invoke-RestMethod -Uri "http://127.0.0.1:8799/api/summary" -TimeoutSec 5
+            if ($summary.totals.projects -lt 1) {
+              throw "El paquete arranco sin inventario: el contenido no viajo dentro."
+            }
+            Write-Host "  inventario OK ($($summary.totals.projects) proyectos, riesgo $($summary.risk.score))"
+          }
+          finally {
+            Get-Process node -ErrorAction SilentlyContinue |
+              Where-Object { $_.Path -like "*RootCause-Blockchain-Security*" } |
+              Stop-Process -Force -ErrorAction SilentlyContinue
+            if ($process -and -not $process.HasExited) {
+              Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            }
+          }
+
+      - name: Publicar el portable como artefacto de CI
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rootcause-blockchain-security-portable-ci
+          path: build/*.zip
+          retention-days: 7
+          if-no-files-found: error
+
+  documentacion:
+    name: Documentacion coherente
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Node LTS
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      # Un README que apunta a un documento inexistente es una promesa rota.
+      - name: Los documentos referenciados existen
+        run: node scripts/check-docs.js
