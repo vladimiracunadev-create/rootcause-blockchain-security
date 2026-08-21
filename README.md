@@ -278,6 +278,9 @@ test/                    Pruebas unitarias e integración
 | Documento | Contenido |
 | --- | --- |
 | [`docs/INDEX.md`](docs/INDEX.md) | **Índice completo**, con la puerta de CI que verifica cada afirmación |
+| [`docs/MANUAL_USUARIO.md`](docs/MANUAL_USUARIO.md) | Qué es cada cosa del panel, en claro |
+| [`docs/HEURISTICAS.md`](docs/HEURISTICAS.md) | Especificación exacta de las 14 reglas |
+| [`docs/DETECCION_AMENAZAS.md`](docs/DETECCION_AMENAZAS.md) | Mapa honesto: qué detecta hoy y qué no |
 | [`docs/ADR-0001-plataforma-y-lenguaje.md`](docs/ADR-0001-plataforma-y-lenguaje.md) | Por qué escritorio y no SaaS; por qué Node hoy, Rust después y no Go |
 | [`docs/BLOCKCHAIN-Y-BITCOIN.md`](docs/BLOCKCHAIN-Y-BITCOIN.md) | Qué es cada cosa y por qué son dos productos |
 | [`docs/WINDOWS-APP.md`](docs/WINDOWS-APP.md) | Construir, configurar, verificar y publicar la aplicación |
@@ -286,6 +289,10 @@ test/                    Pruebas unitarias e integración
 | [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) | Amenazas consideradas y fuera de alcance |
 | [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | Respuesta operativa a incidentes |
 | [`docs/SECURITY-CHECKLIST.md`](docs/SECURITY-CHECKLIST.md) | Antes de usar datos reales |
+| [`docs/COMMANDS.md`](docs/COMMANDS.md) | Referencia de comandos, variables de entorno y API |
+| [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | Problemas comunes y su causa real |
+| [`docs/CI_GITHUB.md`](docs/CI_GITHUB.md) | Los cuatro workflows y qué protege cada uno |
+| [`docs/POLITICA_DE_PRIVACIDAD_LOCAL.md`](docs/POLITICA_DE_PRIVACIDAD_LOCAL.md) | Qué datos toca y cómo comprobarlo |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Qué falta y en qué orden |
 
 ---
