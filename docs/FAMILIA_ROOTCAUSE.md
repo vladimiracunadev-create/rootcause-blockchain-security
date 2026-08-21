@@ -89,13 +89,20 @@ está limpia.
 
 Documentadas en vez de disimuladas:
 
-- **Licencia.** La línea Inspectors usa Apache 2.0; la línea Digital Assets usa
-  MIT. Conviene unificarlas cuando se decida la política definitiva del
-  portafolio.
-- **Cobertura de landing.** Todas las ediciones publican página de producto en
-  GitHub Pages salvo Bitcoin Defense, que todavía no la tiene.
+- **Licencia.** Las cuatro ediciones Inspector usan Apache 2.0; las dos de
+  Digital Assets usan MIT. Conviene unificarlas cuando se decida la política
+  definitiva del portafolio. El razonamiento de esta edición está en
+  [`LICENCIA_Y_DECISION.md`](LICENCIA_Y_DECISION.md).
+- **Lenguaje.** Cuatro lenguajes en seis repositorios: Rust en escritorio nativo,
+  JavaScript en Web y Digital Assets, Dart en móvil. Es una consecuencia de
+  seguir cada superficie, no una falta de criterio — pero es una superficie de
+  mantenimiento real.
 - **Madurez de release.** Las ediciones de escritorio publican binarios
-  verificados; Web y Mobile publican por sus propios canales.
+  verificados por hash; Web y Mobile publican por sus propios canales.
+
+Las seis ediciones **sí** comparten: página de producto en GitHub Pages, CI con
+actions pinneadas a SHA, análisis CodeQL y telemetría cero verificada en el
+propio build.
 
 ## Detalle de esta edición
 
