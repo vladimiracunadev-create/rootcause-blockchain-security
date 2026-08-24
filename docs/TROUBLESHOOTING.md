@@ -45,7 +45,7 @@ Los binarios no están firmados con certificado de código. La verificación
 disponible hoy es el hash publicado:
 
 ~~~powershell
-Get-FileHash .\RootCause-Blockchain-Security-0.2.0-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\RootCause-Blockchain-Security-0.3.0-win-x64-setup.exe -Algorithm SHA256
 ~~~
 
 Compara con `SHA256SUMS.txt` del release. Si coincide, el archivo es exactamente

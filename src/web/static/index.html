@@ -28,6 +28,9 @@
           <button class="nav-item" data-view-target="wallet">
             <span class="nav-icon">▣</span><span>Wallet Posture</span><b id="nav-wallet-count">0</b>
           </button>
+          <button class="nav-item" data-view-target="intelligence">
+            <span class="nav-icon">◎</span><span>Intelligence</span><b id="nav-intel-count">0</b>
+          </button>
           <button class="nav-item" data-view-target="inventory">
             <span class="nav-icon">◇</span><span>Inventario</span>
           </button>
@@ -145,6 +148,56 @@
               <div class="incident-list" id="wallet-incidents"></div>
             </article>
             <div class="trust-boundary"><span>◉</span><p><strong>Frontera watch-only</strong>Este panel nunca ofrece conectar, revocar, firmar, transferir ni pausar: cada hallazgo remite a un runbook humano.</p></div>
+          </section>
+
+          <section class="view" data-view="intelligence">
+            <div class="section-intro">
+              <div><p class="eyebrow">Análisis on-chain público</p><h2>Blockchain Intelligence</h2></div>
+              <p>Indicadores investigables, puntaje explicable y seguimiento de fondos sobre datos públicos. Nada de esto acusa a nadie: son señales que una persona debe revisar.</p>
+            </div>
+            <div class="metric-grid" id="intel-metrics"></div>
+
+            <article class="panel">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Riesgo explicable</p><h3>Consultar una dirección</h3></div>
+                <span class="live-chip">Nunca un número sin explicación</span>
+              </div>
+              <form class="intel-search" id="intel-search-form">
+                <select id="intel-network" aria-label="Red">
+                  <option value="ethereum">Ethereum</option>
+                  <option value="bitcoin">Bitcoin</option>
+                </select>
+                <input id="intel-address" type="text" spellcheck="false" autocomplete="off"
+                  placeholder="Dirección pública (0x… o 1…)" aria-label="Dirección pública" />
+                <button class="button primary" type="submit">Evaluar</button>
+              </form>
+              <div id="intel-assessment"><div class="empty-state">Introduce una dirección pública para ver su puntaje, los factores que lo componen y sus limitaciones.</div></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Movimiento de fondos</p><h3>Grafo acotado</h3></div>
+                <span class="status-chip" id="intel-graph-status">Sin consulta</span>
+              </div>
+              <div id="intel-graph"><div class="empty-state">El grafo se dibuja al evaluar una dirección. Siempre con límites de profundidad y de nodos.</div></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Señales abiertas</p><h3>Alertas de inteligencia</h3></div>
+                <button class="text-button" id="intel-analyze-button">Re-analizar →</button>
+              </div>
+              <div class="incident-list" id="intel-alerts"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Investigación</p><h3>Casos abiertos</h3></div>
+              </div>
+              <div id="intel-cases"></div>
+            </article>
+
+            <div class="trust-boundary"><span>◉</span><p><strong>Frontera de inteligencia</strong>Sin listas remotas de reputación, sin identidades verificadas y sin bloqueo automático de fondos. El análisis de una transacción es consultivo: nunca autoriza ni impide una operación.</p></div>
           </section>
 
           <section class="view" data-view="inventory">

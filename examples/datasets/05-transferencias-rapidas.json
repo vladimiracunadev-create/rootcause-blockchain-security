@@ -1,0 +1,67 @@
+{
+  "id": "05-transferencias-rapidas",
+  "title": "Transferencias rapidas entre multiples wallets",
+  "description": "El valor atraviesa cuatro direcciones en quince minutos conservando mas del 90 % en cada salto.",
+  "network": "ethereum",
+  "evaluateAt": "2026-08-02T00:00:00.000Z",
+  "expected": {
+    "indicators": [
+      "INT-FLOW-003"
+    ],
+    "note": "Patron de alejamiento del origen: pocos saltos, muy rapidos y sin fraccionar."
+  },
+  "registries": {},
+  "transactions": [
+    {
+      "network": "ethereum",
+      "txid": "0xab10000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000001,
+      "blockHash": "0xbab1000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T09:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xe1e1000000000000000000000000000000000000",
+          "to": "0xe2e2000000000000000000000000000000000000",
+          "amountRaw": "10000000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xab20000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000002,
+      "blockHash": "0xbab2000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T09:05:00.000Z",
+      "transfers": [
+        {
+          "from": "0xe2e2000000000000000000000000000000000000",
+          "to": "0xe3e3000000000000000000000000000000000000",
+          "amountRaw": "9600000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xab30000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000003,
+      "blockHash": "0xbab3000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T09:10:00.000Z",
+      "transfers": [
+        {
+          "from": "0xe3e3000000000000000000000000000000000000",
+          "to": "0xe4e4000000000000000000000000000000000000",
+          "amountRaw": "9200000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    }
+  ]
+}

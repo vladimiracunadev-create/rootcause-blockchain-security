@@ -1,6 +1,6 @@
 {
   "name": "rootcause-blockchain-security",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Watch-only multi-chain application security, causal analysis and incident response desktop app for RootCause.",
   "type": "module",

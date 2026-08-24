@@ -1,0 +1,68 @@
+{
+  "id": "08-drainer-simulado",
+  "title": "Drainer simulado: aprobacion ilimitada y vaciado",
+  "description": "La victima concede una aprobacion igual al maximo de uint256 a una direccion del conjunto local de drainers y a continuacion pierde el saldo.",
+  "network": "ethereum",
+  "evaluateAt": "2026-08-02T00:00:00.000Z",
+  "expected": {
+    "indicators": [
+      "INT-EXPO-003",
+      "INT-EXPO-004"
+    ],
+    "note": "Dos senales distintas sobre el mismo episodio: la aprobacion ilimitada (hecho observable) y la coincidencia con el conjunto local (marca del operador)."
+  },
+  "registries": {
+    "drainers": [
+      {
+        "network": "ethereum",
+        "address": "0xdada000000000000000000000000000000000000",
+        "label": "Drainer de laboratorio",
+        "category": "drainer",
+        "flagged": true,
+        "flagReason": "Conjunto sintetico de pruebas; ninguna atribucion real",
+        "source": {
+          "kind": "local-dataset",
+          "id": "fixture"
+        }
+      }
+    ]
+  },
+  "transactions": [
+    {
+      "network": "ethereum",
+      "txid": "0xd010000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000001,
+      "blockHash": "0xbd01000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T09:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc8c8000000000000000000000000000000000000",
+          "to": "0xdada000000000000000000000000000000000000",
+          "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "asset": "TEST",
+          "assetContract": "0x7011000000000000000000000000000000000000",
+          "decimals": 18,
+          "kind": "approval"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xd020000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000002,
+      "blockHash": "0xbd02000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T10:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc8c8000000000000000000000000000000000000",
+          "to": "0xdada000000000000000000000000000000000000",
+          "amountRaw": "50000000000000000000",
+          "asset": "TEST",
+          "assetContract": "0x7011000000000000000000000000000000000000",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    }
+  ]
+}

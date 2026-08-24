@@ -1,0 +1,237 @@
+{
+  "id": "10-falso-positivo",
+  "title": "Falso positivo: direccion de deposito etiquetada",
+  "description": "Una direccion de deposito de un servicio, etiquetada por el operador, recibe fondos de doce clientes. El indicador se activa correctamente y aun asi el hallazgo es un falso positivo.",
+  "network": "ethereum",
+  "evaluateAt": "2026-08-02T00:00:00.000Z",
+  "expected": {
+    "indicators": [
+      "INT-FLOW-001",
+      "INT-ASSET-001"
+    ],
+    "expectedFalsePositive": true,
+    "expectedMitigatingFactor": "labelled-counterparty",
+    "note": "El indicador NO se suprime: se activa y el puntaje lo atenua por la etiqueta local. Suprimirlo esconderia el patron; atenuarlo lo explica."
+  },
+  "registries": {
+    "contracts": [
+      {
+        "network": "ethereum",
+        "address": "0x1de9000000000000000000000000000000000000",
+        "label": "Deposito de servicio (etiqueta del operador)",
+        "category": "exchange-deposit",
+        "flagged": false,
+        "source": {
+          "kind": "local-dataset",
+          "id": "fixture"
+        }
+      }
+    ]
+  },
+  "transactions": [
+    {
+      "network": "ethereum",
+      "txid": "0xfa00000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000000,
+      "blockHash": "0xbfa0000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T00:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e0000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "400000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa10000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000001,
+      "blockHash": "0xbfa1000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T01:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e1000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "510000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa20000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000002,
+      "blockHash": "0xbfa2000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T02:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e2000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "620000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa30000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000003,
+      "blockHash": "0xbfa3000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T03:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e3000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "730000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa40000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000004,
+      "blockHash": "0xbfa4000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T04:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e4000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "840000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa50000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000005,
+      "blockHash": "0xbfa5000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T05:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e5000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "950000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa60000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000006,
+      "blockHash": "0xbfa6000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T06:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e6000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "1060000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa70000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000007,
+      "blockHash": "0xbfa7000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T07:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e7000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "1170000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa80000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000008,
+      "blockHash": "0xbfa8000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T08:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e8000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "1280000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa90000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000009,
+      "blockHash": "0xbfa9000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T09:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1e9000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "1390000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa10000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000010,
+      "blockHash": "0xbfa1000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T10:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1ea000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "1500000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfa11000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000011,
+      "blockHash": "0xbfa1100000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T11:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc1eb000000000000000000000000000000000000",
+          "to": "0x1de9000000000000000000000000000000000000",
+          "amountRaw": "1610000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    }
+  ]
+}

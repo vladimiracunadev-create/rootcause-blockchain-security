@@ -14,17 +14,25 @@ export function jsonResponse(response, status, body, extraHeaders = {}) {
   response.end(payload);
 }
 
-export function createApiRouter({ service, readJson }) {
+export function createApiRouter({ service, readJson, intelligenceRouter = null }) {
   return async function routeApi(request, response, url) {
     const method = request.method || "GET";
     const path = url.pathname;
     const actor = actorFrom(request);
 
+    // La API de inteligencia está versionada bajo /api/v1 y se resuelve antes
+    // que las rutas heredadas: si no reconoce la ruta devuelve null y el
+    // control vuelve aquí.
+    if (intelligenceRouter && path.startsWith("/api/v1/")) {
+      const handled = await intelligenceRouter(request, response, url, { actor, readJson });
+      if (handled !== null) return handled;
+    }
+
     if (method === "GET" && path === "/api/health") {
       return jsonResponse(response, 200, {
         status: "ok",
         service: "rootcause-blockchain-security",
-        version: "0.2.0",
+        version: "0.3.0",
         time: new Date().toISOString()
       });
     }

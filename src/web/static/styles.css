@@ -250,6 +250,54 @@ dialog::backdrop { background: rgba(2,5,13,.75); backdrop-filter: blur(5px); }
 .toast.visible { opacity: 1; transform: translateY(0); }
 .toast.error { border-color: rgba(255,93,122,.35); }
 
+/* ── Blockchain Intelligence ─────────────────────────────────────────────── */
+.intel-search { display: grid; grid-template-columns: 150px minmax(0,1fr) auto; gap: 10px; margin-bottom: 16px; }
+.intel-search select, .intel-search input {
+  padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+  background: rgba(10,15,30,.75); color: inherit; font: inherit; font-size: 13px;
+}
+.intel-search input { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.intel-search select:focus-visible, .intel-search input:focus-visible { outline: 2px solid var(--violet); outline-offset: 1px; }
+
+.intel-score { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 20px; align-items: center; padding: 18px; border: 1px solid var(--line); border-radius: 14px; margin-bottom: 18px; background: rgba(16,23,42,.7); }
+.intel-score-visual { display: grid; place-items: center; width: 92px; height: 92px; border-radius: 50%; border: 3px solid var(--line); }
+.intel-score-visual strong { font-size: 30px; letter-spacing: -.04em; }
+.intel-score-visual small { color: var(--muted); font-size: 10px; }
+.intel-score[data-band="critical"] .intel-score-visual { border-color: #ff5d7a; }
+.intel-score[data-band="high"] .intel-score-visual { border-color: #ff9f45; }
+.intel-score[data-band="moderate"] .intel-score-visual { border-color: #ffd166; }
+.intel-score[data-band="low"] .intel-score-visual { border-color: #2bd8c5; }
+.intel-score h3 { margin: 3px 0 6px; font-size: 17px; }
+.intel-model { color: var(--muted); font-size: 11px; margin-top: 6px; }
+
+.factor-row { display: grid; grid-template-columns: 54px minmax(0,1fr) auto; gap: 12px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.factor-row:last-child { border-bottom: 0; }
+.factor-row b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.factor-row[data-direction="up"] b { color: #ff9f45; }
+.factor-row[data-direction="down"] b { color: #2bd8c5; }
+.factor-row strong { font-size: 13px; }
+.factor-row p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.factor-row em { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; }
+.factor-row > span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+
+.intel-indicator { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.intel-indicator:last-child { border-bottom: 0; }
+.intel-indicator > span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+.intel-indicator strong { display: block; margin: 4px 0 3px; font-size: 13px; }
+.intel-indicator p { color: var(--muted); font-size: 12px; }
+.intel-indicator details { margin-top: 8px; }
+.intel-indicator summary { cursor: pointer; color: var(--muted); font-size: 11px; }
+.intel-indicator details ul { margin: 8px 0 6px 16px; color: var(--muted); font-size: 12px; }
+
+.graph-canvas { overflow-x: auto; padding: 6px 0; }
+.graph-canvas svg { min-width: 420px; width: 100%; height: auto; }
+.graph-edge { stroke: rgba(124,92,255,.45); stroke-width: 1.5; }
+.graph-node rect { fill: rgba(16,23,42,.95); stroke: var(--line); stroke-width: 1; }
+.graph-node text { fill: #f4f6ff; font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.graph-node.start rect { stroke: var(--violet); stroke-width: 2; }
+.graph-node.flagged rect { stroke: #ff5d7a; stroke-width: 2; }
+.graph-note { color: var(--muted); font-size: 11px; margin-top: 8px; }
+
 @media (max-width: 1100px) {
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
   .overview-grid { grid-template-columns: 1fr; }
@@ -291,6 +339,10 @@ dialog::backdrop { background: rgba(2,5,13,.75); backdrop-filter: blur(5px); }
   .separation-card { grid-template-columns: 1fr; }
   .separation-line { justify-content: center; }
   .evidence-grid { grid-template-columns: 1fr; }
+  .intel-search { grid-template-columns: 1fr; }
+  .intel-score { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .factor-row { grid-template-columns: 44px minmax(0,1fr); }
+  .factor-row > span { grid-column: 2; }
 }
 
 @media (prefers-reduced-motion: reduce) {

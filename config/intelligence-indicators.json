@@ -1,0 +1,249 @@
+{
+  "version": "2026-08-24",
+  "modelVersion": "intelligence-1.0.0",
+  "note": "Indicadores investigativos INT-*. No son violaciones de política ni acusaciones: son señales reproducibles que un analista humano debe revisar. Los controles preventivos BLK-* viven en control-catalog.json y son un catálogo distinto.",
+  "families": [
+    {
+      "id": "INT-FLOW",
+      "title": "Topología del movimiento de fondos",
+      "objective": "Detectar formas de flujo asociadas a consolidación, dispersión y encadenamiento."
+    },
+    {
+      "id": "INT-BEHAV",
+      "title": "Comportamiento de la dirección",
+      "objective": "Detectar cambios de patrón, fraccionamiento y coordinación entre direcciones."
+    },
+    {
+      "id": "INT-EXPO",
+      "title": "Exposición a contrapartes marcadas",
+      "objective": "Detectar interacción con contratos o direcciones marcadas localmente y trampas de historial."
+    },
+    {
+      "id": "INT-ASSET",
+      "title": "Distribución de activos",
+      "objective": "Detectar concentraciones inusuales del flujo de un activo."
+    },
+    {
+      "id": "INT-BRIDGE",
+      "title": "Movimiento entre redes",
+      "objective": "Detectar el uso encadenado de puentes para alejar fondos de su origen."
+    },
+    {
+      "id": "INT-EXPLOIT",
+      "title": "Actividad posterior a un incidente",
+      "objective": "Relacionar movimientos con un exploit registrado localmente."
+    }
+  ],
+  "indicators": [
+    {
+      "id": "INT-FLOW-001",
+      "family": "INT-FLOW",
+      "title": "Fan-in: consolidación desde muchas direcciones",
+      "description": "Una dirección recibe fondos desde un número inusual de direcciones distintas dentro de una ventana corta.",
+      "severity": "medium",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Direcciones de depósito de un exchange o procesador de pagos.",
+        "Contratos de recaudación, airdrops o nóminas.",
+        "Pools de minería distribuyendo o recibiendo pagos agregados."
+      ],
+      "recommendedAction": "Determinar si la dirección es un punto de depósito conocido antes de considerar la consolidación como señal."
+    },
+    {
+      "id": "INT-FLOW-002",
+      "family": "INT-FLOW",
+      "title": "Fan-out: dispersión hacia muchas direcciones",
+      "description": "Una dirección distribuye fondos hacia un número inusual de destinos distintos dentro de una ventana corta.",
+      "severity": "medium",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Pagos masivos legítimos: nóminas, airdrops, reembolsos.",
+        "Salidas por lotes (batching) de un exchange.",
+        "Distribución programada de un contrato de vesting."
+      ],
+      "recommendedAction": "Comparar el patrón con la actividad histórica de la dirección y con su etiqueta local antes de escalar."
+    },
+    {
+      "id": "INT-FLOW-003",
+      "family": "INT-FLOW",
+      "title": "Transferencias rápidas entre múltiples wallets",
+      "description": "El valor atraviesa varias direcciones en cadena con muy poco tiempo entre saltos, patrón asociado a alejar fondos de su origen.",
+      "severity": "high",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Enrutamiento automático de contratos o agregadores DeFi.",
+        "Rebalanceo interno entre wallets calientes de un mismo operador.",
+        "Bots de arbitraje operando en el mismo bloque."
+      ],
+      "recommendedAction": "Reconstruir la cadena completa y verificar si los saltos intermedios son contratos conocidos."
+    },
+    {
+      "id": "INT-FLOW-004",
+      "family": "INT-FLOW",
+      "title": "Peeling chain",
+      "description": "Cadena de transacciones en la que se desprende un importe pequeño en cada paso y el resto continúa hacia una dirección nueva.",
+      "severity": "high",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Gestión normal de cambio (change) en carteras UTXO.",
+        "Retiros sucesivos desde una wallet caliente.",
+        "Comercio minorista con un saldo remanente que se reutiliza."
+      ],
+      "recommendedAction": "Verificar si las salidas pequeñas terminan en servicios de conversión y documentar el recorrido completo."
+    },
+    {
+      "id": "INT-BEHAV-001",
+      "family": "INT-BEHAV",
+      "title": "Actividad súbita tras inactividad prolongada",
+      "description": "Una dirección sin movimientos durante un periodo largo concentra varias operaciones en pocas horas.",
+      "severity": "medium",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Custodia fría que se moviliza por una decisión operativa planificada.",
+        "Herencia, migración de custodia o cambio de proveedor.",
+        "Reclamación de un airdrop antiguo."
+      ],
+      "recommendedAction": "Confirmar con el titular u operador si la reactivación fue intencional."
+    },
+    {
+      "id": "INT-BEHAV-002",
+      "family": "INT-BEHAV",
+      "title": "Montos fraccionados repetidamente",
+      "description": "Repetición de transferencias de importe casi idéntico, patrón compatible con fraccionamiento deliberado por debajo de un umbral.",
+      "severity": "medium",
+      "defaultConfidence": "low",
+      "falsePositives": [
+        "Suscripciones, cuotas o pagos periódicos de igual importe.",
+        "Retiros con un límite operativo fijo por transacción.",
+        "Automatización que envía lotes de tamaño constante."
+      ],
+      "recommendedAction": "Contrastar la periodicidad con una explicación comercial antes de tratarlo como estructuración."
+    },
+    {
+      "id": "INT-BEHAV-003",
+      "family": "INT-BEHAV",
+      "title": "Comportamiento coordinado entre direcciones",
+      "description": "Varias direcciones distintas operan hacia el mismo destino en una ventana muy estrecha, compatible con control común.",
+      "severity": "medium",
+      "defaultConfidence": "low",
+      "falsePositives": [
+        "Reacción simultánea del mercado a un mismo evento público.",
+        "Participantes de un mismo airdrop o mint reclamando a la vez.",
+        "Usuarios distintos del mismo servicio con salidas por lotes."
+      ],
+      "recommendedAction": "Tratar la coordinación como hipótesis; buscar evidencia independiente de control común."
+    },
+    {
+      "id": "INT-BEHAV-004",
+      "family": "INT-BEHAV",
+      "title": "Cambio anómalo de frecuencia, volumen o destino",
+      "description": "El comportamiento reciente de la dirección se aparta significativamente de su propia línea base observada.",
+      "severity": "medium",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Cambio legítimo de actividad comercial o de proveedor.",
+        "Línea base demasiado corta para ser representativa.",
+        "Estacionalidad no capturada por la ventana de observación."
+      ],
+      "recommendedAction": "Revisar si la línea base tiene suficiente historial antes de considerar el cambio significativo."
+    },
+    {
+      "id": "INT-EXPO-001",
+      "family": "INT-EXPO",
+      "title": "Interacción con un contrato marcado localmente",
+      "description": "La dirección interactuó con un contrato que el operador marcó en su propio registro local.",
+      "severity": "high",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Marca local desactualizada o heredada sin revisión.",
+        "Interacción involuntaria provocada por un token o NFT no solicitado.",
+        "Contrato marcado por precaución y no por evidencia."
+      ],
+      "recommendedAction": "Revisar por qué el contrato está marcado y con qué evidencia; la marca es del operador, no de un tercero."
+    },
+    {
+      "id": "INT-EXPO-002",
+      "family": "INT-EXPO",
+      "title": "Posible address poisoning en el historial",
+      "description": "Aparece en el historial una dirección visualmente similar a una contraparte real, con importe cero o dust y sin relación previa.",
+      "severity": "medium",
+      "defaultConfidence": "low",
+      "falsePositives": [
+        "Direcciones vanity que coinciden por diseño.",
+        "Contratos desplegados de forma determinista con prefijos similares.",
+        "Coincidencia estadística en conjuntos grandes de direcciones."
+      ],
+      "recommendedAction": "No copiar direcciones del historial; verificar contra la libreta de direcciones aprobada."
+    },
+    {
+      "id": "INT-EXPO-003",
+      "family": "INT-EXPO",
+      "title": "Aprobación de gasto ilimitada",
+      "description": "Se observó una aprobación de token igual al máximo del tipo entero, que permite gastar todo el saldo sin nueva autorización.",
+      "severity": "high",
+      "defaultConfidence": "high",
+      "falsePositives": [
+        "Práctica habitual de muchas dApp legítimas para ahorrar gas.",
+        "Aprobación acotada en el tiempo por el propio contrato.",
+        "Aprobación ya revocada en una transacción posterior."
+      ],
+      "recommendedAction": "Comprobar si la aprobación sigue vigente y revocarla desde un entorno independiente si no se reconoce."
+    },
+    {
+      "id": "INT-EXPO-004",
+      "family": "INT-EXPO",
+      "title": "Coincidencia con un drainer del conjunto local",
+      "description": "La dirección interactuó con una dirección o contrato incluido en el conjunto local de drainers conocidos del operador.",
+      "severity": "critical",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Conjunto local desactualizado o con entradas mal atribuidas.",
+        "Reutilización de una dirección que cambió de propósito.",
+        "Interacción pasiva por recepción de un token no solicitado."
+      ],
+      "recommendedAction": "Verificar la procedencia y la fecha de la entrada del conjunto local antes de actuar sobre ella."
+    },
+    {
+      "id": "INT-ASSET-001",
+      "family": "INT-ASSET",
+      "title": "Concentración inusual del flujo de un activo",
+      "description": "Una sola dirección concentra una fracción dominante del flujo observado de un activo dentro de la ventana analizada.",
+      "severity": "low",
+      "defaultConfidence": "low",
+      "falsePositives": [
+        "Ventana de observación demasiado pequeña o dataset parcial.",
+        "Contrato de tesorería o custodia que concentra por diseño.",
+        "Token con muy pocos participantes reales."
+      ],
+      "recommendedAction": "Ampliar la ventana de observación antes de interpretar la concentración."
+    },
+    {
+      "id": "INT-BRIDGE-001",
+      "family": "INT-BRIDGE",
+      "title": "Uso sucesivo de puentes",
+      "description": "Los fondos atraviesan más de un puente en una ventana corta, lo que reduce la trazabilidad entre redes.",
+      "severity": "high",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Optimización legítima de rutas y comisiones entre redes.",
+        "Rebalanceo de liquidez de un operador multi-red.",
+        "Agregadores que encadenan puentes automáticamente."
+      ],
+      "recommendedAction": "Documentar los identificadores en ambas redes; la correlación cross-chain requiere verificación manual."
+    },
+    {
+      "id": "INT-EXPLOIT-001",
+      "family": "INT-EXPLOIT",
+      "title": "Movimiento posterior a un exploit registrado",
+      "description": "La dirección movió fondos dentro de la ventana posterior a un exploit registrado localmente y relacionado con ella.",
+      "severity": "critical",
+      "defaultConfidence": "medium",
+      "falsePositives": [
+        "Movimiento de recuperación ejecutado por el propio equipo afectado.",
+        "Actividad de terceros no relacionada que coincide en el tiempo.",
+        "Ventana temporal demasiado amplia."
+      ],
+      "recommendedAction": "Separar los movimientos de contención legítimos de los del atacante antes de cualquier conclusión."
+    }
+  ]
+}

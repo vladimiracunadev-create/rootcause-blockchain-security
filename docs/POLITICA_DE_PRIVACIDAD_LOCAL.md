@@ -84,6 +84,32 @@ Si configuras un endpoint remoto con `EVM_ALLOW_REMOTE_RPC=true`, ese proveedor
 vigilando y con qué frecuencia. Es una decisión legítima, pero consciente: la
 postura por defecto es localhost precisamente por esto.
 
+## Datos del dominio de inteligencia
+
+El análisis on-chain trabaja con **datos públicos de la cadena** (bloques,
+transacciones, direcciones, importes) y con **registros locales que tú creas**:
+etiquetas, contratos marcados, conjuntos de drainers e incidentes conocidos.
+
+Tres decisiones de privacidad merecen ser explícitas:
+
+1. **Ninguna consulta sale a un servicio de reputación.** No existe una lista
+   externa de direcciones «malas». Consultarla no filtraría tus datos: filtraría
+   **el hecho de que estás investigando esa dirección**, que suele ser más
+   sensible. Un gate verifica que el dominio de inteligencia no contenga
+   ningún origen remoto.
+2. **Ninguna dirección se relaciona con una persona.** El sistema no produce la
+   categoría «identidad verificada». Las agrupaciones de direcciones son
+   hipótesis con su nivel de confianza y su advertencia.
+3. **Las marcas son tuyas, no de un tercero.** Cuando un indicador dice que una
+   contraparte está marcada, se refiere a tu registro local, y lo dice en la
+   propia evidencia.
+
+Si analizas direcciones de terceros, ten presente que estás tratando datos que
+en muchas jurisdicciones pueden considerarse personales cuando son
+relacionables con una persona identificable. Esta herramienta no hace esa
+relación, pero tú podrías hacerla fuera de ella; el gobierno de esos datos está
+en [`DATA-GOVERNANCE.md`](DATA-GOVERNANCE.md).
+
 ## La página de producto es otra cosa
 
 La landing publicada en GitHub Pages **sí** carga imágenes de `img.shields.io`

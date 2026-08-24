@@ -11,7 +11,7 @@
 ║  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝      ║
 ║                                                                                   ║
 ║                   B L O C K C H A I N   S E C U R I T Y                           ║
-║          Consola watch-only multi-chain · Node sin dependencias · v0.2.0          ║
+║          Consola watch-only multi-chain · Node sin dependencias · v0.3.0          ║
 ╚═══════════════════════════════════════════════════════════════════════════════════╝
 ```
 
@@ -22,7 +22,7 @@
 [![Dependencias](https://img.shields.io/badge/dependencias-0-success.svg)](docs/ADR-0001-plataforma-y-lenguaje.md)
 [![Telemetría](https://img.shields.io/badge/telemetr%C3%ADa-cero-success.svg)](docs/THREAT_MODEL.md)
 [![Claves](https://img.shields.io/badge/claves%20privadas-nunca-success.svg)](SECURITY.md)
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-0.2.0-brightgreen.svg)](CHANGELOG.md)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-0.3.0-brightgreen.svg)](CHANGELOG.md)
 
 🌐 **[Página del producto →](https://vladimiracunadev-create.github.io/rootcause-blockchain-security/)**  ·  ⬇️ **[Descargar para Windows →](https://github.com/vladimiracunadev-create/rootcause-blockchain-security/releases/latest)**  ·  📘 **[Índice de documentación →](docs/INDEX.md)**
 
@@ -64,7 +64,7 @@ por SHA-256** contra `SHASUMS256.txt` de nodejs.org al empaquetar. Cada release
 incluye `SHA256SUMS.txt` para verificar la descarga.
 
 ~~~powershell
-Get-FileHash .\RootCause-Blockchain-Security-0.2.0-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\RootCause-Blockchain-Security-0.3.0-win-x64-setup.exe -Algorithm SHA256
 ~~~
 
 Detalles de instalación, configuración y verificación en
@@ -109,6 +109,26 @@ revocar, sin firmar**: cada hallazgo remite a un runbook humano.
 Las fronteras exactas —lo que este dominio nunca hará y qué producto RootCause
 cubre cada superficie— están en
 [`docs/WALLET-SECURITY-BOUNDARIES.md`](docs/WALLET-SECURITY-BOUNDARIES.md).
+
+### Blockchain Intelligence: investigar, no acusar
+
+![Panel de Blockchain Intelligence: métricas de análisis on-chain, buscador de riesgo por dirección, grafo acotado de movimiento de fondos y alertas de inteligencia](docs/img/panel-intelligence.png)
+
+Análisis de datos **públicos** de Bitcoin y Ethereum: **15 indicadores
+investigativos** `INT-*` (fan-in, fan-out, peeling chains, transferencias
+rápidas, address poisoning, aprobaciones ilimitadas, exposición a direcciones
+marcadas localmente, actividad posterior a un exploit…), un **puntaje de riesgo
+0–100 que nunca viaja sin su explicación**, seguimiento de fondos sobre un grafo
+con límites duros, y alertas, casos y evidencia hasheada para una investigación
+con trazabilidad.
+
+Lo que este dominio **no** hace, por diseño: no consulta listas remotas de
+reputación, no atribuye identidad a una dirección, no infiere intención y no
+bloquea fondos. Cada resultado separa **hecho observado**, **indicador**,
+**inferencia** e **hipótesis**, y ninguna de esas categorías asciende sola.
+
+Detalle en [`docs/ONCHAIN-ANALYTICS.md`](docs/ONCHAIN-ANALYTICS.md) y
+[`docs/RISK-MODEL.md`](docs/RISK-MODEL.md).
 
 ### Trece controles, veintidós detecciones
 
@@ -281,23 +301,38 @@ curl -X POST http://127.0.0.1:8790/api/scan \
   --data "{}"
 ~~~
 
-Contrato completo en [`docs/API.md`](docs/API.md).
+La API de inteligencia está **versionada** y documentada en OpenAPI. Una wallet
+puede consultar el riesgo de un destino sin entregar nada privado:
+
+~~~bash
+curl http://127.0.0.1:8790/api/v1/risk/addresses/ethereum/0x…
+~~~
+
+La respuesta trae puntaje, banda, confianza, los factores que lo componen con su
+peso, la evidencia, las limitaciones y la versión del modelo. **Nunca un número
+suelto.** Esa API no pide claves ni semillas, y su análisis previo de una
+transacción es consultivo: advierte, no autoriza ni bloquea.
+
+Contrato completo en [`docs/API.md`](docs/API.md) y
+[`docs/openapi-intelligence.yaml`](docs/openapi-intelligence.yaml).
 
 ---
 
 ## 📁 Estructura
 
 ~~~text
-config/                  Políticas y catálogo de controles
+config/                  Políticas, catálogo de controles y catálogo de indicadores
 docs/                    Arquitectura, amenazas, decisiones, runbooks y capturas
 examples/                Proyectos y eventos públicos ficticios
+examples/datasets/       Diez escenarios sintéticos con su resultado esperado
 landing/                 Página de producto publicada en GitHub Pages
 packaging/windows/       Empaquetado de escritorio: portable, instalador e icono
 scripts/                 Validación, gates de seguridad y utilidades
-src/api/                 API HTTP local
+src/api/                 API HTTP local y API v1 de inteligencia
 src/domain/              Validación, reglas y protección de secretos
+src/domain/intelligence/ Modelo normalizado, indicadores, grafo y puntaje
 src/infrastructure/      RPC EVM, cifrado y auditoría
-src/services/            Casos de uso y watchtower
+src/services/            Casos de uso, conectores, watchtower e investigación
 src/web/static/          Dashboard responsive y PWA
 test/                    Pruebas unitarias e integración
 ~~~
@@ -312,6 +347,10 @@ test/                    Pruebas unitarias e integración
 | [`docs/MANUAL_USUARIO.md`](docs/MANUAL_USUARIO.md) | Qué es cada cosa del panel, en claro |
 | [`docs/HEURISTICAS.md`](docs/HEURISTICAS.md) | Especificación exacta de las 22 reglas |
 | [`docs/WALLET-SECURITY-BOUNDARIES.md`](docs/WALLET-SECURITY-BOUNDARIES.md) | Fronteras de la postura de wallets y matriz de la familia |
+| [`docs/ONCHAIN-ANALYTICS.md`](docs/ONCHAIN-ANALYTICS.md) | Los 15 indicadores de inteligencia, con umbrales y falsos positivos |
+| [`docs/RISK-MODEL.md`](docs/RISK-MODEL.md) | Cómo se calcula un puntaje explicable y por qué nunca va solo |
+| [`docs/BLOCKCHAIN-FORENSICS.md`](docs/BLOCKCHAIN-FORENSICS.md) | Grafo, seguimiento de fondos y límites del análisis |
+| [`docs/INVESTIGATION-GUIDE.md`](docs/INVESTIGATION-GUIDE.md) | Flujo de trabajo del analista, de la ingesta al informe |
 | [`docs/DETECCION_AMENAZAS.md`](docs/DETECCION_AMENAZAS.md) | Mapa honesto: qué detecta hoy y qué no |
 | [`docs/ADR-0001-plataforma-y-lenguaje.md`](docs/ADR-0001-plataforma-y-lenguaje.md) | Por qué escritorio y no SaaS; por qué Node hoy, Rust después y no Go |
 | [`docs/BLOCKCHAIN-Y-BITCOIN.md`](docs/BLOCKCHAIN-Y-BITCOIN.md) | Qué es cada cosa y por qué son dos productos |
@@ -344,6 +383,13 @@ test/                    Pruebas unitarias e integración
 - Los binarios no están firmados con certificado de código: SmartScreen puede
   advertir en la primera ejecución. La verificación disponible hoy es el hash
   publicado.
+- El puntaje de riesgo mide **exposición a señales investigables** sobre los
+  datos ingeridos. No es una prueba, no atribuye identidad y **la ausencia de
+  indicadores no demuestra ausencia de riesgo**.
+- La inteligencia solo ve lo que se le ingirió. No sigue fondos al otro lado de
+  un puente, no observa el mempool y no consulta reputación externa.
+- Los umbrales de los indicadores son ejemplos calibrables: mal ajustados
+  producen falsos positivos, no seguridad.
 
 ---
 

@@ -1,0 +1,67 @@
+{
+  "id": "06-address-poisoning",
+  "title": "Address poisoning: direccion similar con importe cero",
+  "description": "Una direccion sin relacion previa, visualmente parecida a una contraparte real, envia un importe cero para quedar en el historial.",
+  "network": "ethereum",
+  "evaluateAt": "2026-08-04T00:00:00.000Z",
+  "expected": {
+    "indicators": [
+      "INT-EXPO-002"
+    ],
+    "note": "Candidato heuristico. La similitud sola no basta: hace falta importe cero o dust y ausencia de relacion previa."
+  },
+  "registries": {},
+  "transactions": [
+    {
+      "network": "ethereum",
+      "txid": "0xa910000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000091,
+      "blockHash": "0xba91000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T10:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xa9a9000000000000000000000000000000000000",
+          "to": "0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c001",
+          "amountRaw": "4000000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xa920000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000092,
+      "blockHash": "0xba92000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-02T11:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c001",
+          "to": "0xa9a9000000000000000000000000000000000000",
+          "amountRaw": "1200000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xa930000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000093,
+      "blockHash": "0xba93000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-03T12:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xc0c0c0ffee000000000000000000000000000001",
+          "to": "0xa9a9000000000000000000000000000000000000",
+          "amountRaw": "0",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    }
+  ]
+}

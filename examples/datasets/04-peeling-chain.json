@@ -1,0 +1,94 @@
+{
+  "id": "04-peeling-chain",
+  "title": "Peeling chain sobre Bitcoin",
+  "description": "Cadena UTXO en la que cada transaccion desprende cerca del 20 % y traslada el resto a una direccion nueva. Las direcciones son validas (base58check) y ficticias.",
+  "network": "bitcoin",
+  "evaluateAt": "2026-08-03T00:00:00.000Z",
+  "expected": {
+    "indicators": [
+      "INT-FLOW-004"
+    ],
+    "note": "Los saltos estan espaciados seis horas para no activar ademas el indicador de transferencias rapidas."
+  },
+  "registries": {},
+  "transactions": [
+    {
+      "network": "bitcoin",
+      "txid": "0xbc10000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 860001,
+      "blockHash": "0xcbc1000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T00:00:00.000Z",
+      "inputs": [
+        {
+          "address": "1FYtuDERksu9bUQXb5MAM7RsPUcrZQ5ADd",
+          "amountRaw": "100000000",
+          "previousIndex": 0
+        }
+      ],
+      "outputs": [
+        {
+          "address": "1E23u4mnXT6paWFr312EgUFuW8XNw3SrbU",
+          "amountRaw": "20000000",
+          "scriptType": "pubkeyhash"
+        },
+        {
+          "address": "14iq1aHQDbNa27paCR8jysAoFjks5Re8sJ",
+          "amountRaw": "79000000",
+          "scriptType": "pubkeyhash"
+        }
+      ]
+    },
+    {
+      "network": "bitcoin",
+      "txid": "0xbc20000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 860002,
+      "blockHash": "0xcbc2000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T06:00:00.000Z",
+      "inputs": [
+        {
+          "address": "14iq1aHQDbNa27paCR8jysAoFjks5Re8sJ",
+          "amountRaw": "79000000",
+          "previousIndex": 0
+        }
+      ],
+      "outputs": [
+        {
+          "address": "1Pbb3Kw7CXWWH9TVewcScGAJxE9rmFjxHU",
+          "amountRaw": "15000000",
+          "scriptType": "pubkeyhash"
+        },
+        {
+          "address": "1GhrW9FvuTVRqcxn6m8n6rkLHSJTT8ffBB",
+          "amountRaw": "63000000",
+          "scriptType": "pubkeyhash"
+        }
+      ]
+    },
+    {
+      "network": "bitcoin",
+      "txid": "0xbc30000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 860003,
+      "blockHash": "0xcbc3000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T12:00:00.000Z",
+      "inputs": [
+        {
+          "address": "1GhrW9FvuTVRqcxn6m8n6rkLHSJTT8ffBB",
+          "amountRaw": "63000000",
+          "previousIndex": 0
+        }
+      ],
+      "outputs": [
+        {
+          "address": "1LfcCuQZuGMkZV89yJmsYgW2YhE7q8UQ6x",
+          "amountRaw": "12000000",
+          "scriptType": "pubkeyhash"
+        },
+        {
+          "address": "1LVUbvYhPHJXvsFKcTZJCKzkJ431TJiZvF",
+          "amountRaw": "50000000",
+          "scriptType": "pubkeyhash"
+        }
+      ]
+    }
+  ]
+}

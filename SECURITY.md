@@ -27,6 +27,27 @@ defecto, aplica timeout y limita el tamaño de respuesta. Un despliegue real deb
 sumar aislamiento de red, autenticación del reverse proxy, un gestor de secretos
 y respaldos cifrados.
 
+## Dominio de inteligencia
+
+El análisis on-chain amplía la superficie del producto —ingiere datos de
+terceros, puntúa direcciones y expone una API para wallets— y por eso tiene sus
+propias garantías verificadas por `scripts/check-security-claims.js` contra la
+aplicación en marcha:
+
+- La API de riesgo rechaza material privado en cualquier profundidad y no puede
+  autorizar ni bloquear una operación: `POST /api/v1/risk/transactions` devuelve
+  siempre `decision: "advisory-only"`.
+- Ningún puntaje se emite sin sus factores, su confianza, sus limitaciones y la
+  marca de que requiere revisión humana.
+- El grafo aplica sus cotas aunque se soliciten valores extremos.
+- El cargador de datasets rechaza la travesía de rutas.
+- El dominio no contiene ningún origen remoto: **no hay listas externas de
+  reputación**, porque consultarlas revelaría qué se está investigando.
+
+Este producto no atribuye identidad a una dirección y no produce la categoría
+«identidad verificada». Tratar un puntaje como un veredicto, o una agrupación
+heurística como titularidad, es un uso incorrecto de la herramienta.
+
 ## Respuesta
 
 Si se sospecha exposición de una clave administrativa, RootCause ayuda a

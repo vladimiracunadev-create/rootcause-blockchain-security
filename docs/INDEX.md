@@ -22,7 +22,10 @@ ejecutable; los documentos explican el porqué.
 | Documento | Contenido |
 |---|---|
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Capas, flujo de datos y decisiones internas |
-| [`API.md`](API.md) | Contrato HTTP completo de la API local |
+| [`API.md`](API.md) | Contrato HTTP completo de la API local y de la API v1 |
+| [`openapi-intelligence.yaml`](openapi-intelligence.yaml) | Especificación OpenAPI de la API de riesgo para wallets |
+| [`DATA-MODEL.md`](DATA-MODEL.md) | Entidades normalizadas, claves de deduplicación y niveles epistémicos |
+| [`ADR-0002-almacenamiento-inteligencia.md`](ADR-0002-almacenamiento-inteligencia.md) | Por qué el MVP no añade bases de datos y cuándo revisarlo |
 | [`HEURISTICAS.md`](HEURISTICAS.md) | **Especificación exacta de las 22 reglas**: condición, severidad, evidencia y umbral |
 | [`COMMANDS.md`](COMMANDS.md) | Referencia de comandos: scripts, variables de entorno, API y empaquetado |
 | [`CI_GITHUB.md`](CI_GITHUB.md) | Los cuatro workflows, qué protege cada uno y cómo reproducirlos |
@@ -36,6 +39,11 @@ ejecutable; los documentos explican el porqué.
 |---|---|
 | [`DETECCION_AMENAZAS.md`](DETECCION_AMENAZAS.md) | **Mapa honesto**: qué detecta hoy y qué queda fuera |
 | [`WALLET-SECURITY-BOUNDARIES.md`](WALLET-SECURITY-BOUNDARIES.md) | Fronteras de la postura de wallets, matriz de la familia y backlog de integración |
+| [`ONCHAIN-ANALYTICS.md`](ONCHAIN-ANALYTICS.md) | **Los 15 indicadores de inteligencia**: umbral, evidencia y falsos positivos |
+| [`RISK-MODEL.md`](RISK-MODEL.md) | Cómo se calcula el puntaje explicable y qué no significa |
+| [`BLOCKCHAIN-FORENSICS.md`](BLOCKCHAIN-FORENSICS.md) | Grafo, seguimiento de fondos y límites del análisis |
+| [`INVESTIGATION-GUIDE.md`](INVESTIGATION-GUIDE.md) | Flujo de trabajo del analista, de la ingesta al informe |
+| [`DATA-GOVERNANCE.md`](DATA-GOVERNANCE.md) | Qué datos entran, cuánto se conservan y cómo se gobiernan |
 | [`THREAT_MODEL.md`](THREAT_MODEL.md) | Amenazas consideradas y explícitamente fuera de alcance |
 | [`POLITICA_DE_PRIVACIDAD_LOCAL.md`](POLITICA_DE_PRIVACIDAD_LOCAL.md) | Qué datos toca, dónde quedan y cómo comprobarlo |
 | [`LICENCIA_Y_DECISION.md`](LICENCIA_Y_DECISION.md) | Por qué MIT, qué se pierde con ello y qué implica para un fork |
@@ -57,6 +65,9 @@ ejecuta:
 | «Cero dependencias, cero orígenes remotos, cero proveedores alojados» | `scripts/check-local-only.js` |
 | «No acepta claves ni credenciales; el RPC es de solo lectura y local por defecto» | `scripts/check-security-claims.js` |
 | «Las reglas del motor están en el catálogo, la política y el README» | `scripts/check-rule-coverage.js` |
+| «Los 15 indicadores tienen umbral, falsos positivos, acción y documentación» | `scripts/check-rule-coverage.js` |
+| «Ningún puntaje se emite sin explicación, límites y revisión humana» | `scripts/check-security-claims.js` |
+| «El grafo aplica sus cotas y la API de riesgo rechaza material privado» | `scripts/check-security-claims.js` |
 | «Ningún documento enlaza a un archivo inexistente» | `scripts/check-docs.js` |
 | «La aplicación empaquetada arranca y sirve inventario» | job `app-windows` de `.github/workflows/ci.yml` |
 

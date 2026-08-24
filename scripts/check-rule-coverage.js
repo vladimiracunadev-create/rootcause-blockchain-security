@@ -94,6 +94,78 @@ for (const code of difference(documented, emitted)) {
   fail("El README documenta " + code + ", que ninguna regla emite.");
 }
 
+// ── 4. Indicadores de inteligencia (INT-*) ─────────────────────────────────
+//
+// Los indicadores investigativos son un catálogo SEPARADO de los controles
+// preventivos: un indicador no es una violación de política. Pero sufren la
+// misma deriva silenciosa, así que se comprueban igual.
+const indicatorSource = await readText("src/domain/intelligence/indicators.js");
+const indicatorCatalog = JSON.parse(await readText("config/intelligence-indicators.json"));
+const intelligencePolicies = JSON.parse(await readText("config/intelligence-policies.json"));
+
+const referenced = new Set(
+  [...indicatorSource.matchAll(/\["(INT-[A-Z]+-\d{3})"\]/g)].map((match) => match[1])
+);
+const catalogued = new Set((indicatorCatalog.indicators || []).map((entry) => entry.id));
+const families = new Set((indicatorCatalog.families || []).map((entry) => entry.id));
+const thresholds = new Set(Object.keys(intelligencePolicies.thresholds || {}));
+
+if (catalogued.size === 0) fail("El catálogo de indicadores INT-* está vacío.");
+
+for (const code of difference(referenced, catalogued)) {
+  fail("El motor referencia el indicador " + code + ", que no existe en intelligence-indicators.json.");
+}
+for (const code of difference(catalogued, referenced)) {
+  fail("El catálogo declara el indicador " + code + ", que el motor nunca emite.");
+}
+for (const code of difference(catalogued, thresholds)) {
+  fail("El indicador " + code + " no tiene umbrales en intelligence-policies.json.");
+}
+for (const code of difference(thresholds, catalogued)) {
+  fail("intelligence-policies.json define umbrales para " + code + ", que no está en el catálogo.");
+}
+
+for (const indicator of indicatorCatalog.indicators || []) {
+  if (!families.has(indicator.family)) {
+    fail("El indicador " + indicator.id + " pertenece a la familia inexistente " + indicator.family + ".");
+  }
+  // La honestidad del producto depende de que cada indicador declare cómo
+  // puede equivocarse y qué hacer con él. Sin eso, es una alerta más.
+  if (!Array.isArray(indicator.falsePositives) || indicator.falsePositives.length < 2) {
+    fail("El indicador " + indicator.id + " debe declarar al menos dos falsos positivos posibles.");
+  }
+  if (!indicator.recommendedAction) {
+    fail("El indicador " + indicator.id + " no declara una acción recomendada.");
+  }
+  if (!["critical", "high", "medium", "low"].includes(indicator.severity)) {
+    fail("El indicador " + indicator.id + " tiene una severidad no soportada.");
+  }
+}
+
+// ── 5. Los indicadores están documentados ──────────────────────────────────
+const analyticsDoc = await readText("docs/ONCHAIN-ANALYTICS.md");
+const documentedIndicators = new Set(analyticsDoc.match(/\bINT-[A-Z]+-\d{3}\b/g) || []);
+for (const code of difference(catalogued, documentedIndicators)) {
+  fail("El indicador " + code + " no aparece en docs/ONCHAIN-ANALYTICS.md.");
+}
+for (const code of difference(documentedIndicators, catalogued)) {
+  fail("docs/ONCHAIN-ANALYTICS.md documenta " + code + ", que no existe en el catálogo.");
+}
+
+// ── 6. Las cifras declaradas coinciden con la realidad ─────────────────────
+const declaredCounts = [
+  { file: "README.md", text: readme },
+  { file: "docs/ONCHAIN-ANALYTICS.md", text: analyticsDoc }
+];
+for (const { file, text: content } of declaredCounts) {
+  const claim = content.match(/(\d+)\s+indicadores\s+(?:de\s+inteligencia|investigativos)/i);
+  if (claim && Number(claim[1]) !== catalogued.size) {
+    fail(
+      file + " declara " + claim[1] + " indicadores y el catálogo tiene " + catalogued.size + "."
+    );
+  }
+}
+
 if (errors.length) {
   console.error(errors.map((error) => "- " + error).join("\n"));
   process.exitCode = 1;
@@ -101,8 +173,13 @@ if (errors.length) {
   console.log(
     "Reglas coherentes: " +
       emitted.size +
-      " códigos emitidos, mapeados a " +
+      " códigos BLK-* emitidos, mapeados a " +
       (catalog.controls || []).length +
-      " controles, y documentados en política y README."
+      " controles, y documentados en política y README.\n" +
+      "Indicadores coherentes: " +
+      catalogued.size +
+      " códigos INT-* en " +
+      families.size +
+      " familias, con umbral, falsos positivos, acción recomendada y documentación."
   );
 }

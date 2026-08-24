@@ -10,6 +10,14 @@ import { EvmRpcClient } from "./infrastructure/evm-rpc.js";
 import { createDemoState, createEmptyState } from "./services/demo-state.js";
 import { DefenseService } from "./services/defense-service.js";
 import { Watchtower } from "./services/watchtower.js";
+import { createIntelligenceRouter } from "./api/intelligence-router.js";
+import { IntelligenceService } from "./services/intelligence-service.js";
+import { ingestDataset } from "./services/intelligence-datasets.js";
+import {
+  ConnectorRegistry,
+  DatasetConnector,
+  EvmRpcConnector
+} from "./services/intelligence-connectors.js";
 
 async function readJson(filePath) {
   return JSON.parse(await fs.readFile(filePath, "utf8"));
@@ -18,9 +26,11 @@ async function readJson(filePath) {
 export async function buildRuntime(env = process.env) {
   const config = loadConfig(env);
   assertProductionConfig(config);
-  const [policies, controls] = await Promise.all([
+  const [policies, controls, indicatorCatalog, intelligencePolicies] = await Promise.all([
     readJson(path.join(PROJECT_ROOT, "config", "policies.json")),
-    readJson(path.join(PROJECT_ROOT, "config", "control-catalog.json"))
+    readJson(path.join(PROJECT_ROOT, "config", "control-catalog.json")),
+    readJson(path.join(PROJECT_ROOT, "config", "intelligence-indicators.json")),
+    readJson(path.join(PROJECT_ROOT, "config", "intelligence-policies.json"))
   ]);
   const initialState = config.demoMode ? createDemoState() : createEmptyState();
   const store = config.demoMode
@@ -29,13 +39,45 @@ export async function buildRuntime(env = process.env) {
   const evmClient = new EvmRpcClient(config.evm);
   const service = new DefenseService({ store, config, policies, controls, evmClient });
   await service.initialize();
+
+  // Conectores de adquisición. El de dataset local está siempre disponible y no
+  // toca la red; el de EVM reutiliza el cliente JSON-RPC con su allowlist de
+  // solo lectura y hereda su restricción de destino local por defecto.
+  const connectors = new ConnectorRegistry();
+  connectors.register(new DatasetConnector({ network: "ethereum", dataset: { id: "empty", transactions: [] } }));
+  connectors.register(new EvmRpcConnector({ network: "ethereum", client: evmClient }));
+
+  const intelligence = new IntelligenceService({
+    defenseService: service,
+    indicatorCatalog,
+    policies: intelligencePolicies,
+    connectors
+  });
+
+  // La demo arranca con escenarios reproducibles cargados: una consola de
+  // inteligencia vacía no permite comprobar nada.
+  if (config.demoMode) {
+    for (const datasetId of [
+      "02-fan-in",
+      "04-peeling-chain",
+      "06-address-poisoning",
+      "08-drainer-simulado",
+      "09-post-exploit",
+      "10-falso-positivo"
+    ]) {
+      await ingestDataset(intelligence, datasetId, "demo-seed");
+    }
+    await intelligence.analyze("demo-seed");
+  }
+
   const application = createApplication({
     service,
     config,
-    staticRoot: path.join(PROJECT_ROOT, "src", "web", "static")
+    staticRoot: path.join(PROJECT_ROOT, "src", "web", "static"),
+    intelligenceRouter: createIntelligenceRouter({ intelligence })
   });
   const watchtower = new Watchtower(service, config.watchtower);
-  return { application, config, service, watchtower };
+  return { application, config, service, intelligence, connectors, watchtower };
 }
 
 // La edicion de escritorio necesita que el panel aparezca solo al arrancar.

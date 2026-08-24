@@ -69,7 +69,7 @@ powershell -File packaging/windows/make-icon.ps1
 powershell -File packaging/windows/build-portable.ps1
 
 # Instalador (reutiliza la carpeta ensamblada por el paso anterior)
-iscc /DAppVersion=0.2.0 packaging/windows/RootCause-Blockchain-Security.iss
+iscc /DAppVersion=0.3.0 packaging/windows/RootCause-Blockchain-Security.iss
 ~~~
 
 Atajo para los dos primeros pasos:
@@ -103,7 +103,7 @@ Un paquete que pesa lo esperado no prueba nada. La cadena de verificación es:
 Para verificar una descarga:
 
 ~~~powershell
-Get-FileHash .\RootCause-Blockchain-Security-0.2.0-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\RootCause-Blockchain-Security-0.3.0-win-x64-setup.exe -Algorithm SHA256
 ~~~
 
 ## Publicar una versión
@@ -111,12 +111,12 @@ Get-FileHash .\RootCause-Blockchain-Security-0.2.0-win-x64-setup.exe -Algorithm 
 ~~~bash
 # 1. subir la versión en package.json y CHANGELOG.md
 # 2. crear y empujar el tag; el workflow hace el resto
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.3.0
+git push origin v0.3.0
 ~~~
 
 El workflow rechaza el tag si no coincide con la versión de `package.json`, de
-modo que no puede publicarse un `v0.2.0` que por dentro dice `0.1.0`.
+modo que no puede publicarse un `v0.3.0` que por dentro dice `0.1.0`.
 
 ## Mantenimiento del runtime
 

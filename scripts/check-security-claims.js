@@ -412,6 +412,109 @@ try {
     );
   }
 
+  // ── Frontera de inteligencia ────────────────────────────────────────────
+  // El dominio de análisis on-chain amplía mucho la superficie: ingiere datos
+  // de terceros, puntúa direcciones y expone una API para wallets. Cada una de
+  // esas capacidades tiene una forma de convertirse en algo peligroso, y aquí
+  // se comprueba que ninguna lo ha hecho.
+  const intelSummary = await (await fetch(base + "/api/v1/intelligence/summary")).json();
+  expect(
+    intelSummary?.apiVersion === "v1" && Number(intelSummary?.summary?.transactions || 0) > 0,
+    "API de inteligencia versionada y con datos (" + intelSummary?.summary?.transactions + " transacciones)",
+    "La API v1 de inteligencia no respondió con datos: " + JSON.stringify(intelSummary).slice(0, 200)
+  );
+
+  // Un puntaje sin explicación es exactamente lo que este producto no puede
+  // producir: se comprueba sobre la respuesta real.
+  const sampleAddress = "0xc8c8" + "0".repeat(36);
+  const riskResponse = await fetch(base + "/api/v1/risk/addresses/ethereum/" + sampleAddress);
+  const riskBody = await riskResponse.json();
+  const assessment = riskBody?.assessment;
+  expect(
+    riskResponse.status === 200 &&
+      Number.isInteger(assessment?.score) &&
+      Array.isArray(assessment?.factorsIncreasing) &&
+      Array.isArray(assessment?.limitations) &&
+      assessment.limitations.length >= 3 &&
+      assessment.requiresHumanReview === true &&
+      Boolean(assessment.modelVersion),
+    "el puntaje nunca viaja sin explicación, límites y revisión humana",
+    "Una evaluación de riesgo llegó sin explicación completa: " + JSON.stringify(riskBody).slice(0, 300)
+  );
+
+  // La API de riesgo para wallets es el punto donde un producto así se
+  // convierte en custodio por accidente. No debe aceptar material privado ni
+  // pretender autorizar nada.
+  for (const secret of [
+    { network: "ethereum", to: "0x" + "b".repeat(40), seedPhrase: "abandon abandon abandon" },
+    { network: "ethereum", to: "0x" + "b".repeat(40), wallet: { privateKey: "0x" + "ab".repeat(32) } },
+    { network: "ethereum", to: "0x" + "b".repeat(40), signedTransaction: { rawSignedTransaction: "0xf86b" } }
+  ]) {
+    const response = await post("/api/v1/risk/transactions", secret, { "x-rootcause-request": "1" });
+    expect(
+      response.status === 422,
+      "la API de riesgo rechaza material privado (" + Object.keys(secret).filter((key) => key !== "network" && key !== "to") + ")",
+      "La API de riesgo aceptó material privado: " + response.status
+    );
+  }
+
+  const advisory = await post(
+    "/api/v1/risk/transactions",
+    { network: "ethereum", from: sampleAddress, to: "0xdada" + "0".repeat(36) },
+    { "x-rootcause-request": "1" }
+  );
+  const advisoryBody = await advisory.json();
+  expect(
+    advisory.status === 200 &&
+      advisoryBody.decision === "advisory-only" &&
+      !("approved" in advisoryBody) &&
+      !("blocked" in advisoryBody) &&
+      !("signature" in advisoryBody),
+    "el análisis previo de transacción es consultivo, no autoriza ni bloquea",
+    "El análisis previo devolvió algo que parece una autorización: " + JSON.stringify(advisoryBody).slice(0, 300)
+  );
+
+  // El grafo tiene que estar acotado siempre: una consulta hostil no puede
+  // pedir profundidad ilimitada y agotar el proceso.
+  const hostileGraph = await (
+    await fetch(
+      base + "/api/v1/intelligence/graph/ethereum/" + sampleAddress + "?depth=100000&maxNodes=100000000"
+    )
+  ).json();
+  expect(
+    hostileGraph?.limits?.maxDepth <= 6 && hostileGraph?.limits?.maxNodes <= 2000,
+    "el grafo aplica sus cotas aunque se pidan valores extremos",
+    "El grafo aceptó límites desmedidos: " + JSON.stringify(hostileGraph?.limits)
+  );
+
+  // Ninguna consulta debe poder salirse del directorio de datasets.
+  const traversal = await post(
+    "/api/v1/intelligence/ingest/dataset",
+    { datasetId: "../../package" },
+    { "x-rootcause-request": "1" }
+  );
+  expect(
+    traversal.status === 400,
+    "el cargador de datasets rechaza el path traversal",
+    "Un datasetId con travesía de rutas devolvió " + traversal.status + "."
+  );
+
+  // Ninguna lista remota de reputación: consultarla filtraría qué se vigila.
+  const intelligenceSources = [
+    "src/domain/intelligence/indicators.js",
+    "src/domain/intelligence/risk-score.js",
+    "src/services/intelligence-service.js"
+  ];
+  let remoteIntel = 0;
+  for (const relative of intelligenceSources) {
+    const content = await fs.readFile(path.join(PROJECT_ROOT, relative), "utf8");
+    if (/https?:\/\/[a-z0-9.-]+\.[a-z]{2,}/i.test(content)) {
+      remoteIntel += 1;
+      fail("El dominio de inteligencia referencia un origen remoto en " + relative + ".");
+    }
+  }
+  if (remoteIntel === 0) ok("inteligencia sin listas remotas de reputación");
+
   // El paquete distribuido tiene que arrancar CON contenido. Una aplicación
   // que abre vacía es el fallo que nadie detecta a tiempo.
   const summary = await (await fetch(base + "/api/summary")).json();

@@ -45,6 +45,27 @@ que usa el producto, ordenada por lo que más ha costado históricamente:
 | 27 | Firma off-chain (permit, typed data) todavía no utilizada | **No** | Invisible hasta su uso; prevención pre-firma: Web Inspector |
 | 28 | Drainer, blind signing, malware de portapapeles, SIM swap, seed expuesta | **No (solo consecuencias on-chain)** | Ver [`WALLET-SECURITY-BOUNDARIES.md`](WALLET-SECURITY-BOUNDARIES.md) |
 
+## Dos motores, dos preguntas distintas
+
+Desde la versión 0.3.0 el producto tiene dos catálogos que **no se mezclan**:
+
+| Catálogo | Pregunta que responde | Salida |
+|---|---|---|
+| `BLK-*` (22 detecciones) | ¿Está mal puesto un control de mi sistema? | Incidente con causa raíz y remediación |
+| `INT-*` (15 indicadores) | ¿Hay algo que investigar en estos datos públicos? | Indicador con evidencia, confianza y falsos positivos |
+
+Una detección `BLK-*` afirma que una política declarada se incumple. Un
+indicador `INT-*` **no afirma nada**: señala un patrón reproducible y remite a
+una persona. Confundirlos sería el error más caro de este producto, y por eso
+viven en catálogos, configuraciones y documentos separados
+([`HEURISTICAS.md`](HEURISTICAS.md) y
+[`ONCHAIN-ANALYTICS.md`](ONCHAIN-ANALYTICS.md)).
+
+Donde ambos miran el mismo patrón —aprobaciones ilimitadas, address poisoning—
+se distinguen por el dominio: `BLK-WALLET-*` evalúa **cuentas vigiladas contra
+tu política**; `INT-EXPO-*` evalúa **datos ingeridos en una investigación**. No
+se duplican porque no operan sobre el mismo conjunto.
+
 ## Los grados de «sí»
 
 No todos los «sí» valen lo mismo, y mezclarlos sería deshonesto. La columna
@@ -83,6 +104,16 @@ escribir tus controles y luego te confronta con tu propia declaración. Su valor
 está en que *hacer el inventario* ya descubre la mitad de los problemas, y en
 que la declaración queda registrada, fechada y auditable — de modo que si
 resultó falsa, eso también es un hallazgo.
+
+### Sí como indicador investigable
+
+Los quince códigos `INT-*`. Son el grado más débil de todos y el que exige más
+disciplina al leerlo: dicen que un patrón está presente en los datos
+**ingeridos**, con una confianza declarada y una lista de formas conocidas de
+equivocarse. No concluyen, no atribuyen identidad y no autorizan ninguna acción.
+
+La honestidad aquí es estructural: un gate de CI rechaza cualquier indicador
+que no declare al menos dos falsos positivos posibles y una acción recomendada.
 
 ### Heurística, marcada como tal
 

@@ -7,17 +7,35 @@
   accounts, delegaciones EIP-7702 y actividad inesperada — 13 controles y 22
   detecciones, siempre watch-only.
 
-## 0.3
+## 0.3 — entregado (2026-08-24)
 
+- **RootCause Blockchain Intelligence**: ingesta idempotente con control de
+  reorganizaciones, 15 indicadores investigativos, puntaje explicable, grafo
+  acotado de movimiento de fondos, alertas, casos, evidencia inmutable y API v1
+  con OpenAPI. Bitcoin y Ethereum.
+
+## 0.4 — siguiente incremento
+
+Etapa 3 del dominio de inteligencia, **explícitamente no implementada hoy**:
+
+- anomalías estadísticas sobre la línea base de cada dirección, con su tasa de
+  error declarada;
+- correlación cross-chain real: emparejar la entrada y la salida de un puente
+  entre dos redes, con confianza medida en vez de supuesta;
+- métricas de calidad del motor: precisión por indicador a partir de los falsos
+  positivos que los analistas registran;
 - adaptadores de logs EVM con checkpoints y confirmaciones, incluyendo la
   traducción automática de logs `Approval`/`ApprovalForAll`/`Transfer` a los
   eventos wallet normalizados;
 - adaptador Permit2 explícito y probado contra su especificación oficial;
-- ingesta de SBOM, hashes de build y attestations de despliegue;
-- simulación externa de upgrades sin capacidad de firma;
-- exportación de evidencia hacia el RootCause principal.
+- almacenamiento embebido (SQLite o DuckDB) si se cumplen los umbrales de
+  [`ADR-0002`](ADR-0002-almacenamiento-inteligencia.md).
 
-## 0.4
+Los modelos de aprendizaje automático se mantienen **opcionales y fuera del
+camino crítico**: un puntaje que no se puede explicar no puede sostener una
+decisión sobre el dinero de nadie.
+
+## 0.5
 
 - adaptadores Solana, Cosmos y Substrate;
 - detección de cambios de validadores y gobernanza;

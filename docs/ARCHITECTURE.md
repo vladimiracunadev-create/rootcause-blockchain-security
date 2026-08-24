@@ -18,10 +18,36 @@ flowchart LR
 ## Componentes
 
 - `src/domain`: validación, guardia de secretos y reglas puras.
+- `src/domain/intelligence`: modelo normalizado, motor de indicadores, grafo de
+  fondos y puntaje explicable. Todo funciones puras y deterministas.
 - `src/infrastructure`: RPC EVM read-only, cifrado y auditoría.
-- `src/services`: casos de uso, correlación y watchtower.
-- `src/api`: API HTTP local.
+- `src/services`: casos de uso, correlación, watchtower, conectores de
+  adquisición y ciclo de vida de alertas, casos y evidencia.
+- `src/api`: API HTTP local y API v1 versionada de inteligencia.
 - `src/web/static`: dashboard PWA sin telemetría ni CDN.
+
+## Dominio de inteligencia
+
+~~~mermaid
+flowchart LR
+  C[Conectores read-only<br/>dataset · EVM · Bitcoin] --> P[Pipeline<br/>normalizar · deduplicar · reorgs]
+  P --> H[(Hechos observados<br/>con procedencia)]
+  H --> I[Motor de indicadores<br/>INT-*]
+  H --> G[Grafo acotado]
+  I --> S[Puntaje explicable]
+  G --> S
+  I --> A[Alertas]
+  A --> K[Casos + evidencia hasheada]
+  S --> V[API v1 · panel]
+  K --> R[Informe técnico]
+~~~
+
+El flujo tiene una propiedad deliberada: **el puntaje nunca sale sin pasar por
+la explicación**, y las alertas nunca disparan una acción, solo abren un caso
+para una persona.
+
+Decisión de almacenamiento y cuándo revisarla:
+[`ADR-0002`](ADR-0002-almacenamiento-inteligencia.md).
 
 ## Límite con Bitcoin
 

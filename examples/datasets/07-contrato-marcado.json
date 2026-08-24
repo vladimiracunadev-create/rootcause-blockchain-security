@@ -1,0 +1,65 @@
+{
+  "id": "07-contrato-marcado",
+  "title": "Interaccion con un contrato marcado localmente",
+  "description": "El operador marco un contrato en su registro local y una direccion interactua con el.",
+  "network": "ethereum",
+  "evaluateAt": "2026-08-02T00:00:00.000Z",
+  "expected": {
+    "indicators": [
+      "INT-EXPO-001"
+    ],
+    "note": "La marca es LOCAL y del operador. El indicador no afirma que el contrato sea malicioso: afirma que esta marcado."
+  },
+  "registries": {
+    "contracts": [
+      {
+        "network": "ethereum",
+        "address": "0xdead000000000000000000000000000000000000",
+        "label": "Contrato de prueba marcado",
+        "category": "flagged-test",
+        "flagged": true,
+        "flagReason": "Marcado en el laboratorio para verificar el indicador",
+        "source": {
+          "kind": "local-dataset",
+          "id": "fixture"
+        }
+      }
+    ]
+  },
+  "transactions": [
+    {
+      "network": "ethereum",
+      "txid": "0xfc10000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000001,
+      "blockHash": "0xbfc1000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T10:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xb7b7000000000000000000000000000000000000",
+          "to": "0xdead000000000000000000000000000000000000",
+          "amountRaw": "500000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    },
+    {
+      "network": "ethereum",
+      "txid": "0xfc20000000000000000000000000000000000000000000000000000000000000",
+      "blockHeight": 21000002,
+      "blockHash": "0xbfc2000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": "2026-08-01T12:00:00.000Z",
+      "transfers": [
+        {
+          "from": "0xb7b7000000000000000000000000000000000000",
+          "to": "0xdead000000000000000000000000000000000000",
+          "amountRaw": "800000000000000000",
+          "asset": "ETH",
+          "decimals": 18,
+          "kind": "transfer"
+        }
+      ]
+    }
+  ]
+}

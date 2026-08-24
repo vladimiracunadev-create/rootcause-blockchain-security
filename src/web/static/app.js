@@ -1,6 +1,7 @@
 const model = {
   summary: null,
   controls: [],
+  intelligence: null,
   filter: "active",
   selectedIncidentId: null
 };
@@ -250,6 +251,194 @@ function renderWallet() {
   document.querySelector("#nav-wallet-count").textContent = posture.openIncidents ?? 0;
 }
 
+// ── Blockchain Intelligence ────────────────────────────────────────────────
+
+const bandNames = { low: "Bajo", moderate: "Moderado", high: "Alto", critical: "Crítico" };
+const epistemicNames = {
+  "observed-fact": "Hecho observado",
+  indicator: "Indicador",
+  inference: "Inferencia",
+  hypothesis: "Hipótesis"
+};
+
+function alertTemplate(alert) {
+  return `
+    <article class="incident-row" data-alert-id="${escapeHtml(alert.id)}" data-severity="${escapeHtml(alert.severity)}" role="button" tabindex="0">
+      <span class="severity-bar" aria-hidden="true"></span>
+      <div class="incident-main">
+        <span>${escapeHtml(alert.indicator)} · ${escapeHtml(alert.status)}</span>
+        <h4>${escapeHtml(alert.title)}</h4>
+        <p>${escapeHtml(alert.explanation)}</p>
+      </div>
+      <div class="incident-meta">
+        <span class="severity-label">${escapeHtml(severityNames[alert.severity] || alert.severity)}</span>
+        <time>${escapeHtml(shortDate(alert.createdAt))}</time>
+      </div>
+    </article>`;
+}
+
+function factorTemplate(factor) {
+  const sign = factor.points >= 0 ? "+" : "";
+  return `
+    <div class="factor-row" data-direction="${factor.points >= 0 ? "up" : "down"}">
+      <b>${sign}${factor.points}</b>
+      <div>
+        <strong>${escapeHtml(factor.label)}</strong>
+        <p>${escapeHtml(factor.detail || "")}</p>
+        ${factor.caveat ? `<em>${escapeHtml(factor.caveat)}</em>` : ""}
+      </div>
+      <span>${escapeHtml(epistemicNames[factor.epistemicLevel] || factor.epistemicLevel || "")}</span>
+    </div>`;
+}
+
+function renderAssessment(assessment) {
+  const target = document.querySelector("#intel-assessment");
+  const increasing = (assessment.factorsIncreasing || []).map(factorTemplate).join("");
+  const decreasing = (assessment.factorsDecreasing || []).map(factorTemplate).join("");
+  const limitations = (assessment.limitations || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const indicators = (assessment.indicators || [])
+    .map(
+      (indicator) => `
+      <div class="intel-indicator">
+        <span>${escapeHtml(indicator.indicator)} · ${escapeHtml(severityNames[indicator.severity] || indicator.severity)} · confianza ${escapeHtml(indicator.confidence)}</span>
+        <strong>${escapeHtml(indicator.title)}</strong>
+        <p>${escapeHtml(indicator.explanation)}</p>
+        <details>
+          <summary>Falsos positivos posibles y acción recomendada</summary>
+          <ul>${(indicator.falsePositives || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          <p><strong>Acción:</strong> ${escapeHtml(indicator.recommendedAction || "")}</p>
+        </details>
+      </div>`
+    )
+    .join("");
+
+  target.innerHTML = `
+    <div class="intel-score" data-band="${escapeHtml(assessment.band)}">
+      <div class="intel-score-visual"><strong>${assessment.score}</strong><small>/ 100</small></div>
+      <div>
+        <p class="eyebrow">${escapeHtml(assessment.subject)}</p>
+        <h3>${escapeHtml(bandNames[assessment.band] || assessment.band)} · confianza ${escapeHtml(assessment.confidence)}</h3>
+        <p>${escapeHtml(assessment.summary)}</p>
+        <p class="intel-model">Modelo ${escapeHtml(assessment.modelVersion || "—")} · ${assessment.dataScope?.transactionsAnalyzed ?? 0} transacciones analizadas</p>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <section class="detail-block"><h3>Factores que aumentan el puntaje</h3>${increasing || '<p class="empty-state">Ninguno.</p>'}</section>
+      <section class="detail-block"><h3>Factores que lo reducen</h3>${decreasing || '<p class="empty-state">Ninguno.</p>'}</section>
+      <section class="detail-block"><h3>Indicadores</h3>${indicators || '<p class="empty-state">Sin indicadores activos sobre los datos analizados.</p>'}</section>
+      <section class="detail-block"><h3>Limitaciones</h3><ul>${limitations}</ul></section>
+      <section class="detail-block"><h3>Recomendación</h3><p>${escapeHtml(assessment.recommendation)}</p><p><strong>Requiere revisión humana:</strong> siempre.</p></section>
+    </div>`;
+}
+
+// Grafo en SVG generado a mano: los nodos se colocan por número de saltos
+// (columnas) y el resultado es determinista. Sin librerías, sin CDN.
+function renderGraph(graph) {
+  const status = document.querySelector("#intel-graph-status");
+  const target = document.querySelector("#intel-graph");
+  if (!graph?.found || !graph.nodes.length) {
+    status.textContent = "Sin datos";
+    target.innerHTML = '<div class="empty-state">La dirección no aparece en el grafo de transferencias observadas.</div>';
+    return;
+  }
+  const columns = new Map();
+  for (const node of graph.nodes.slice(0, 40)) {
+    if (!columns.has(node.hops)) columns.set(node.hops, []);
+    columns.get(node.hops).push(node);
+  }
+  const columnKeys = [...columns.keys()].sort((a, b) => a - b);
+  const width = Math.max(420, columnKeys.length * 190);
+  const tallest = Math.max(...columnKeys.map((key) => columns.get(key).length));
+  const height = Math.max(160, tallest * 46 + 30);
+  const position = new Map();
+  columnKeys.forEach((key, columnIndex) => {
+    const nodes = columns.get(key);
+    nodes.forEach((node, rowIndex) => {
+      position.set(node.key, {
+        x: 60 + columnIndex * 180,
+        y: 30 + rowIndex * 46 + (tallest - nodes.length) * 23
+      });
+    });
+  });
+  const flagged = new Set(graph.flaggedNodes || []);
+  const edges = graph.edges
+    .filter((edge) => position.has(edge.from) && position.has(edge.to))
+    .slice(0, 120)
+    .map((edge) => {
+      const from = position.get(edge.from);
+      const to = position.get(edge.to);
+      return `<line x1="${from.x + 46}" y1="${from.y}" x2="${to.x - 46}" y2="${to.y}" class="graph-edge" />`;
+    })
+    .join("");
+  const nodes = [...position.entries()]
+    .map(([key, point]) => {
+      const address = key.split(":").slice(1).join(":");
+      const label = address.length > 12 ? address.slice(0, 6) + "…" + address.slice(-4) : address;
+      const isStart = key === graph.start;
+      const isFlagged = flagged.has(key);
+      return `<g class="graph-node${isStart ? " start" : ""}${isFlagged ? " flagged" : ""}">
+        <rect x="${point.x - 46}" y="${point.y - 14}" width="92" height="28" rx="8" />
+        <text x="${point.x}" y="${point.y + 4}" text-anchor="middle">${escapeHtml(label)}</text>
+        <title>${escapeHtml(key)}</title>
+      </g>`;
+    })
+    .join("");
+
+  status.textContent = graph.truncated ? "Truncado: " + graph.truncationReasons.join(", ") : "Completo";
+  status.classList.toggle("offline", Boolean(graph.truncated));
+  target.innerHTML = `
+    <div class="graph-canvas"><svg viewBox="0 0 ${width} ${height}" role="img"
+      aria-label="Grafo de transferencias observadas desde la dirección consultada">${edges}${nodes}</svg></div>
+    <p class="graph-note">${graph.nodes.length} nodos · ${graph.edges.length} aristas · profundidad ${graph.depth}. ${escapeHtml(graph.caveat)}</p>`;
+}
+
+function renderIntelligence() {
+  const intel = model.intelligence;
+  if (!intel) return;
+  const summary = intel.summary || {};
+  const metrics = [
+    ["Transacciones analizadas", summary.transactions, "Redes: " + (summary.networks || []).join(", ")],
+    ["Indicadores activos", summary.indicators, "Señales investigables"],
+    ["Alertas abiertas", summary.alerts?.open, (summary.alerts?.falsePositives ?? 0) + " falsos positivos registrados"],
+    ["Casos", summary.cases?.total, (summary.cases?.open ?? 0) + " abiertos"],
+    ["Grafo", summary.graph?.nodes, (summary.graph?.edges ?? 0) + " aristas"],
+    ["Direcciones marcadas", (summary.registries?.drainers ?? 0) + (summary.registries?.contracts ?? 0), "Registro local del operador"],
+    ["Reorganizaciones", summary.reorgs, (summary.orphanedTransactions ?? 0) + " transacciones huérfanas"],
+    ["Evidencia", summary.evidence, "Hasheada e inmutable"]
+  ];
+  document.querySelector("#intel-metrics").innerHTML = metrics
+    .map(([label, value, hint]) => `<article class="metric-card"><span>${escapeHtml(label)}</span><strong>${humanNumber(value || 0)}</strong><small>${escapeHtml(hint)}</small></article>`)
+    .join("");
+  document.querySelector("#nav-intel-count").textContent = summary.alerts?.open ?? 0;
+
+  const alerts = intel.alerts || [];
+  document.querySelector("#intel-alerts").innerHTML = alerts.length
+    ? alerts.map(alertTemplate).join("")
+    : '<div class="empty-state">Sin alertas abiertas.</div>';
+
+  const cases = intel.cases || [];
+  document.querySelector("#intel-cases").innerHTML = cases.length
+    ? cases
+        .map(
+          (entry) => `
+      <div class="contract-line">
+        <div><strong>${escapeHtml(entry.title)}</strong><code>${escapeHtml(entry.status)} · ${entry.alertIds.length} alertas · ${entry.evidenceIds.length} evidencias</code></div>
+        <span class="${entry.status === "closed" ? "" : "unverified"}"></span>
+      </div>`
+        )
+        .join("")
+    : '<div class="empty-state">No hay casos de investigación abiertos.</div>';
+}
+
+async function evaluateAddress(network, address) {
+  const [risk, graph] = await Promise.all([
+    api(`/api/v1/risk/addresses/${encodeURIComponent(network)}/${encodeURIComponent(address)}`),
+    api(`/api/v1/intelligence/graph/${encodeURIComponent(network)}/${encodeURIComponent(address)}?direction=both&depth=3`)
+  ]);
+  renderAssessment(risk.assessment);
+  renderGraph(graph);
+}
+
 function renderProjects() {
   const projects = model.summary.projects || [];
   document.querySelector("#project-grid").innerHTML = projects.length
@@ -271,6 +460,7 @@ function render() {
   renderNode();
   renderIncidents();
   renderWallet();
+  renderIntelligence();
   renderProjects();
   renderControls();
 }
@@ -279,6 +469,22 @@ async function reload() {
   const [summary, controls] = await Promise.all([api("/api/summary"), api("/api/controls")]);
   model.summary = summary;
   model.controls = controls.controls || [];
+  // La consola de inteligencia es opcional: si su API no responde, el resto del
+  // panel sigue funcionando en vez de quedarse en blanco.
+  try {
+    const [intelSummary, alerts, cases] = await Promise.all([
+      api("/api/v1/intelligence/summary"),
+      api("/api/v1/intelligence/alerts"),
+      api("/api/v1/intelligence/cases")
+    ]);
+    model.intelligence = {
+      summary: intelSummary.summary,
+      alerts: (alerts.alerts || []).filter((alert) => !["closed", "false-positive"].includes(alert.status)),
+      cases: cases.cases || []
+    };
+  } catch {
+    model.intelligence = null;
+  }
   render();
 }
 
@@ -286,6 +492,7 @@ const VIEW_TITLES = {
   overview: "Postura de seguridad",
   incidents: "Incidentes",
   wallet: "Wallet Posture",
+  intelligence: "Blockchain Intelligence",
   inventory: "Inventario multi-chain",
   controls: "Controles de defensa"
 };
@@ -413,8 +620,40 @@ document.querySelector("#acknowledge-button").addEventListener("click", async (e
   document.querySelector("#incident-dialog").close();
 });
 
+document.querySelector("#intel-search-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const network = document.querySelector("#intel-network").value;
+  const address = document.querySelector("#intel-address").value.trim();
+  if (!address) return;
+  const button = event.currentTarget.querySelector("button");
+  await runAction(button, () => evaluateAddress(network, address), "Evaluación completada.");
+});
+
+document.querySelector("#intel-analyze-button").addEventListener("click", (event) =>
+  runAction(
+    event.currentTarget,
+    () => api("/api/v1/intelligence/analyze", { method: "POST", body: "{}" }),
+    "Análisis de inteligencia completado."
+  )
+);
+
+// Una evaluación es marcable: `?network=…&address=…#intelligence` abre el panel
+// con esa dirección ya evaluada. Sirve para volver a una investigación sin
+// repetir la búsqueda y para que una captura apunte siempre al mismo estado.
+function evaluateFromQuery() {
+  const parameters = new URLSearchParams(window.location.search);
+  const address = parameters.get("address");
+  const network = parameters.get("network") || "ethereum";
+  if (!address) return;
+  document.querySelector("#intel-network").value = network;
+  document.querySelector("#intel-address").value = address;
+  evaluateAddress(network, address).catch((error) => toast(error.message, true));
+}
+
 switchView(viewFromHash(window.location.hash), false);
-reload().catch((error) => toast(error.message, true));
+reload()
+  .then(evaluateFromQuery)
+  .catch((error) => toast(error.message, true));
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));

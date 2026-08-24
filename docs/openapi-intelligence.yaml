@@ -1,0 +1,574 @@
+openapi: 3.1.0
+info:
+  title: RootCause Blockchain Intelligence API
+  version: 1.0.0
+  summary: API local, de solo lectura sobre datos públicos, para consultar riesgo on-chain.
+  description: |
+    API versionada del dominio de inteligencia de RootCause Blockchain Security.
+
+    Esta API NUNCA solicita claves privadas, frases semilla, keystores ni
+    autorización para mover fondos, y NUNCA construye, firma o transmite una
+    transaccion. El endpoint de analisis previo de una transaccion es
+    explicitamente consultivo: devuelve advertencias, no permisos.
+
+    Todo puntaje se devuelve acompanado de los factores que lo componen, su
+    confianza, sus limitaciones y la version del modelo. No existe ninguna ruta
+    que devuelva un puntaje sin explicacion.
+
+    Las mutaciones exigen la cabecera `x-rootcause-request: 1` y se rechazan si
+    llegan como peticion cross-site. El servicio escucha en loopback por defecto.
+  license:
+    name: MIT
+servers:
+  - url: http://127.0.0.1:8790
+    description: Instancia local
+tags:
+  - name: risk
+    description: Consulta de riesgo para wallets y servicios
+  - name: pipeline
+    description: Ingesta y analisis
+  - name: graph
+    description: Seguimiento de fondos
+  - name: investigation
+    description: Alertas, casos y evidencia
+paths:
+  /api/v1/risk/addresses/{network}/{address}:
+    get:
+      tags: [risk]
+      summary: Riesgo de una direccion, con explicacion completa
+      parameters:
+        - name: network
+          in: path
+          required: true
+          schema: { type: string, enum: [bitcoin, ethereum] }
+        - name: address
+          in: path
+          required: true
+          description: Direccion publica. Se valida checksum base58check/bech32 en Bitcoin.
+          schema: { type: string, minLength: 20, maxLength: 128 }
+      responses:
+        "200":
+          description: Evaluacion con puntaje, factores, confianza y limitaciones
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [apiVersion, assessment]
+                properties:
+                  apiVersion: { type: string, const: v1 }
+                  assessment: { $ref: "#/components/schemas/RiskAssessment" }
+        "400":
+          description: Direccion invalida o red no soportada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/risk/contracts/{network}/{address}:
+    get:
+      tags: [risk]
+      summary: Riesgo de un contrato, con explicacion completa
+      parameters:
+        - name: network
+          in: path
+          required: true
+          schema: { type: string, enum: [bitcoin, ethereum] }
+        - name: address
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Evaluacion del contrato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  apiVersion: { type: string, const: v1 }
+                  assessment: { $ref: "#/components/schemas/RiskAssessment" }
+  /api/v1/risk/transactions:
+    post:
+      tags: [risk]
+      summary: Analisis previo de una transaccion (consultivo)
+      description: |
+        Evalua el destino de una transaccion antes de que el usuario la firme en
+        SU wallet. RootCause no construye, firma ni transmite nada, y este
+        endpoint no autoriza ni bloquea la operacion: devuelve advertencias.
+
+        El cuerpo solo admite identificadores publicos. Cualquier campo con
+        material privado en cualquier profundidad se rechaza con 422.
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [network, to]
+              properties:
+                network: { type: string, enum: [bitcoin, ethereum] }
+                from: { type: string, description: Direccion publica de origen (opcional) }
+                to: { type: string, description: Direccion publica de destino }
+              additionalProperties: false
+      responses:
+        "200":
+          description: Resultado consultivo
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [decision, notice, warnings, counterparty]
+                properties:
+                  network: { type: string }
+                  from: { type: [string, "null"] }
+                  to: { type: string }
+                  decision:
+                    type: string
+                    const: advisory-only
+                    description: Valor fijo. Esta API nunca emite una autorizacion.
+                  notice: { type: string }
+                  warnings: { type: array, items: { type: string } }
+                  counterparty: { $ref: "#/components/schemas/RiskAssessment" }
+                  evaluatedAt: { type: string, format: date-time }
+        "422":
+          description: Se detecto material privado en la peticion y fue rechazada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/intelligence/summary:
+    get:
+      tags: [pipeline]
+      summary: Estado del dominio de inteligencia
+      responses:
+        "200": { description: Resumen de datos, alertas, casos y conectores }
+  /api/v1/intelligence/indicators:
+    get:
+      tags: [pipeline]
+      summary: Catalogo de los indicadores INT-*
+      responses:
+        "200": { description: Catalogo con severidad, falsos positivos y accion recomendada }
+  /api/v1/intelligence/datasets:
+    get:
+      tags: [pipeline]
+      summary: Datasets sinteticos disponibles con su resultado esperado
+      responses:
+        "200": { description: Lista de datasets }
+  /api/v1/intelligence/connectors:
+    get:
+      tags: [pipeline]
+      summary: Conectores registrados y sus metricas
+      responses:
+        "200": { description: Conectores, todos de solo lectura }
+  /api/v1/intelligence/ingest:
+    post:
+      tags: [pipeline]
+      summary: Ingerir bloques y transacciones normalizados
+      description: Idempotente por red y hash. Un bloque distinto a una altura conocida se trata como reorganizacion.
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                blocks: { type: array, maxItems: 500, items: { type: object } }
+                transactions: { type: array, maxItems: 5000, items: { type: object } }
+                source: { $ref: "#/components/schemas/DataSource" }
+                datasetId: { type: [string, "null"] }
+      responses:
+        "202": { description: Resultado de la ejecucion con sus estadisticas }
+        "422": { description: Material privado rechazado }
+  /api/v1/intelligence/ingest/dataset:
+    post:
+      tags: [pipeline]
+      summary: Ingerir un dataset sintetico por identificador
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [datasetId]
+              properties:
+                datasetId: { type: string, pattern: "^[0-9a-z][0-9a-z-]{2,60}$" }
+      responses:
+        "202": { description: Dataset ingerido con sus registros locales }
+        "400": { description: Identificador invalido o con travesia de rutas }
+        "404": { description: Dataset inexistente }
+  /api/v1/intelligence/ingest/connector:
+    post:
+      tags: [pipeline]
+      summary: Ingerir desde un conector registrado
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [connectorId]
+              properties:
+                connectorId: { type: string }
+                options: { type: object }
+      responses:
+        "202": { description: Resultado de la ingesta }
+        "404": { description: Conector desconocido }
+        "429": { description: Limite de solicitudes del conector alcanzado }
+  /api/v1/intelligence/analyze:
+    post:
+      tags: [pipeline]
+      summary: Ejecutar el motor de indicadores y sincronizar alertas
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+      responses:
+        "200": { description: Numero de indicadores y alertas creadas }
+  /api/v1/intelligence/graph/{network}/{address}:
+    get:
+      tags: [graph]
+      summary: Recorrido acotado del movimiento de fondos
+      parameters:
+        - name: network
+          in: path
+          required: true
+          schema: { type: string, enum: [bitcoin, ethereum] }
+        - name: address
+          in: path
+          required: true
+          schema: { type: string }
+        - name: direction
+          in: query
+          schema: { type: string, enum: [forward, backward, both], default: forward }
+        - name: depth
+          in: query
+          description: Recortado al techo duro de 6 aunque se pida mas.
+          schema: { type: integer, minimum: 1, maximum: 6 }
+        - name: maxNodes
+          in: query
+          schema: { type: integer, maximum: 2000 }
+        - name: asset
+          in: query
+          schema: { type: string }
+        - name: minAmountRaw
+          in: query
+          schema: { type: string, pattern: "^[0-9]{1,78}$" }
+      responses:
+        "200":
+          description: Nodos, aristas y declaracion de truncamiento
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GraphResult" }
+  /api/v1/intelligence/paths:
+    get:
+      tags: [graph]
+      summary: Caminos simples entre dos direcciones
+      parameters:
+        - { name: network, in: query, required: true, schema: { type: string } }
+        - { name: from, in: query, required: true, schema: { type: string } }
+        - { name: to, in: query, required: true, schema: { type: string } }
+        - { name: depth, in: query, schema: { type: integer, maximum: 6 } }
+      responses:
+        "200": { description: Caminos encontrados y si la busqueda se trunco }
+        "400": { description: Faltan parametros obligatorios }
+  /api/v1/intelligence/cycles:
+    get:
+      tags: [graph]
+      summary: Ciclos observados en el grafo
+      responses:
+        "200": { description: Ciclos, acotados }
+  /api/v1/intelligence/communities:
+    get:
+      tags: [graph]
+      summary: Componentes conexos (inferencia, no titularidad)
+      responses:
+        "200": { description: Comunidades con su advertencia }
+  /api/v1/intelligence/alerts:
+    get:
+      tags: [investigation]
+      summary: Listar alertas
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [new, in-review, confirmed, false-positive, mitigated, closed] }
+        - name: subject
+          in: query
+          schema: { type: string }
+      responses:
+        "200": { description: Alertas ordenadas por fecha }
+  /api/v1/intelligence/alerts/{id}:
+    patch:
+      tags: [investigation]
+      summary: Cambiar el estado de una alerta o asignarla
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [new, in-review, confirmed, false-positive, mitigated, closed] }
+                assignedTo: { type: string, maxLength: 80 }
+                note:
+                  type: string
+                  maxLength: 400
+                  description: Al declarar false-positive queda registrado como motivo.
+      responses:
+        "200": { description: Alerta actualizada con su historial }
+        "400": { description: Estado no soportado }
+        "404": { description: Alerta inexistente }
+  /api/v1/intelligence/cases:
+    get:
+      tags: [investigation]
+      summary: Listar casos de investigacion
+      responses:
+        "200": { description: Casos }
+    post:
+      tags: [investigation]
+      summary: Abrir un caso
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title: { type: string, maxLength: 160 }
+                summary: { type: string, maxLength: 600 }
+                priority: { type: string, enum: [low, medium, high, critical] }
+                assignedTo: { type: string, maxLength: 80 }
+                alertIds: { type: array, items: { type: string }, maxItems: 100 }
+      responses:
+        "201": { description: Caso abierto }
+  /api/v1/intelligence/cases/{id}:
+    patch:
+      tags: [investigation]
+      summary: Anadir notas, decisiones o cambiar el estado de un caso
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [open, in-review, closed] }
+                note: { type: string, maxLength: 1000 }
+                decision: { type: string, maxLength: 400 }
+                alertIds: { type: array, items: { type: string } }
+      responses:
+        "200": { description: Caso actualizado con su linea temporal }
+  /api/v1/intelligence/cases/{id}/evidence:
+    post:
+      tags: [investigation]
+      summary: Adjuntar evidencia inmutable a un caso
+      description: La evidencia se hashea con SHA-256 al crearse. No existe operacion de edicion.
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind]
+              properties:
+                kind: { type: string, maxLength: 40 }
+                description: { type: string, maxLength: 400 }
+                payload: { type: object }
+                source: { $ref: "#/components/schemas/DataSource" }
+      responses:
+        "201": { description: Evidencia adjuntada con su hash }
+        "404": { description: Caso inexistente }
+  /api/v1/intelligence/cases/{id}/report:
+    get:
+      tags: [investigation]
+      summary: Informe tecnico del caso
+      description: Incluye hechos, indicadores, inferencias, evidencia verificada y limitaciones declaradas.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Informe completo }
+  /api/v1/intelligence/evidence/verify:
+    get:
+      tags: [investigation]
+      summary: Verificar la integridad de toda la evidencia almacenada
+      responses:
+        "200": { description: Resultado de la verificacion y evidencias alteradas, si las hay }
+  /api/v1/intelligence/registry/{kind}:
+    post:
+      tags: [investigation]
+      summary: Registrar un contrato, drainer o puente en el registro LOCAL
+      description: Las marcas son del operador. Este producto no consulta listas remotas de reputacion.
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+        - name: kind
+          in: path
+          required: true
+          schema: { type: string, enum: [contracts, drainers, bridges] }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [network, address]
+              properties:
+                network: { type: string, enum: [bitcoin, ethereum] }
+                address: { type: string }
+                label: { type: string, maxLength: 120 }
+                category: { type: string, maxLength: 40 }
+                flagged: { type: boolean }
+                flagReason: { type: string, maxLength: 200 }
+      responses:
+        "201": { description: Registro creado o actualizado }
+  /api/v1/intelligence/exploits:
+    post:
+      tags: [investigation]
+      summary: Registrar un incidente conocido en el registro local
+      parameters:
+        - $ref: "#/components/parameters/LocalRequestHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [network, address, label, occurredAt]
+              properties:
+                network: { type: string, enum: [bitcoin, ethereum] }
+                address: { type: string }
+                label: { type: string, maxLength: 120 }
+                occurredAt: { type: string, format: date-time }
+                description: { type: string, maxLength: 400 }
+      responses:
+        "201": { description: Incidente registrado }
+components:
+  parameters:
+    LocalRequestHeader:
+      name: x-rootcause-request
+      in: header
+      required: true
+      description: Obligatoria en toda mutacion. Sin ella la peticion se rechaza con 403.
+      schema: { type: string, const: "1" }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+    DataSource:
+      type: object
+      description: Procedencia obligatoria. Un tipo desconocido degrada a la fiabilidad mas baja.
+      properties:
+        id: { type: string }
+        kind:
+          type: string
+          enum: [own-node, local-dataset, indexer, explorer, third-party-intel, unknown]
+        reliability: { type: number, minimum: 0, maximum: 1 }
+        endpoint: { type: string }
+        retrievedAt: { type: string, format: date-time }
+    RiskFactor:
+      type: object
+      description: Un componente del puntaje. Nunca se devuelve un puntaje sin estos factores.
+      required: [id, label, points]
+      properties:
+        id: { type: string }
+        label: { type: string }
+        points: { type: integer, description: Positivo si aumenta el puntaje, negativo si lo reduce }
+        weight: { type: object, description: Desglose del calculo de este factor }
+        detail: { type: string }
+        epistemicLevel:
+          type: string
+          enum: [observed-fact, indicator, inference, hypothesis]
+        caveat: { type: string }
+    RiskAssessment:
+      type: object
+      required:
+        [subject, score, band, bandLabel, confidence, factorsIncreasing, factorsDecreasing, limitations, requiresHumanReview, modelVersion]
+      properties:
+        subject: { type: string, description: Clave canonica red:direccion }
+        network: { type: string }
+        score: { type: integer, minimum: 0, maximum: 100 }
+        band: { type: string, enum: [low, moderate, high, critical] }
+        bandLabel: { type: string }
+        confidence:
+          type: string
+          enum: [low, medium, high]
+          description: Cuanto respalda la evidencia al resultado. Independiente del puntaje.
+        modelVersion: { type: string }
+        evaluatedAt: { type: string, format: date-time }
+        epistemicLevel: { type: string, const: inference }
+        summary: { type: string }
+        factorsIncreasing: { type: array, items: { $ref: "#/components/schemas/RiskFactor" } }
+        factorsDecreasing: { type: array, items: { $ref: "#/components/schemas/RiskFactor" } }
+        indicators: { type: array, items: { $ref: "#/components/schemas/Indicator" } }
+        proximity:
+          type: object
+          properties:
+            distance: { type: [integer, "null"] }
+            via: { type: [string, "null"] }
+            truncated: { type: boolean }
+            caveat: { type: string }
+        limitations:
+          type: array
+          minItems: 3
+          items: { type: string }
+          description: Siempre presentes. Declaran que el puntaje no es prueba ni identidad.
+        requiresHumanReview: { type: boolean, const: true }
+        recommendation: { type: string, description: Recomendacion de proceso, nunca una accion sobre fondos }
+        dataScope:
+          type: object
+          properties:
+            transactionsAnalyzed: { type: integer }
+            orphanedExcluded: { type: integer }
+            lastIngestAt: { type: [string, "null"] }
+    Indicator:
+      type: object
+      required: [id, indicator, title, severity, confidence, explanation, evidence, falsePositives, recommendedAction]
+      properties:
+        id: { type: string }
+        indicator: { type: string, pattern: "^INT-[A-Z]+-[0-9]{3}$" }
+        title: { type: string }
+        severity: { type: string, enum: [critical, high, medium, low] }
+        confidence: { type: string, enum: [low, medium, high] }
+        explanation: { type: string }
+        evidence: { type: object }
+        relatedTransactions: { type: array, items: { type: string } }
+        falsePositives:
+          type: array
+          minItems: 2
+          items: { type: string }
+          description: Obligatorio. Un gate de CI rechaza un indicador sin al menos dos.
+        recommendedAction: { type: string }
+        detectedAt: { type: string, format: date-time }
+        source: { $ref: "#/components/schemas/DataSource" }
+    GraphResult:
+      type: object
+      properties:
+        start: { type: string }
+        direction: { type: string, enum: [forward, backward, both] }
+        depth: { type: integer }
+        nodes: { type: array, items: { type: object } }
+        edges: { type: array, items: { type: object } }
+        truncated: { type: boolean }
+        truncationReasons:
+          type: array
+          items: { type: string, enum: [max-depth, max-nodes, max-edges] }
+        limits: { type: object }
+        caveat: { type: string }
