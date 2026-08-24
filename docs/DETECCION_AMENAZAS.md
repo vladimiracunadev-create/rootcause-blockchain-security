@@ -28,16 +28,28 @@ que usa el producto, ordenada por lo que más ha costado históricamente:
 | 10 | Cambio de rol privilegiado sin aprobación previa | **Sí (con evento)** | `BLK-EVENT-001` |
 | 11 | Salida de valor anómala fuera de política | **Sí (con evento)** | `BLK-FUNDS-001` |
 | 12 | Ceguera del observador: caído, cadena equivocada, atrasado | **Sí** | `BLK-NODE-001/002/003` |
-| 13 | Reentrancy, overflow, lógica defectuosa del contrato | **No** | Requiere análisis de bytecode |
-| 14 | Manipulación económica de precio (oracle manipulation) | **No** | Requiere simulación y datos de mercado |
-| 15 | Ataque de gobernanza por acumulación de tokens | **No** | Requiere seguimiento de tenencia |
-| 16 | MEV, sandwich, front-running | **No** | Requiere observar el mempool |
-| 17 | Phishing de firmantes, ingeniería social | **No** | Fuera de la superficie on-chain |
-| 18 | Compromiso del equipo desde el que se firma | **No** | Es el trabajo de RootCause Windows/macOS Inspector |
+| 13 | Allowance ilimitado, excesivo o envejecido | **Sí (con evento)** | `BLK-WALLET-001` |
+| 14 | Aprobación hacia un spender fuera de política | **Sí (con evento)** | `BLK-WALLET-002` |
+| 15 | Operador NFT global (`ApprovalForAll`) no autorizado | **Sí (con evento)** | `BLK-WALLET-003` |
+| 16 | Permit (EIP-2612/712) consumido fuera de política | **Sí (con evento)** | `BLK-WALLET-004` |
+| 17 | Address poisoning del historial | **Heurística** | `BLK-WALLET-005`, solo candidato |
+| 18 | Cambio de owner/guardián/módulo/umbral en smart account | **Sí (con evento)** | `BLK-WALLET-006` |
+| 19 | Delegación EIP-7702 no registrada sobre una EOA vigilada | **Sí (con evento)** | `BLK-WALLET-007` |
+| 20 | Reactivación, red no autorizada, fuera de patrón | **Sí (con evento)** | `BLK-WALLET-008` |
+| 21 | Reentrancy, overflow, lógica defectuosa del contrato | **No** | Requiere análisis de bytecode |
+| 22 | Manipulación económica de precio (oracle manipulation) | **No** | Requiere simulación y datos de mercado |
+| 23 | Ataque de gobernanza por acumulación de tokens | **No** | Requiere seguimiento de tenencia |
+| 24 | MEV, sandwich, front-running | **No** | Requiere observar el mempool |
+| 25 | Phishing de firmantes, ingeniería social | **No** | RootCause Web Inspector |
+| 26 | Compromiso del equipo desde el que se firma | **No** | RootCause Windows/macOS Inspector |
+| 27 | Firma off-chain (permit, typed data) todavía no utilizada | **No** | Invisible hasta su uso; prevención pre-firma: Web Inspector |
+| 28 | Drainer, blind signing, malware de portapapeles, SIM swap, seed expuesta | **No (solo consecuencias on-chain)** | Ver [`WALLET-SECURITY-BOUNDARIES.md`](WALLET-SECURITY-BOUNDARIES.md) |
 
-## Los tres grados de «sí»
+## Los grados de «sí»
 
-No todos los «sí» valen lo mismo, y mezclarlos sería deshonesto.
+No todos los «sí» valen lo mismo, y mezclarlos sería deshonesto. La columna
+«producto responsable» de cada «no» está en la matriz de
+[`WALLET-SECURITY-BOUNDARIES.md`](WALLET-SECURITY-BOUNDARIES.md).
 
 ### Sí verificado contra la cadena
 
@@ -49,7 +61,8 @@ mentir o estar comprometido.**
 
 ### Sí sobre hechos observados
 
-`BLK-EVENT-001`, `BLK-FUNDS-001`.
+`BLK-EVENT-001`, `BLK-FUNDS-001`, `BLK-WALLET-001` a `BLK-WALLET-004`,
+`BLK-WALLET-006`, `BLK-WALLET-007`, `BLK-WALLET-008`.
 
 Dependen de que alguien —el adaptador de cadena— entregue el hecho a la API. El
 producto evalúa correctamente lo que recibe; **no puede detectar un evento que
@@ -70,6 +83,14 @@ escribir tus controles y luego te confronta con tu propia declaración. Su valor
 está en que *hacer el inventario* ya descubre la mitad de los problemas, y en
 que la declaración queda registrada, fechada y auditable — de modo que si
 resultó falsa, eso también es un hallazgo.
+
+### Heurística, marcada como tal
+
+`BLK-WALLET-005` (address poisoning) es la única regla que produce un
+**candidato**, nunca una confirmación: exige similitud visual **más** monto
+dust o cero **más** ausencia de relación registrada, y aún así el incidente
+declara `confidence: heuristic` y lista sus falsos positivos posibles. Una
+dirección parecida con una transferencia de monto normal no dispara nada.
 
 ## Lo que estructuralmente no puede hacer
 
@@ -113,6 +134,7 @@ ausencia es la propiedad de seguridad central.
 | Superficie | Cobertura | Comentario |
 |---|---|---|
 | Plano de control (admin, proxy, upgrade, timelock) | **Alta** | Es el foco del producto |
+| Postura de wallets (allowances, operadores, smart accounts, EIP-7702) | **Media-alta** | Requiere eventos normalizados; sin conexión de wallet |
 | Dependencias externas (oráculos, puentes) | **Media-alta** | Depende de lo declarado |
 | Cadena de suministro de software | **Media** | Fijación y procedencia, no análisis del código |
 | Eventos on-chain | **Media** | Requiere adaptador que entregue hechos |

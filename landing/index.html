@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
-    content="RootCause Blockchain Security — consola local watch-only para aplicaciones blockchain: contratos, proxies, oráculos, puentes, gobernanza y dependencias. Aplicación de escritorio para Windows, cero dependencias, cero telemetría, nunca claves privadas." />
+    content="RootCause Blockchain Security — consola local watch-only para aplicaciones blockchain: contratos, proxies, oráculos, puentes, gobernanza, dependencias y postura de wallets. Aplicación de escritorio para Windows, cero dependencias, cero telemetría, nunca claves privadas." />
   <meta property="og:title" content="RootCause Blockchain Security — consola watch-only multi-chain" />
   <meta property="og:description"
     content="Puedes tener las claves perfectas y perderlo todo igual. Inventario de controles, motor causal determinista y evidencia exportable. Todo local. Telemetría: cero." />
@@ -136,6 +136,15 @@
         </div>
 
         <div class="feature-card">
+          <div class="feature-icon">👛</div>
+          <h3>Postura de wallets, sin ser una wallet</h3>
+          <p>Cuentas públicas vigiladas: <strong>allowances ilimitados</strong>, spenders fuera de política,
+            operadores NFT, permits usados, candidatos de address poisoning, cambios de smart account y
+            delegaciones <strong>EIP-7702</strong>. Sin conectar wallet, sin revocar, sin firmar: cada hallazgo
+            remite a un runbook humano.</p>
+        </div>
+
+        <div class="feature-card">
           <div class="feature-icon">🛰️</div>
           <h3>Integridad del observador</h3>
           <p>Un observador caído, conectado al <strong>chain ID equivocado</strong> o atrasado no es un detalle
@@ -164,9 +173,9 @@
         <div>
           <div class="shot">
             <img src="img/panel-incidentes.png"
-              alt="Lista de incidentes: once hallazgos ordenados por severidad, cada uno con su código BLK, la entidad afectada y una explicación en una línea" />
+              alt="Lista de incidentes: diecinueve hallazgos ordenados por severidad, cada uno con su código BLK, la entidad afectada y una explicación en una línea" />
           </div>
-          <p class="shot-caption">Once incidentes del estado de demostración, ordenados por severidad.</p>
+          <p class="shot-caption">Diecinueve incidentes del estado de demostración, ordenados por severidad.</p>
         </div>
         <div>
           <div class="shot">
@@ -176,6 +185,12 @@
           <p class="shot-caption">El detalle: causa raíz, evidencia y remediación.</p>
         </div>
       </div>
+
+      <div class="shot">
+        <img src="img/panel-wallet.png"
+          alt="Panel Wallet Posture: ocho métricas de postura de wallets, cinco cuentas públicas vigiladas con su criticidad y los incidentes de wallet activos con su código BLK-WALLET" />
+      </div>
+      <p class="shot-caption">Wallet Posture: cuentas públicas vigiladas, sin conectar wallet, sin revocar, sin firmar.</p>
 
       <div class="shot-grid">
         <div>
@@ -188,9 +203,9 @@
         <div>
           <div class="shot">
             <img src="img/panel-controles.png"
-              alt="Catálogo de nueve controles de defensa, de la procedencia de bytecode a la integridad del observador, y el núcleo RootCause compartido con Bitcoin Defense" />
+              alt="Catálogo de trece controles de defensa, de la procedencia de bytecode a la actividad de wallets, y el núcleo RootCause compartido con Bitcoin Defense" />
           </div>
-          <p class="shot-caption">Nueve controles, catorce detecciones deterministas.</p>
+          <p class="shot-caption">Trece controles, veintidós detecciones deterministas.</p>
         </div>
       </div>
     </div>
@@ -199,7 +214,7 @@
   <!-- ═══════════════════════════════  REGLAS  ════════════════════════════ -->
   <section id="reglas" class="section">
     <div class="container">
-      <h2 class="section-title">📋 Las catorce detecciones, sin letra pequeña</h2>
+      <h2 class="section-title">📋 Las veintidós detecciones, sin letra pequeña</h2>
       <p class="section-sub">Reglas deterministas con umbral explícito. Ninguna puntuación opaca, ningún modelo que no
         pueda explicar su veredicto. Un gate de CI impide que esta tabla se desincronice del motor.</p>
 
@@ -227,6 +242,14 @@
             <tr><td><code>BLK-NODE-001</code></td><td>OBSERVER-INTEGRITY</td><td>Observador RPC no disponible</td></tr>
             <tr><td><code>BLK-NODE-002</code></td><td>OBSERVER-INTEGRITY</td><td>RPC conectado al chain ID equivocado</td></tr>
             <tr><td><code>BLK-NODE-003</code></td><td>OBSERVER-INTEGRITY</td><td>Observador atrasado</td></tr>
+            <tr><td><code>BLK-WALLET-001</code></td><td>WALLET-ALLOWANCE</td><td>Allowance ilimitado o superior a política</td></tr>
+            <tr><td><code>BLK-WALLET-002</code></td><td>WALLET-COUNTERPARTY</td><td>Spender no reconocido por la política local</td></tr>
+            <tr><td><code>BLK-WALLET-003</code></td><td>WALLET-ALLOWANCE</td><td>Operador NFT (ApprovalForAll) fuera de política</td></tr>
+            <tr><td><code>BLK-WALLET-004</code></td><td>WALLET-ALLOWANCE</td><td>Permit utilizado fuera de política</td></tr>
+            <tr><td><code>BLK-WALLET-005</code></td><td>WALLET-COUNTERPARTY</td><td>Posible address poisoning (candidato heurístico)</td></tr>
+            <tr><td><code>BLK-WALLET-006</code></td><td>SMART-ACCOUNT-INTEGRITY</td><td>Cambio inesperado en smart account</td></tr>
+            <tr><td><code>BLK-WALLET-007</code></td><td>SMART-ACCOUNT-INTEGRITY</td><td>Delegación EOA EIP-7702 inesperada</td></tr>
+            <tr><td><code>BLK-WALLET-008</code></td><td>WALLET-ACTIVITY</td><td>Actividad inesperada de una cuenta vigilada</td></tr>
           </tbody>
         </table>
       </div>
@@ -332,7 +355,7 @@
       <div class="install-block">
         <h3>Verificar la descarga</h3>
         <p>Cada release incluye <code>SHA256SUMS.txt</code>. Compara el resultado con la línea correspondiente.</p>
-        <pre><code>Get-FileHash .\RootCause-Blockchain-Security-0.1.0-win-x64-setup.exe -Algorithm SHA256</code></pre>
+        <pre><code>Get-FileHash .\RootCause-Blockchain-Security-0.2.0-win-x64-setup.exe -Algorithm SHA256</code></pre>
       </div>
 
       <div class="install-block">

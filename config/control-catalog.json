@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-20",
+  "version": "2026-08-24",
   "controls": [
     {
       "id": "SC-PROVENANCE",
@@ -54,6 +54,30 @@
       "title": "Integridad del observador",
       "objective": "Garantizar que la fuente de hechos on-chain está disponible, en la red correcta y al día.",
       "rules": ["BLK-NODE-001", "BLK-NODE-002", "BLK-NODE-003"]
+    },
+    {
+      "id": "WALLET-ALLOWANCE",
+      "title": "Autorizaciones de gasto de wallets",
+      "objective": "Detectar allowances, operadores NFT y permits excesivos, envejecidos o fuera de la política local.",
+      "rules": ["BLK-WALLET-001", "BLK-WALLET-003", "BLK-WALLET-004"]
+    },
+    {
+      "id": "WALLET-COUNTERPARTY",
+      "title": "Contrapartes de wallets",
+      "objective": "Detectar spenders no reconocidos por la política local y candidatos heurísticos de address poisoning.",
+      "rules": ["BLK-WALLET-002", "BLK-WALLET-005"]
+    },
+    {
+      "id": "SMART-ACCOUNT-INTEGRITY",
+      "title": "Integridad de smart accounts",
+      "objective": "Detectar cambios inesperados en propietarios, guardianes, módulos, umbrales, implementaciones y delegaciones EIP-7702.",
+      "rules": ["BLK-WALLET-006", "BLK-WALLET-007"]
+    },
+    {
+      "id": "WALLET-ACTIVITY",
+      "title": "Actividad de wallets",
+      "objective": "Detectar reactivación inesperada, operaciones fuera de patrón y actividad en redes no autorizadas.",
+      "rules": ["BLK-WALLET-008"]
     }
   ]
 }

@@ -33,7 +33,7 @@ permisos. La unidad de riesgo es el dispositivo.
 | Edición | Dominio | Tecnología | Repositorio |
 |---|---|---|---|
 | **Bitcoin Defense** | UTXO, wallets, firmantes, PSBT, Bitcoin Core | Node sin dependencias | [rootcause-bitcoin-defense](https://github.com/vladimiracunadev-create/rootcause-bitcoin-defense) |
-| **Blockchain Security** | Contratos, proxies, oráculos, puentes, gobernanza | Node sin dependencias | [rootcause-blockchain-security](https://github.com/vladimiracunadev-create/rootcause-blockchain-security) |
+| **Blockchain Security** | Contratos, proxies, oráculos, puentes, gobernanza, postura de wallets | Node sin dependencias | [rootcause-blockchain-security](https://github.com/vladimiracunadev-create/rootcause-blockchain-security) |
 
 Observan **un sistema de control**: quién puede firmar, quién puede actualizar,
 qué depende de qué. La unidad de riesgo no es la máquina sino la arquitectura de
@@ -48,6 +48,7 @@ privilegios. Aquí el activo se pierde sin que nadie toque tu equipo.
 | Procedencia | Authenticode | `codesign` | — | — | Firmware del firmante | Bytecode y compilación |
 | Privilegios | UAC | TCC | — | Permisos concedidos | Multisig y quorum | Admin, proxy, upgrade, timelock |
 | Dependencias externas | — | — | — | — | — | Oráculos, puentes, librerías |
+| Postura de wallets | — | — | — | — | UTXO, firmantes, PSBT | Allowances, operadores, smart accounts, EIP-7702 |
 | Fuente de hechos | Sistema local | Sistema local | Navegador | Sistema Android | Bitcoin Core (RPC lectura) | Nodo EVM (JSON-RPC lectura) |
 | Evidencia | JSON, SQLite, ETL | JSON, SQLite, Markdown | Panel local | PDF | Auditoría encadenada | Auditoría encadenada |
 
@@ -69,6 +70,11 @@ Lo que **sí** se comparte:
   límites.
 - La disciplina de entrega: puertas de CI que verifican los claims, no que los
   repitan.
+
+La matriz exacta de qué producto responde por cada superficie de la seguridad
+de wallets (phishing → Web Inspector, malware → Inspectors de endpoint,
+allowances y smart accounts → Blockchain Security) está en
+[`WALLET-SECURITY-BOUNDARIES.md`](WALLET-SECURITY-BOUNDARIES.md).
 
 ## Cuál usar
 

@@ -80,7 +80,7 @@ uno rechaza el vocabulario del otro a propósito.
 
 ## 5. Qué cubre concretamente este repositorio
 
-Catorce detecciones deterministas, agrupadas en nueve controles
+Veintidós detecciones deterministas, agrupadas en trece controles
 (`config/control-catalog.json`), sobre las cinco superficies donde una
 aplicación blockchain pierde dinero sin que nadie robe una clave:
 

@@ -78,6 +78,79 @@ test("rejects secret fields before project registration", async (context) => {
   assert.equal((await response.json()).error.code, "SECRET_MATERIAL_REJECTED");
 });
 
+test("registers a watched account and rejects secrets and duplicates", async (context) => {
+  const { server, baseUrl } = await fixture();
+  context.after(() => server.close());
+  const headers = { "content-type": "application/json", "x-rootcause-request": "1" };
+  const body = {
+    projectId: "project-atlas-treasury",
+    chainId: "1",
+    address: "0x" + "55".repeat(20),
+    accountType: "multisig",
+    purpose: "Tesorería de prueba",
+    criticality: "high"
+  };
+  const created = await fetch(baseUrl + "/api/accounts", { method: "POST", headers, body: JSON.stringify(body) });
+  assert.equal(created.status, 201);
+  const duplicate = await fetch(baseUrl + "/api/accounts", { method: "POST", headers, body: JSON.stringify(body) });
+  assert.equal(duplicate.status, 409);
+  const withSecret = await fetch(baseUrl + "/api/accounts", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ...body, address: "0x" + "56".repeat(20), seedPhrase: "abandon abandon" })
+  });
+  assert.equal(withSecret.status, 422);
+  const list = await (await fetch(baseUrl + "/api/accounts")).json();
+  assert.ok(list.accounts.some((account) => account.address === body.address));
+});
+
+test("wallet events are validated, idempotent and rejected for unwatched addresses", async (context) => {
+  const { server, baseUrl } = await fixture();
+  context.after(() => server.close());
+  const headers = { "content-type": "application/json", "x-rootcause-request": "1" };
+  const event = {
+    type: "wallet.allowance.changed",
+    chainId: "1",
+    blockNumber: 21000050,
+    transactionHash: "0x" + "77".repeat(32),
+    logIndex: 1,
+    walletAddress: "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+    contractAddress: "0x" + "88".repeat(20),
+    spender: "0x" + "99".repeat(20),
+    amountRaw: "1000",
+    decimals: 18
+  };
+  const first = await fetch(baseUrl + "/api/observe/event", { method: "POST", headers, body: JSON.stringify(event) });
+  assert.equal(first.status, 201);
+  const firstBody = await first.json();
+  const second = await fetch(baseUrl + "/api/observe/event", { method: "POST", headers, body: JSON.stringify(event) });
+  const secondBody = await second.json();
+  assert.equal(firstBody.event.id, secondBody.event.id, "same log must not enter twice");
+
+  const unwatched = await fetch(baseUrl + "/api/observe/event", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ...event, walletAddress: "0x" + "aa".repeat(20), transactionHash: "0x" + "bb".repeat(32) })
+  });
+  assert.equal(unwatched.status, 400);
+
+  const signed = await fetch(baseUrl + "/api/observe/event", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ...event, transactionHash: "0x" + "cc".repeat(32), rawSignedTransaction: "0xf86b" })
+  });
+  assert.equal(signed.status, 422);
+});
+
+test("summary exposes wallet posture with demo incidents", async (context) => {
+  const { server, baseUrl } = await fixture();
+  context.after(() => server.close());
+  const summary = await (await fetch(baseUrl + "/api/summary")).json();
+  assert.ok(summary.walletPosture.accounts >= 5);
+  assert.equal(summary.walletPosture.unlimitedAllowances, 1);
+  assert.ok(summary.incidents.some((incident) => incident.code.startsWith("BLK-WALLET-")));
+});
+
 test("registers a public multi-chain project", async (context) => {
   const { server, baseUrl } = await fixture();
   context.after(() => server.close());

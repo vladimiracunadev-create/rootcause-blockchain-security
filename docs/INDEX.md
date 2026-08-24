@@ -23,7 +23,7 @@ ejecutable; los documentos explican el porqué.
 |---|---|
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Capas, flujo de datos y decisiones internas |
 | [`API.md`](API.md) | Contrato HTTP completo de la API local |
-| [`HEURISTICAS.md`](HEURISTICAS.md) | **Especificación exacta de las 14 reglas**: condición, severidad, evidencia y umbral |
+| [`HEURISTICAS.md`](HEURISTICAS.md) | **Especificación exacta de las 22 reglas**: condición, severidad, evidencia y umbral |
 | [`COMMANDS.md`](COMMANDS.md) | Referencia de comandos: scripts, variables de entorno, API y empaquetado |
 | [`CI_GITHUB.md`](CI_GITHUB.md) | Los cuatro workflows, qué protege cada uno y cómo reproducirlos |
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | Publicar una versión, cada paso con su comando de verificación |
@@ -35,6 +35,7 @@ ejecutable; los documentos explican el porqué.
 | Documento | Contenido |
 |---|---|
 | [`DETECCION_AMENAZAS.md`](DETECCION_AMENAZAS.md) | **Mapa honesto**: qué detecta hoy y qué queda fuera |
+| [`WALLET-SECURITY-BOUNDARIES.md`](WALLET-SECURITY-BOUNDARIES.md) | Fronteras de la postura de wallets, matriz de la familia y backlog de integración |
 | [`THREAT_MODEL.md`](THREAT_MODEL.md) | Amenazas consideradas y explícitamente fuera de alcance |
 | [`POLITICA_DE_PRIVACIDAD_LOCAL.md`](POLITICA_DE_PRIVACIDAD_LOCAL.md) | Qué datos toca, dónde quedan y cómo comprobarlo |
 | [`LICENCIA_Y_DECISION.md`](LICENCIA_Y_DECISION.md) | Por qué MIT, qué se pierde con ello y qué implica para un fork |

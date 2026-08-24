@@ -38,3 +38,17 @@ reglas de dominio ni funciones de custodia.
 
 La integración productiva debe agregar autenticación mutua, RBAC, colas con
 idempotencia y un almacén de evidencia inmutable.
+
+## Postura de wallets y productos hermanos
+
+Los eventos wallet (`wallet.allowance.changed`, `wallet.operator.changed`,
+`wallet.permit.used`, `wallet.transfer.observed`,
+`wallet.smart-account.changed`, `wallet.delegation.changed`,
+`wallet.activity.observed`) siguen el mismo contrato: procedencia completa,
+idempotencia por `chainId + transactionHash + logIndex` y nivel de confianza.
+
+Esta tarea no modifica los repositorios hermanos. El **backlog de integración
+con requisitos verificables** para Web Inspector, Windows/macOS Inspector,
+Mobile Inspector, Bitcoin Defense y blockchain-learning-path está en
+[`WALLET-SECURITY-BOUNDARIES.md`](WALLET-SECURITY-BOUNDARIES.md), junto con la
+matriz de responsabilidad por superficie.

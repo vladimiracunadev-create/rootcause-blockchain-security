@@ -124,7 +124,7 @@ powershell -File packaging/windows/build-portable.ps1
 powershell -File packaging/windows/build-portable.ps1 -NodeVersion 22.23.2
 
 # Instalador (reutiliza la carpeta ensamblada por el paso anterior)
-iscc /DAppVersion=0.1.0 packaging/windows/RootCause-Blockchain-Security.iss
+iscc /DAppVersion=0.2.0 packaging/windows/RootCause-Blockchain-Security.iss
 ~~~
 
 ## Docker
@@ -141,8 +141,8 @@ watchtower de escritorio solo corre mientras el panel está abierto.
 ~~~bash
 # 1. subir la versión en package.json y CHANGELOG.md
 # 2. crear y empujar el tag
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ~~~
 
 El workflow rechaza el tag si no coincide con `package.json`. Checklist completo
@@ -158,16 +158,16 @@ gh run list --limit 10
 gh run view <id> --log-failed
 
 # Artefactos de un release
-gh release view v0.1.0 --json assets
+gh release view v0.2.0 --json assets
 
 # Verificar una descarga
-gh release download v0.1.0 --pattern "SHA256SUMS.txt"
+gh release download v0.2.0 --pattern "SHA256SUMS.txt"
 ~~~
 
 ## Verificar una descarga
 
 ~~~powershell
-Get-FileHash .\RootCause-Blockchain-Security-0.1.0-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\RootCause-Blockchain-Security-0.2.0-win-x64-setup.exe -Algorithm SHA256
 ~~~
 
 Compara el resultado con la línea correspondiente de `SHA256SUMS.txt`.

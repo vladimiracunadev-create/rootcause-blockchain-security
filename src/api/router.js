@@ -24,7 +24,7 @@ export function createApiRouter({ service, readJson }) {
       return jsonResponse(response, 200, {
         status: "ok",
         service: "rootcause-blockchain-security",
-        version: "0.1.0",
+        version: "0.2.0",
         time: new Date().toISOString()
       });
     }
@@ -40,6 +40,15 @@ export function createApiRouter({ service, readJson }) {
     if (method === "POST" && path === "/api/projects") {
       const project = await service.addProject(await readJson(request), actor);
       return jsonResponse(response, 201, { project });
+    }
+
+    if (method === "GET" && path === "/api/accounts") {
+      return jsonResponse(response, 200, { accounts: await service.accounts() });
+    }
+
+    if (method === "POST" && path === "/api/accounts") {
+      const account = await service.addWatchedAccount(await readJson(request), actor);
+      return jsonResponse(response, 201, { account });
     }
 
     if (method === "POST" && path === "/api/scan") {

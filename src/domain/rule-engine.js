@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { evaluateWalletPosture } from "./wallet-rules.js";
 
 function findingId(code, entityId, discriminator = "") {
   return crypto
@@ -425,6 +426,7 @@ export function evaluateState(state, context) {
     ...(state.observedEvents || []).flatMap((event) =>
       evaluateEvent(event, state.approvals || [], context.policies)
     ),
-    ...evaluateNode(state.node, context.policies)
+    ...evaluateNode(state.node, context.policies),
+    ...evaluateWalletPosture(state, context)
   ];
 }

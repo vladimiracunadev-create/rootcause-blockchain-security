@@ -67,7 +67,7 @@ El icono no requiere nada: se genera desde código con GDI+.
 ~~~powershell
 powershell -File packaging/windows/make-icon.ps1
 powershell -File packaging/windows/build-portable.ps1
-iscc /DAppVersion=0.1.0 packaging/windows/RootCause-Blockchain-Security.iss
+iscc /DAppVersion=0.2.0 packaging/windows/RootCause-Blockchain-Security.iss
 ~~~
 
 ## Para el despliegue self-hosted

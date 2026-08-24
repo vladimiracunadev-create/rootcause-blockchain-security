@@ -178,6 +178,78 @@ function projectTemplate(project) {
     </article>`;
 }
 
+const accountTypeNames = {
+  eoa: "EOA",
+  multisig: "Multisig",
+  "smart-account": "Smart account",
+  "contract-account": "Cuenta de contrato",
+  "watch-only": "Watch-only"
+};
+const confidenceNames = {
+  observed: "Observado on-chain",
+  declared: "Declarado por el operador",
+  heuristic: "Candidato heurístico"
+};
+
+function walletIncidents() {
+  return (model.summary?.incidents || [])
+    .filter((incident) => String(incident.code || "").startsWith("BLK-WALLET-"))
+    .sort((a, b) => (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9));
+}
+
+function accountTemplate(account) {
+  const openForAccount = walletIncidents().filter(
+    (incident) =>
+      ["open", "acknowledged"].includes(incident.status) &&
+      String(incident.entityId).toLowerCase() === String(account.address).toLowerCase()
+  ).length;
+  return `
+    <article class="project-card">
+      <div class="project-head">
+        <div class="project-title"><span class="chain-avatar">▣</span><div><h3>${escapeHtml(account.purpose || accountTypeNames[account.accountType] || account.accountType)}</h3><p>${escapeHtml(accountTypeNames[account.accountType] || account.accountType)} · chain ${escapeHtml(account.chainId)}</p></div></div>
+        <span class="criticality">${escapeHtml(account.criticality)}</span>
+      </div>
+      <div class="contract-list">
+        <div class="contract-line">
+          <div><strong>Dirección pública</strong><code title="${escapeHtml(account.address)}">${escapeHtml(shortIdentifier(account.address, 12))}</code></div>
+          <span class="${openForAccount ? "unverified" : ""}" title="${openForAccount ? openForAccount + " incidentes activos" : "Sin incidentes activos"}"></span>
+        </div>
+      </div>
+      <div class="project-stats">
+        <div><strong>${(account.allowedSpenders || []).length}</strong><span>spenders ok</span></div>
+        <div><strong>${(account.knownCounterparties || []).length}</strong><span>contrapartes</span></div>
+        <div><strong>${(account.approvalPolicies || []).length}</strong><span>políticas</span></div>
+        <div><strong>${openForAccount}</strong><span>incidentes</span></div>
+      </div>
+    </article>`;
+}
+
+function renderWallet() {
+  const posture = model.summary.walletPosture || {};
+  const metrics = [
+    ["Cuentas vigiladas", posture.accounts, "Direcciones públicas"],
+    ["Allowances activos", posture.activeAllowances, "Proyección por spender"],
+    ["Approvals ilimitados", posture.unlimitedAllowances, "Máximo uint256"],
+    ["Spenders no reconocidos", posture.unrecognizedSpenders, "Fuera de política local"],
+    ["Operadores NFT", posture.activeOperators, "ApprovalForAll activos"],
+    ["Smart accounts", posture.smartAccounts, "Cambios: " + (posture.smartAccountChanges ?? 0) + " incidentes"],
+    ["Delegaciones EIP-7702", posture.delegations, "Observadas on-chain"],
+    ["Poisoning candidatos", posture.poisoningCandidates, "Heurística, no confirmación"]
+  ];
+  document.querySelector("#wallet-metrics").innerHTML = metrics
+    .map(([label, value, hint]) => `<article class="metric-card"><span>${escapeHtml(label)}</span><strong>${humanNumber(value || 0)}</strong><small>${escapeHtml(hint)}</small></article>`)
+    .join("");
+  const accounts = model.summary.watchedAccounts || [];
+  document.querySelector("#wallet-account-grid").innerHTML = accounts.length
+    ? accounts.map(accountTemplate).join("")
+    : '<div class="empty-state">No hay cuentas vigiladas registradas.</div>';
+  const incidents = walletIncidents().filter((entry) => ["open", "acknowledged"].includes(entry.status));
+  document.querySelector("#wallet-incidents").innerHTML = incidents.length
+    ? incidents.map(incidentTemplate).join("")
+    : '<div class="empty-state">Sin incidentes de wallet activos.</div>';
+  document.querySelector("#nav-wallet-count").textContent = posture.openIncidents ?? 0;
+}
+
 function renderProjects() {
   const projects = model.summary.projects || [];
   document.querySelector("#project-grid").innerHTML = projects.length
@@ -198,6 +270,7 @@ function render() {
   renderCausalFlow();
   renderNode();
   renderIncidents();
+  renderWallet();
   renderProjects();
   renderControls();
 }
@@ -212,6 +285,7 @@ async function reload() {
 const VIEW_TITLES = {
   overview: "Postura de seguridad",
   incidents: "Incidentes",
+  wallet: "Wallet Posture",
   inventory: "Inventario multi-chain",
   controls: "Controles de defensa"
 };
@@ -247,12 +321,28 @@ function showIncident(id) {
   const evidence = Object.entries(incident.evidence || {}).map(([key, value]) => `
     <div><span>${escapeHtml(key)}</span><code title="${escapeHtml(typeof value === "object" ? JSON.stringify(value) : value)}">${escapeHtml(typeof value === "object" ? JSON.stringify(value) : value)}</code></div>`).join("");
   const remediation = (incident.remediation || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const limitations = (incident.limitations || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const extra = [
+    incident.confidence
+      ? `<section class="detail-block"><h3>Grado de certeza</h3><p>${escapeHtml(confidenceNames[incident.confidence] || incident.confidence)}</p></section>`
+      : "",
+    incident.policyViolated
+      ? `<section class="detail-block"><h3>Política incumplida</h3><p>${escapeHtml(incident.policyViolated)}</p></section>`
+      : "",
+    incident.impact
+      ? `<section class="detail-block"><h3>Impacto posible</h3><p>${escapeHtml(incident.impact)}</p></section>`
+      : "",
+    limitations
+      ? `<section class="detail-block"><h3>Limitaciones</h3><ul>${limitations}</ul></section>`
+      : ""
+  ].join("");
   document.querySelector("#dialog-content").innerHTML = `
     <div class="detail-grid">
       <section class="detail-block"><h3>Explicación</h3><p>${escapeHtml(incident.explanation)}</p></section>
       <section class="detail-block"><h3>Causa raíz</h3><p>${escapeHtml(incident.rootCause)}</p></section>
+      ${extra}
       <section class="detail-block"><h3>Evidencia</h3><div class="evidence-grid">${evidence}</div></section>
-      <section class="detail-block"><h3>Remediación segura</h3><ul>${remediation}</ul></section>
+      <section class="detail-block"><h3>Remediación segura (runbook humano)</h3><ul>${remediation}</ul></section>
     </div>`;
   const acknowledge = document.querySelector("#acknowledge-button");
   acknowledge.hidden = incident.status !== "open";

@@ -1,0 +1,33 @@
+{
+  "projectId": "project-atlas-treasury",
+  "chainId": "1",
+  "address": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+  "accountType": "eoa",
+  "purpose": "Wallet operativa de pagos de la tesorería",
+  "criticality": "high",
+  "expectedActivity": {
+    "description": "Pagos semanales a contrapartes conocidas",
+    "activeHours": { "startHour": 9, "endHour": 18 }
+  },
+  "allowedSpenders": ["0xd1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1"],
+  "knownCounterparties": ["0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c001"],
+  "allowedTokenContracts": ["0x00000000000000000000000000000000000a11ce"],
+  "approvalPolicies": [
+    {
+      "tokenContract": "0x00000000000000000000000000000000000a11ce",
+      "maximumAllowanceRaw": "250000000000",
+      "maximumAgeDays": 60
+    }
+  ],
+  "dormancyPolicy": { "dormantAfterDays": 30 },
+  "smartAccountPolicy": {
+    "expectedOwners": [],
+    "expectedGuardians": [],
+    "expectedModules": [],
+    "expectedThreshold": 0,
+    "expectedImplementation": null,
+    "expectedDelegate": null,
+    "allowedChainIds": ["1"]
+  },
+  "tags": ["treasury", "sample"]
+}

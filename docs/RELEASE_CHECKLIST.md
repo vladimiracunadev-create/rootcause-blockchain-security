@@ -20,8 +20,8 @@ fallar, pero habiendo consumido ya el tag.
 ## Crear el tag
 
 ~~~bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ~~~
 
 El workflow **rechaza el tag si no coincide con `package.json`**. Es la red que
@@ -47,8 +47,8 @@ No hace falta comprobarlo a mano, pero conviene saber qué se está verificando:
 | # | Paso | Verificación |
 |---|---|---|
 | 1 | El workflow terminó en verde | `gh run list --workflow release-windows.yml --limit 1` |
-| 2 | Los tres artefactos están publicados | `gh release view v0.1.0 --json assets` |
-| 3 | Los checksums son legibles | `gh release download v0.1.0 --pattern SHA256SUMS.txt` |
+| 2 | Los tres artefactos están publicados | `gh release view v0.2.0 --json assets` |
+| 3 | Los checksums son legibles | `gh release download v0.2.0 --pattern SHA256SUMS.txt` |
 | 4 | La descarga real coincide con su hash | `Get-FileHash .\<archivo> -Algorithm SHA256` |
 | 5 | La landing y el badge de versión del README apuntan a la versión nueva | Revisar `landing/index.html` y `README.md` |
 
@@ -72,7 +72,7 @@ asumir este coste está en
 ## Si algo sale mal
 
 - **El tag ya está creado y el workflow falló.** Corrige, borra el tag remoto
-  (`git push --delete origin v0.1.0`), borra el local y vuelve a empezar. No
+  (`git push --delete origin v0.2.0`), borra el local y vuelve a empezar. No
   reutilices un tag que ya publicó artefactos.
 - **El release se creó pero falta un artefacto.** El paso de `SHA256SUMS.txt`
   falla si falta alguno, así que un release incompleto no debería llegar a

@@ -107,6 +107,60 @@ expect(
   "El cliente EVM aceptó un protocolo fuera de HTTP/HTTPS."
 );
 
+// ── 2b. Frontera wallet: la aplicación no puede firmar, conectar ni mutar ──
+//
+// Con Wallet Security Posture el producto observa cuentas, pero JAMÁS se
+// convierte en wallet. Este gate escanea el código ejecutable (src/**) en
+// busca de métodos y capacidades prohibidos. Las cadenas se construyen por
+// concatenación para que este mismo archivo —que es documentación del gate,
+// no código de producto— no se denuncie a sí mismo.
+const FORBIDDEN_WALLET_CAPABILITIES = [
+  "eth_send" + "Transaction",
+  "eth_send" + "RawTransaction",
+  "eth_sign" + "Transaction",
+  "eth_" + "sign",
+  "personal_" + "sign",
+  "eth_sign" + "TypedData",
+  "wallet_request" + "Permissions",
+  "wallet_add" + "EthereumChain",
+  "wallet_switch" + "EthereumChain",
+  "window." + "ethereum",
+  "Wallet" + "Connect",
+  "Connect " + "Wallet",
+  "Conectar " + "wallet"
+];
+
+async function walkSource(directory) {
+  const entries = await fs.readdir(directory, { withFileTypes: true });
+  const results = [];
+  for (const entry of entries) {
+    const target = path.join(directory, entry.name);
+    if (entry.isDirectory()) results.push(...(await walkSource(target)));
+    else results.push(target);
+  }
+  return results;
+}
+
+const sourceFiles = await walkSource(path.join(PROJECT_ROOT, "src"));
+let walletBoundaryViolations = 0;
+for (const file of sourceFiles) {
+  const content = await fs.readFile(file, "utf8");
+  for (const capability of FORBIDDEN_WALLET_CAPABILITIES) {
+    if (content.includes(capability)) {
+      walletBoundaryViolations += 1;
+      fail(
+        "Capacidad de wallet prohibida en " +
+          path.relative(PROJECT_ROOT, file) +
+          ": " +
+          capability
+      );
+    }
+  }
+}
+if (walletBoundaryViolations === 0) {
+  ok("frontera wallet: sin métodos de firma, conexión ni mutación en src/ (" + FORBIDDEN_WALLET_CAPABILITIES.length + " capacidades vetadas)");
+}
+
 // ── 3. Valores por defecto conservadores ───────────────────────────────────
 const defaults = loadConfig({});
 expect(
@@ -263,6 +317,100 @@ try {
       ": " +
       JSON.stringify(await inventory.json().catch(() => ({})))
   );
+
+  // ── Frontera wallet en runtime ──────────────────────────────────────────
+  // La postura de wallets acepta direcciones públicas y hechos observados;
+  // rechaza seeds, transacciones firmadas y material de firma en cualquier
+  // profundidad del evento.
+  const walletSecretPayloads = [
+    { address: "0x" + "aa".repeat(20), projectId: "project-atlas-treasury", seedPhrase: "abandon abandon" },
+    { address: "0x" + "aa".repeat(20), projectId: "project-atlas-treasury", backup: { keystore: "cifrado" } }
+  ];
+  for (const payload of walletSecretPayloads) {
+    const response = await post("/api/accounts", payload, { "x-rootcause-request": "1" });
+    expect(
+      response.status === 422,
+      "cuenta con material secreto rechazada",
+      "Una cuenta vigilada con material secreto devolvió " + response.status + " en vez de 422."
+    );
+  }
+
+  const walletAccount = await post(
+    "/api/accounts",
+    {
+      projectId: "project-atlas-treasury",
+      chainId: "1",
+      address: "0x" + "77".repeat(20),
+      accountType: "eoa",
+      purpose: "Cuenta de verificación del gate",
+      criticality: "low"
+    },
+    { "x-rootcause-request": "1" }
+  );
+  expect(
+    walletAccount.status === 201,
+    "cuenta pública vigilada aceptada",
+    "El registro de una cuenta pública devolvió " + walletAccount.status + "."
+  );
+
+  const signedTxEvent = await post(
+    "/api/observe/event",
+    {
+      type: "wallet.transfer.observed",
+      chainId: "1",
+      blockNumber: 1,
+      transactionHash: "0x" + "ab".repeat(32),
+      logIndex: 0,
+      walletAddress: "0x" + "77".repeat(20),
+      rawSignedTransaction: "0xf86b..."
+    },
+    { "x-rootcause-request": "1" }
+  );
+  expect(
+    signedTxEvent.status === 422,
+    "evento con transacción firmada rechazado",
+    "Un evento wallet con transacción firmada devolvió " + signedTxEvent.status + " en vez de 422."
+  );
+
+  const walletEventBody = {
+    type: "wallet.allowance.changed",
+    chainId: "1",
+    blockNumber: 21000099,
+    transactionHash: "0x" + "cd".repeat(32),
+    logIndex: 3,
+    walletAddress: "0x" + "77".repeat(20),
+    contractAddress: "0x" + "ee".repeat(20),
+    spender: "0x" + "ff".repeat(20),
+    amountRaw: "1000",
+    decimals: 18,
+    source: "gate-probe"
+  };
+  const firstEvent = await post("/api/observe/event", walletEventBody, { "x-rootcause-request": "1" });
+  const secondEvent = await post("/api/observe/event", walletEventBody, { "x-rootcause-request": "1" });
+  const firstBody = await firstEvent.json().catch(() => ({}));
+  const secondBody = await secondEvent.json().catch(() => ({}));
+  expect(
+    firstEvent.status === 201 && secondEvent.status === 201 && firstBody?.event?.id === secondBody?.event?.id,
+    "evento wallet idempotente por chainId + txHash + logIndex",
+    "El mismo log entró dos veces: " + JSON.stringify([firstBody?.event?.id, secondBody?.event?.id])
+  );
+
+  const walletSummary = await (await fetch(base + "/api/summary")).json();
+  expect(
+    Number(walletSummary?.walletPosture?.accounts || 0) > 0 &&
+      walletSummary.incidents.some((incident) => String(incident.code || "").startsWith("BLK-WALLET-")),
+    "wallet posture presente con incidentes demo",
+    "El resumen no expone la postura de wallets o el demo no produce incidentes BLK-WALLET-*."
+  );
+
+  const dashboardHtml = await (await fetch(base + "/")).text();
+  for (const forbiddenUi of ["Connect " + "Wallet", "Conectar " + "wallet", "Revocar" + " allowance"]) {
+    expect(
+      !dashboardHtml.includes(forbiddenUi),
+      "dashboard sin botón «" + forbiddenUi + "»",
+      "El dashboard servido contiene una capacidad de wallet prohibida: " + forbiddenUi
+    );
+  }
 
   // El paquete distribuido tiene que arrancar CON contenido. Una aplicación
   // que abre vacía es el fallo que nadie detecta a tiempo.

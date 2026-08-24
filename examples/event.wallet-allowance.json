@@ -1,0 +1,16 @@
+{
+  "type": "wallet.allowance.changed",
+  "chainId": "1",
+  "blockNumber": 21000010,
+  "blockHash": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
+  "transactionHash": "0xe1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+  "logIndex": 0,
+  "walletAddress": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+  "contractAddress": "0x00000000000000000000000000000000000a11ce",
+  "spender": "0xd1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1",
+  "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "decimals": 6,
+  "source": "evm-log",
+  "confidence": "observed",
+  "observedAt": "2026-08-24T12:00:00.000Z"
+}

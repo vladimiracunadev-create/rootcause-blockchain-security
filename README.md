@@ -11,7 +11,7 @@
 ║  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝      ║
 ║                                                                                   ║
 ║                   B L O C K C H A I N   S E C U R I T Y                           ║
-║          Consola watch-only multi-chain · Node sin dependencias · v0.1.0          ║
+║          Consola watch-only multi-chain · Node sin dependencias · v0.2.0          ║
 ╚═══════════════════════════════════════════════════════════════════════════════════╝
 ```
 
@@ -22,7 +22,7 @@
 [![Dependencias](https://img.shields.io/badge/dependencias-0-success.svg)](docs/ADR-0001-plataforma-y-lenguaje.md)
 [![Telemetría](https://img.shields.io/badge/telemetr%C3%ADa-cero-success.svg)](docs/THREAT_MODEL.md)
 [![Claves](https://img.shields.io/badge/claves%20privadas-nunca-success.svg)](SECURITY.md)
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-0.1.0-brightgreen.svg)](CHANGELOG.md)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-0.2.0-brightgreen.svg)](CHANGELOG.md)
 
 🌐 **[Página del producto →](https://vladimiracunadev-create.github.io/rootcause-blockchain-security/)**  ·  ⬇️ **[Descargar para Windows →](https://github.com/vladimiracunadev-create/rootcause-blockchain-security/releases/latest)**  ·  📘 **[Índice de documentación →](docs/INDEX.md)**
 
@@ -64,7 +64,7 @@ por SHA-256** contra `SHASUMS256.txt` de nodejs.org al empaquetar. Cada release
 incluye `SHA256SUMS.txt` para verificar la descarga.
 
 ~~~powershell
-Get-FileHash .\RootCause-Blockchain-Security-0.1.0-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\RootCause-Blockchain-Security-0.2.0-win-x64-setup.exe -Algorithm SHA256
 ~~~
 
 Detalles de instalación, configuración y verificación en
@@ -82,7 +82,7 @@ que la sostiene.
 
 ### Incidentes con causa raíz, no alertas sueltas
 
-![Lista de incidentes de RootCause: once hallazgos ordenados por severidad, cada uno con su código BLK, la entidad afectada y una explicación en una línea](docs/img/panel-incidentes.png)
+![Lista de incidentes de RootCause: diecinueve hallazgos ordenados por severidad, cada uno con su código BLK, la entidad afectada y una explicación en una línea](docs/img/panel-incidentes.png)
 
 Cada incidente abre con lo que un operador necesita para decidir: explicación,
 **causa raíz**, evidencia conservada y remediación segura.
@@ -96,9 +96,23 @@ Cada incidente abre con lo que un operador necesita para decidir: explicación,
 Solo **procedencia y controles verificables**. Sin secretos, sin firmas, sin
 credenciales.
 
-### Nueve controles, catorce detecciones
+### Wallet Posture: cuentas públicas vigiladas
 
-![Catálogo de nueve controles de defensa, de la procedencia de bytecode a la integridad del observador, y el núcleo RootCause compartido con Bitcoin Defense](docs/img/panel-controles.png)
+Inventario watch-only de EOA, multisig, smart accounts y tesorerías, con
+detección de allowances ilimitados, spenders fuera de política, operadores NFT,
+permits usados, candidatos de address poisoning, cambios de smart account,
+delegaciones EIP-7702 y actividad inesperada. **Sin conectar wallet, sin
+revocar, sin firmar**: cada hallazgo remite a un runbook humano.
+
+![Panel Wallet Posture: ocho métricas de postura de wallets, cinco cuentas públicas vigiladas con su criticidad y los incidentes de wallet activos con su código BLK-WALLET](docs/img/panel-wallet.png)
+
+Las fronteras exactas —lo que este dominio nunca hará y qué producto RootCause
+cubre cada superficie— están en
+[`docs/WALLET-SECURITY-BOUNDARIES.md`](docs/WALLET-SECURITY-BOUNDARIES.md).
+
+### Trece controles, veintidós detecciones
+
+![Catálogo de trece controles de defensa, de la procedencia de bytecode a la actividad de wallets, y el núcleo RootCause compartido con Bitcoin Defense](docs/img/panel-controles.png)
 
 ---
 
@@ -211,7 +225,16 @@ RPC ni verificación independiente del proveedor. Un endpoint remoto exige adem�
 que consultes ve qué contratos estás vigilando.**
 
 Solana, Cosmos, Substrate y otras redes pueden enviar hechos ya normalizados a
-`POST /api/observe/event` sin acoplar el motor de reglas a ningún SDK.
+`POST /api/observe/event` sin acoplar el motor de reglas a ningún SDK. Esas
+redes **no se declaran soportadas** mientras no existan adaptadores y pruebas
+reales: hoy el soporte implementado es EVM.
+
+El mismo endpoint acepta los siete eventos wallet normalizados
+(`wallet.allowance.changed`, `wallet.operator.changed`, `wallet.permit.used`,
+`wallet.transfer.observed`, `wallet.smart-account.changed`,
+`wallet.delegation.changed`, `wallet.activity.observed`), con validación
+estricta, idempotencia por chain ID + transaction hash + log index y rechazo de
+material de firma en cualquier profundidad.
 
 ---
 
@@ -233,6 +256,14 @@ Solana, Cosmos, Substrate y otras redes pueden enviar hechos ya normalizados a
 | BLK-NODE-001 | OBSERVER-INTEGRITY | Observador RPC no disponible |
 | BLK-NODE-002 | OBSERVER-INTEGRITY | RPC conectado al chain ID equivocado |
 | BLK-NODE-003 | OBSERVER-INTEGRITY | Observador atrasado |
+| BLK-WALLET-001 | WALLET-ALLOWANCE | Allowance ilimitado o superior a política |
+| BLK-WALLET-002 | WALLET-COUNTERPARTY | Spender no reconocido por la política local |
+| BLK-WALLET-003 | WALLET-ALLOWANCE | Operador NFT (ApprovalForAll) fuera de política |
+| BLK-WALLET-004 | WALLET-ALLOWANCE | Permit utilizado fuera de política |
+| BLK-WALLET-005 | WALLET-COUNTERPARTY | Posible address poisoning (candidato heurístico) |
+| BLK-WALLET-006 | SMART-ACCOUNT-INTEGRITY | Cambio inesperado en smart account |
+| BLK-WALLET-007 | SMART-ACCOUNT-INTEGRITY | Delegación EOA EIP-7702 inesperada |
+| BLK-WALLET-008 | WALLET-ACTIVITY | Actividad inesperada de una cuenta vigilada |
 
 Los controles están definidos en `config/control-catalog.json` y los umbrales en
 `config/policies.json`. `pnpm check:rules` impide que se desincronicen.
@@ -279,7 +310,8 @@ test/                    Pruebas unitarias e integración
 | --- | --- |
 | [`docs/INDEX.md`](docs/INDEX.md) | **Índice completo**, con la puerta de CI que verifica cada afirmación |
 | [`docs/MANUAL_USUARIO.md`](docs/MANUAL_USUARIO.md) | Qué es cada cosa del panel, en claro |
-| [`docs/HEURISTICAS.md`](docs/HEURISTICAS.md) | Especificación exacta de las 14 reglas |
+| [`docs/HEURISTICAS.md`](docs/HEURISTICAS.md) | Especificación exacta de las 22 reglas |
+| [`docs/WALLET-SECURITY-BOUNDARIES.md`](docs/WALLET-SECURITY-BOUNDARIES.md) | Fronteras de la postura de wallets y matriz de la familia |
 | [`docs/DETECCION_AMENAZAS.md`](docs/DETECCION_AMENAZAS.md) | Mapa honesto: qué detecta hoy y qué no |
 | [`docs/ADR-0001-plataforma-y-lenguaje.md`](docs/ADR-0001-plataforma-y-lenguaje.md) | Por qué escritorio y no SaaS; por qué Node hoy, Rust después y no Go |
 | [`docs/BLOCKCHAIN-Y-BITCOIN.md`](docs/BLOCKCHAIN-Y-BITCOIN.md) | Qué es cada cosa y por qué son dos productos |

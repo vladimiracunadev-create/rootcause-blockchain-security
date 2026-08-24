@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-20",
+  "version": "2026-08-24",
   "minimumUpgradeDelaySeconds": 86400,
   "minimumGovernanceTimelockSeconds": 172800,
   "maximumObserverLagBlocks": 8,
@@ -7,6 +7,33 @@
   "minimumOracleProviders": 2,
   "minimumBridgeIndependentOperators": 3,
   "minimumBridgeThresholdRatio": 0.6667,
+  "wallet": {
+    "maximumAllowanceAgeDays": 90,
+    "maximumOperatorAgeDays": 90,
+    "dormancyDays": 30,
+    "allowedChainIds": ["1", "11155111"],
+    "operatingWindow": null,
+    "authorizedSpenders": [],
+    "authorizedOperators": [],
+    "knownCounterparties": [],
+    "defaultDustThresholdRaw": "0",
+    "assetPolicies": [
+      {
+        "chainId": "1",
+        "tokenContract": "0x00000000000000000000000000000000000a11ce",
+        "symbol": "DEMO-STABLE",
+        "decimals": 6,
+        "maximumAllowanceRaw": "250000000000",
+        "maximumAgeDays": 60,
+        "dustThresholdRaw": "1000000"
+      }
+    ],
+    "poisoning": {
+      "minimumPrefixMatch": 4,
+      "minimumSuffixMatch": 4,
+      "minimumSignals": 2
+    }
+  },
   "rules": [
     "BLK-CONTRACT-001",
     "BLK-ACCESS-001",
@@ -21,6 +48,14 @@
     "BLK-FUNDS-001",
     "BLK-NODE-001",
     "BLK-NODE-002",
-    "BLK-NODE-003"
+    "BLK-NODE-003",
+    "BLK-WALLET-001",
+    "BLK-WALLET-002",
+    "BLK-WALLET-003",
+    "BLK-WALLET-004",
+    "BLK-WALLET-005",
+    "BLK-WALLET-006",
+    "BLK-WALLET-007",
+    "BLK-WALLET-008"
   ]
 }

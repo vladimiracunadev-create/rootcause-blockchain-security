@@ -25,6 +25,9 @@
           <button class="nav-item" data-view-target="incidents">
             <span class="nav-icon">!</span><span>Incidentes</span><b id="nav-incident-count">0</b>
           </button>
+          <button class="nav-item" data-view-target="wallet">
+            <span class="nav-icon">▣</span><span>Wallet Posture</span><b id="nav-wallet-count">0</b>
+          </button>
           <button class="nav-item" data-view-target="inventory">
             <span class="nav-icon">◇</span><span>Inventario</span>
           </button>
@@ -123,6 +126,25 @@
               <button class="filter" data-filter="all">Todos</button>
             </div>
             <div class="incident-list" id="all-incidents"></div>
+          </section>
+
+          <section class="view" data-view="wallet">
+            <div class="section-intro"><div><p class="eyebrow">Cuentas públicas vigiladas</p><h2>Wallet Posture</h2></div><p>Allowances, operadores, permits usados, smart accounts, delegaciones EIP-7702 y actividad. Watch-only: sin conexión de wallet, sin revocar, sin firmar.</p></div>
+            <div class="metric-grid" id="wallet-metrics"></div>
+            <article class="panel">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Inventario watch-only</p><h3>Cuentas vigiladas</h3></div>
+                <span class="live-chip">Solo direcciones públicas</span>
+              </div>
+              <div class="project-grid" id="wallet-account-grid"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Detección determinista</p><h3>Incidentes de wallet</h3></div>
+              </div>
+              <div class="incident-list" id="wallet-incidents"></div>
+            </article>
+            <div class="trust-boundary"><span>◉</span><p><strong>Frontera watch-only</strong>Este panel nunca ofrece conectar, revocar, firmar, transferir ni pausar: cada hallazgo remite a un runbook humano.</p></div>
           </section>
 
           <section class="view" data-view="inventory">

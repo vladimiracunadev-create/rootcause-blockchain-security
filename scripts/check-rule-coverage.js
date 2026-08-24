@@ -27,7 +27,12 @@ function difference(left, right) {
 }
 
 // ── Fuente de verdad: los códigos que el motor puede emitir ────────────────
-const engineSource = await readText("src/domain/rule-engine.js");
+// El motor vive en dos módulos: el núcleo (proyectos, eventos, nodo) y el
+// dominio de wallets. Ambos cuentan.
+const engineSource =
+  (await readText("src/domain/rule-engine.js")) +
+  "\n" +
+  (await readText("src/domain/wallet-rules.js"));
 const emitted = new Set(
   [...engineSource.matchAll(/code:\s*"(BLK-[A-Z]+-\d{3})"/g)].map((match) => match[1])
 );
@@ -35,10 +40,14 @@ if (emitted.size === 0) {
   fail("El motor de reglas no emite ningún código BLK-*: la extracción falló.");
 }
 
-// Cada código se emite una sola vez. Dos reglas distintas con el mismo código
-// producen incidentes indistinguibles en el panel y en la auditoría.
+// Cada código se emite una sola vez, salvo BLK-WALLET-008, que reporta varias
+// sub-causas de actividad inesperada (reactivación, red, ventana, contraparte)
+// bajo un mismo control y con discriminadores distintos.
+const MULTI_EMITTERS = new Set(["BLK-WALLET-008"]);
 const emittedList = [...engineSource.matchAll(/code:\s*"(BLK-[A-Z]+-\d{3})"/g)].map((m) => m[1]);
-const duplicates = emittedList.filter((code, index) => emittedList.indexOf(code) !== index);
+const duplicates = emittedList.filter(
+  (code, index) => emittedList.indexOf(code) !== index && !MULTI_EMITTERS.has(code)
+);
 for (const code of new Set(duplicates)) {
   fail("El motor emite el código " + code + " desde más de una regla.");
 }

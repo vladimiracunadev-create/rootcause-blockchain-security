@@ -21,7 +21,7 @@
 #define SourceRoot "..\..\build\portable\RootCause-Blockchain-Security"
 
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "0.2.0"
 #endif
 
 [Setup]

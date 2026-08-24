@@ -1,4 +1,4 @@
-# Heurísticas: especificación de las catorce reglas
+# Heurísticas: especificación de las veintidós reglas
 
 Este documento es el contrato exacto del motor causal: qué condición dispara
 cada regla, con qué severidad, qué evidencia conserva y qué remediación
@@ -6,7 +6,8 @@ propone. Está escrito para que alguien pueda **discutir un umbral** sin leer el
 código, y para que quien lea el código pueda comprobar que hace lo que aquí se
 dice.
 
-Fuente de verdad: `src/domain/rule-engine.js`. Umbrales: `config/policies.json`.
+Fuente de verdad: `src/domain/rule-engine.js` y `src/domain/wallet-rules.js`.
+Umbrales: `config/policies.json`.
 Controles: `config/control-catalog.json`. Un gate de CI
 (`scripts/check-rule-coverage.js`) impide que los cuatro se desincronicen.
 
@@ -31,9 +32,11 @@ proyecto** que declaraste en el inventario:
 | `critical` o `high` | `critical` | `high` |
 | `medium` o `low` | `high` | `medium` |
 
-Tres reglas ignoran esa escala y son **siempre `critical`**, porque describen
+Cuatro reglas ignoran esa escala y son **siempre `critical`**, porque describen
 un hecho ya ocurrido y no una condición latente: `BLK-EVENT-001`,
-`BLK-FUNDS-001` y `BLK-NODE-002`.
+`BLK-FUNDS-001`, `BLK-NODE-002` y `BLK-WALLET-006`. Las reglas de wallet usan
+la misma tabla, pero derivada de la **criticidad de la cuenta vigilada** en vez
+de la del proyecto.
 
 La consecuencia es intencionada: **el mismo defecto pesa distinto según lo que
 proteja.** Un admin en una EOA sobre un contrato de laboratorio es `high`;
@@ -53,6 +56,17 @@ riesgo real del sistema**.
 | `minimumBridgeIndependentOperators` | 3 | `BLK-BRIDGE-001` |
 | `abnormalOutflowUsd` | 250 000 | `BLK-FUNDS-001` |
 | `maximumObserverLagBlocks` | 8 | `BLK-NODE-003` |
+| `wallet.maximumAllowanceAgeDays` | 90 | `BLK-WALLET-001` |
+| `wallet.assetPolicies[].maximumAllowanceRaw` | por activo | `BLK-WALLET-001`, `BLK-WALLET-004` |
+| `wallet.maximumOperatorAgeDays` | 90 | `BLK-WALLET-003` |
+| `wallet.poisoning.minimumPrefixMatch` / `minimumSuffixMatch` | 4 / 4 | `BLK-WALLET-005` |
+| `wallet.assetPolicies[].dustThresholdRaw` | por activo | `BLK-WALLET-005` |
+| `wallet.dormancyDays` / `dormancyPolicy.dormantAfterDays` | 30 | `BLK-WALLET-008` |
+| `wallet.allowedChainIds` | `["1","11155111"]` | `BLK-WALLET-007`, `BLK-WALLET-008` |
+
+No hay una cifra universal: los límites de allowance y dust se configuran **por
+activo y por red**, en unidades enteras del token con sus decimales declarados.
+El producto no inventa valores fiat.
 
 ---
 
@@ -196,6 +210,111 @@ técnico: es la diferencia entre «no hay incidentes» y «no me estoy enterando
 
 - **Control:** `OBSERVER-INTEGRITY` · **Severidad:** `high`
 - **Dispara si:** el atraso en bloques supera `maximumObserverLagBlocks`.
+
+---
+
+## Reglas de postura de wallets
+
+Se evalúan sobre cuentas públicas vigiladas (`watchedAccounts`) y los eventos
+wallet normalizados que llegan a `POST /api/observe/event`. Todos los montos se
+comparan como enteros (`BigInt`) en unidades del token con sus decimales
+declarados. Ninguna de estas reglas puede revocar, firmar ni transferir.
+
+### BLK-WALLET-001 · Allowance ilimitado o superior a política
+
+- **Control:** `WALLET-ALLOWANCE` · **Entidad:** cuenta vigilada · **Certeza:** observada
+- **Proyección:** por cada (cadena, wallet, token, spender) gana el último
+  `wallet.allowance.changed`; una revocación con valor cero apaga la
+  autorización anterior.
+- **Dispara si** el allowance activo cumple cualquiera:
+  1. es igual al máximo de `uint256`;
+  2. supera `maximumAllowanceRaw` del activo (política de la cuenta o global);
+  3. sigue activo pasados `maximumAgeDays` del activo o
+     `wallet.maximumAllowanceAgeDays`.
+
+### BLK-WALLET-002 · Spender no reconocido por la política local
+
+- **Control:** `WALLET-COUNTERPARTY` · **Certeza:** observada · **Severidad:** grave
+- **Dispara si:** una aprobación activa apunta a un spender que no está en
+  `allowedSpenders`, `knownCounterparties` ni `wallet.authorizedSpenders`.
+- **Redacción deliberada:** el incidente dice «spender no reconocido por la
+  política local», **nunca** «contrato malicioso»: no hay listas remotas de
+  reputación y la regla no atribuye intención.
+
+### BLK-WALLET-003 · Operador NFT fuera de política
+
+- **Control:** `WALLET-ALLOWANCE` · **Certeza:** observada
+- **Observa:** `ApprovalForAll` de ERC-721 y ERC-1155 (`approvalScope: "all"`)
+  y aprobaciones de token individual (`approvalScope: "single"`), que reporta
+  con severidad distinta porque el riesgo es distinto.
+- **Dispara si:** el operador aprobado no está autorizado, o el permiso sigue
+  activo pasado `wallet.maximumOperatorAgeDays`.
+
+### BLK-WALLET-004 · Permit utilizado fuera de política
+
+- **Control:** `WALLET-ALLOWANCE` · **Certeza:** observada · **Severidad:** grave
+- **Cubre:** EIP-2612 y permisos compatibles con EIP-712 **cuando existe
+  evidencia pública de su uso** (`wallet.permit.used`). Permit2 no está
+  soportado: exigiría un adaptador explícito y probado.
+- **Dispara si:** el contrato que consumió el permit no está registrado, o el
+  monto excede la política del activo, o equivale al máximo `uint256`.
+
+> **Limitación fundamental:** una firma `permit` puede permanecer off-chain y
+> ser invisible hasta que alguien la utilice. RootCause no se conecta a la
+> wallet, por lo que **no puede proteger antes de la firma**: solo detecta el
+> consumo on-chain. La prevención pre-firma es dominio de Web Inspector.
+
+### BLK-WALLET-005 · Posible address poisoning (candidato heurístico)
+
+- **Control:** `WALLET-COUNTERPARTY` · **Certeza:** `heuristic`, siempre
+- **Dispara solo si coinciden varias señales** sobre una transferencia:
+  1. la contraparte comparte al menos `minimumPrefixMatch` caracteres de
+     prefijo o `minimumSuffixMatch` de sufijo con una contraparte conocida
+     (señal obligatoria);
+  2. el monto es cero o menor o igual al umbral dust del activo;
+  3. la dirección no tiene relación registrada con la cuenta.
+- **Nunca** declara ataque confirmado por similitud sola: una transferencia de
+  monto normal desde una dirección parecida **no** dispara. El incidente lista
+  los falsos positivos posibles (direcciones vanity, exchanges, contratos de
+  fábrica).
+
+### BLK-WALLET-006 · Cambio inesperado en smart account
+
+- **Control:** `SMART-ACCOUNT-INTEGRITY` · **Severidad:** `critical` siempre
+- **Observa:** `wallet.smart-account.changed` con `changeKind`: propietario
+  agregado o eliminado, guardián cambiado, módulo habilitado o deshabilitado,
+  umbral modificado, implementación actualizada, mecanismo de recuperación
+  alterado.
+- **No dispara si:** el evento trae un `approvalHash` registrado, o el cambio
+  coincide con la configuración esperada de `smartAccountPolicy`.
+- **Correlación:** `BLK-EVENT-001` cubre el mismo patrón sobre contratos del
+  proyecto; esta regla aplica a la cuenta vigilada y el incidente documenta la
+  relación para no duplicar.
+
+### BLK-WALLET-007 · Delegación EOA (EIP-7702) inesperada
+
+- **Control:** `SMART-ACCOUNT-INTEGRITY` · **Severidad:** grave
+- **Base:** EIP-7702 (transacción tipo 4: la EOA delega su ejecución a una
+  implementación; el código de la cuenta pasa a ser `0xef0100` + dirección).
+  Especificación consultada el 2026-08-24.
+- **Dispara si:** la EOA vigilada adquiere una delegación distinta de
+  `smartAccountPolicy.expectedDelegate` sin aprobación registrada, o la
+  delegación ocurre en una cadena fuera de `allowedChainIds`.
+- **No supone compromiso:** una EOA con código delegado puede ser diseño
+  legítimo; la regla reporta la desviación respecto de la política.
+
+### BLK-WALLET-008 · Actividad inesperada
+
+- **Control:** `WALLET-ACTIVITY` · **Certeza:** observada
+- **Sub-causas**, cada una con discriminador propio para no duplicar:
+  1. **Reactivación:** una cuenta `critical`/`high` con `dormancyPolicy` supera
+     sus días de inactividad y vuelve a operar;
+  2. **Red no autorizada:** actividad en una cadena fuera de `allowedChainIds`;
+  3. **Fuera de ventana:** operación fuera de `expectedActivity.activeHours`;
+  4. **Contraparte nueva:** interacción con una dirección fuera de
+     `knownCounterparties`.
+- **Correlación:** las salidas anómalas de valor siguen siendo territorio de
+  `BLK-FUNDS-001`; esta regla no genera un segundo incidente por el mismo hecho.
 
 ---
 

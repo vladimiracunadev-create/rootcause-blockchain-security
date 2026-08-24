@@ -21,9 +21,9 @@ Para detener la aplicación, cierra la ventana de consola.
 La primera vez arranca en **modo demostración**: datos ficticios, todo en
 memoria, nada se escribe en disco. Sirve para recorrer el panel sin riesgo.
 
-## Las cuatro pantallas
+## Las cinco pantallas
 
-El panel tiene cuatro vistas en la barra izquierda. Cada una responde a una
+El panel tiene cinco vistas en la barra izquierda. Cada una responde a una
 pregunta distinta.
 
 ### 1. Postura · «¿cómo estoy ahora mismo?»
@@ -69,10 +69,29 @@ Haz clic en cualquier incidente para abrir el detalle:
 | **Evidencia** | Los datos públicos conservados: proyecto, dirección, valores observados y umbral de política. Es lo que pegarías en un informe. |
 | **Remediación segura** | Los pasos concretos. **La aplicación no los ejecuta**: los ejecuta una persona con su runbook. |
 
+Los incidentes de wallet añaden tres secciones más: **grado de certeza**
+(observado, declarado o candidato heurístico), **política incumplida** e
+**impacto posible**, además de sus **limitaciones** — lo que ese hallazgo no
+puede afirmar.
+
 El botón **Reconocer incidente** marca que ya lo has visto y estás trabajando
 en él. No lo cierra ni lo oculta: cambia su estado a `acknowledged`.
 
-### 3. Inventario · «¿qué estoy vigilando exactamente?»
+### 3. Wallet Posture · «¿mis cuentas están bien controladas?»
+
+![Panel Wallet Posture con las métricas de postura, las cuentas vigiladas y los incidentes de wallet](img/panel-wallet.png)
+
+El inventario watch-only de cuentas públicas: EOA, multisig, smart accounts,
+tesorerías. Arriba, ocho métricas: cuentas vigiladas, allowances activos,
+approvals ilimitados, spenders no reconocidos, operadores NFT, smart accounts,
+delegaciones EIP-7702 y candidatos de address poisoning. Debajo, cada cuenta
+con su criticidad y sus incidentes, y la lista de incidentes de wallet.
+
+**Lo que esta pantalla nunca tendrá:** botón de conectar wallet, de revocar,
+de firmar, de transferir o de pausar. Cada hallazgo remite a un runbook que
+ejecuta una persona desde un entorno independiente.
+
+### 4. Inventario · «¿qué estoy vigilando exactamente?»
 
 ![Inventario multi-chain con dos proyectos, sus contadores y sus contratos](img/panel-inventario.png)
 
@@ -87,11 +106,11 @@ firmas, sin credenciales — por diseño, no por omisión.
 > severidad de sus incidentes. Un proyecto marcado `critical` convierte en
 > `critical` los hallazgos que en uno `low` serían `high`.
 
-### 4. Controles · «¿qué me protege de qué?»
+### 5. Controles · «¿qué me protege de qué?»
 
-![Catálogo de nueve controles de defensa](img/panel-controles.png)
+![Catálogo de trece controles de defensa](img/panel-controles.png)
 
-Los nueve objetivos preventivos y las reglas que verifican cada uno. Es el mapa
+Los trece objetivos preventivos y las reglas que verifican cada uno. Es el mapa
 para entender por qué existe cada detección.
 
 ## Del modo demostración a tus datos
