@@ -1,5 +1,31 @@
 # Changelog
 
+## Sin publicar
+
+- **Muestra del producto lista para proyectar**: `docs/presentacion.md` es la
+  fuente única de la que salen las **8 diapositivas** en 16:9, la **pauta del
+  expositor** y sus **4 anexos**, en HTML y en PDF (`pnpm build:presentacion`).
+  El guion y las láminas viven en el mismo archivo para que no se separen a la
+  segunda edición: el cuerpo de cada sección es lo que se proyecta y la cita que
+  la cierra es el libreto, dividido en **lo que se dice** —palabra por palabra,
+  en intervenciones numeradas— y **lo que se hace**, que no se pronuncia nunca.
+- Ninguna cifra de las láminas se escribe a mano: controles, detecciones,
+  indicadores, escenarios, pruebas e invariantes se cuentan del repositorio al
+  generar la presentación, y la salida de la lámina de la demo se captura
+  **ejecutando los dos comandos**. Una lámina proyectada a pantalla completa es
+  el peor sitio posible para un número obsoleto.
+- `scripts/check-presentation.js`: puerta nueva que compara la presentación
+  generada con lo que anuncia el README —láminas, minutos y anexos— y comprueba
+  que cada lámina llegó a la pauta con sus dos bloques y que ningún marcador
+  quedó sin rellenar.
+- Las capturas del panel viajan **incrustadas** en el HTML de las diapositivas:
+  un archivo único que se copia a un pendrive y se abre en cualquier equipo, sin
+  pedirle nada a ningún origen externo.
+- El PDF lo imprime un Chrome o un Edge del sistema por el **protocolo
+  DevTools**, y el Markdown lo convierte `scripts/lib/markdown.js`: **cero
+  dependencias también en las herramientas**. `deploy-landing.yml` genera,
+  verifica y publica la muestra junto con la página de producto.
+
 ## 0.3.0 — 2026-08-24
 
 - **RootCause Blockchain Intelligence**: dominio nuevo de análisis on-chain

@@ -14,6 +14,12 @@
 #   2. Antes de publicar se verifica que la pagina no referencia ninguna
 #      imagen que no exista. Una landing con un hueco gris es peor que no
 #      tener landing: es la primera impresion del producto.
+#
+#   3. Aqui se GENERA la muestra del producto (diapositivas y pauta del
+#      expositor) desde docs/presentacion.md. Los PDF no se versionan: pesan
+#      cerca de dos megas y se rehacen enteros en cada cambio del guion. Se
+#      construyen, se verifican contra lo que anuncia el README y se publican
+#      en site/presentacion/.
 # ─────────────────────────────────────────────────────────────────────────────
 name: Deploy Landing Page
 
@@ -23,6 +29,11 @@ on:
     paths:
       - "landing/**"
       - "docs/img/**"
+      - "docs/presentacion.md"
+      - "scripts/build-presentation.js"
+      - "scripts/render-presentation-pdf.js"
+      - "scripts/check-presentation.js"
+      - "scripts/lib/**"
       - ".github/workflows/deploy-landing.yml"
   workflow_dispatch:
 
@@ -49,14 +60,58 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
+      - name: Node LTS
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      # Las diapositivas y la pauta salen de docs/presentacion.md. El paso
+      # ejecuta ademas las pruebas y los dos comandos de la demo, porque las
+      # cifras y la salida que proyecta la lamina son las reales, no una
+      # transcripcion. Los PDF los imprime el Chrome del runner por el
+      # protocolo DevTools: ni aqui hay dependencias npm.
+      - name: Generar la presentacion y la pauta del expositor
+        run: |
+          node scripts/build-presentation.js
+          node scripts/render-presentation-pdf.js
+
+      # Un README que anuncia siete laminas y una presentacion que trae ocho es
+      # el fallo que nadie ve hasta que alguien tiene que exponer.
+      - name: Comprobar que coincide con lo que anuncia el README
+        run: node scripts/check-presentation.js
+
       - name: Ensamblar el sitio
         run: |
           mkdir -p site
           cp -r landing/. site/
           mkdir -p site/img
           cp docs/img/*.png site/img/
+          mkdir -p site/presentacion
+          cp presentacion/presentacion.html presentacion/pauta.html site/presentacion/
+          cp presentacion/PRESENTACION.pdf presentacion/PAUTA.pdf site/presentacion/
           echo "  archivos publicados:"
           find site -type f | sort | sed 's/^/    /'
+
+      # La landing enlaza los dos PDF de la muestra. Un enlace de descarga roto
+      # en la pagina de producto se descubre siempre en el peor momento.
+      - name: Verificar que la muestra llego completa al sitio
+        run: |
+          for f in site/presentacion/PRESENTACION.pdf site/presentacion/PAUTA.pdf \
+                   site/presentacion/presentacion.html; do
+            if [ ! -s "$f" ]; then
+              echo "  FALTA o esta vacio: $f"
+              exit 1
+            fi
+            echo "  ok: $f ($(du -h "$f" | cut -f1))"
+          done
+          missing=0
+          for ref in $(grep -oE 'href="presentacion/[^"]+"' site/index.html | sed 's/href="//; s/"//'); do
+            if [ ! -f "site/$ref" ]; then
+              echo "  FALTA el destino enlazado por la landing: $ref"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then exit 1; fi
 
       # Una imagen rota en la pagina de producto es la primera impresion del
       # proyecto. Se comprueba antes de publicar, no despues.

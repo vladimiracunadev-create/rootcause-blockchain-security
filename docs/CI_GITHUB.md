@@ -10,7 +10,7 @@ nunca toca la red de un registro de paquetes.
 | `ci.yml` | push y PR a `main`, manual | Las seis puertas de calidad |
 | `codeql.yml` | push, PR, lunes 06:41 UTC, manual | Análisis estático del código propio |
 | `release-windows.yml` | tag `v*`, manual | Que un tag no publique un artefacto roto |
-| `deploy-landing.yml` | cambios en `landing/` o `docs/img/`, manual | Que la página de producto no salga con huecos |
+| `deploy-landing.yml` | cambios en `landing/`, `docs/img/` o `docs/presentacion.md`, manual | Que la página de producto no salga con huecos y que la muestra publicada sea la que anuncia el README |
 
 ## `ci.yml` — las seis puertas
 
@@ -60,6 +60,14 @@ publicar comprueba dos cosas:
 - que ninguna imagen referenciada falte —una landing con un hueco gris es la
   primera impresión del producto—;
 - que ninguna imagen se quede sin texto alternativo.
+
+Aquí se genera además la **muestra del producto**: las diapositivas y la pauta
+del expositor salen de `docs/presentacion.md` en cada despliegue, porque los PDF
+no se versionan. El paso ejecuta las pruebas y los dos comandos de la demo —las
+cifras y la salida que se proyectan son las reales, no una transcripción—,
+imprime los PDF con el Chrome del runner por el protocolo DevTools, y
+`scripts/check-presentation.js` rechaza el despliegue si el README anuncia un
+número de láminas, de minutos o de anexos distinto del que trae la presentación.
 
 ## Dependabot
 

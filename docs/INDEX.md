@@ -11,6 +11,7 @@ ejecutable; los documentos explican el porqué.
 | [`../README.md`](../README.md) | Visión general, capturas del panel y arranque en 30 segundos |
 | [`MANUAL_USUARIO.md`](MANUAL_USUARIO.md) | **Qué es cada cosa del panel, en claro.** Empieza aquí |
 | [`WINDOWS-APP.md`](WINDOWS-APP.md) | Instalar, configurar y verificar la aplicación de escritorio |
+| [`presentacion.md`](presentacion.md) | **Presentar el producto hoy**: 8 diapositivas, demo de 90 s y pauta del expositor |
 | [`RUNBOOK.md`](RUNBOOK.md) | Qué hacer ante un incidente, paso a paso |
 | [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md) | Problemas comunes y su causa real |
 | [`REQUIREMENTS.md`](REQUIREMENTS.md) | Qué hace falta para usarla, desarrollarla y empaquetarla |
@@ -69,6 +70,7 @@ ejecuta:
 | «Ningún puntaje se emite sin explicación, límites y revisión humana» | `scripts/check-security-claims.js` |
 | «El grafo aplica sus cotas y la API de riesgo rechaza material privado» | `scripts/check-security-claims.js` |
 | «Ningún documento enlaza a un archivo inexistente» | `scripts/check-docs.js` |
+| «La presentación publicada tiene las láminas, los minutos y los anexos que anuncia el README» | `scripts/check-presentation.js` |
 | «La aplicación empaquetada arranca y sirve inventario» | job `app-windows` de `.github/workflows/ci.yml` |
 
 Ejecutar todas a la vez:

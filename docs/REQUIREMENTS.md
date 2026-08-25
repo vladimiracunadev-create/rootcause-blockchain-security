@@ -54,6 +54,23 @@ contrato de [`API.md`](API.md).
 **No hay dependencias de terceros y no debe haberlas.** `pnpm check:local-only`
 tumba el build si aparece una. Ver [`../CONTRIBUTING.md`](../CONTRIBUTING.md).
 
+## Para generar la presentación
+
+| Requisito | Detalle |
+|---|---|
+| Node.js | 22.12+, el mismo que para desarrollar |
+| Chrome o Edge | Solo para imprimir los PDF. Se le habla por el protocolo DevTools; **no se instala puppeteer ni ninguna otra dependencia** |
+
+Si el navegador está en una ruta poco habitual, indícala en `ROOTCAUSE_CHROME`.
+Sin navegador se puede generar igualmente el HTML —que es proyectable tal cual—
+con `node scripts/build-presentation.js`; lo único que falta entonces son los dos
+PDF.
+
+~~~bash
+pnpm build:presentacion
+pnpm check:presentacion
+~~~
+
 ## Para construir la aplicación de Windows
 
 | Requisito | Detalle |

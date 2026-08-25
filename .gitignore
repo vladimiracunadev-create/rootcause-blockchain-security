@@ -13,3 +13,7 @@ packaging/windows/rootcause.ico
 # La landing reutiliza las capturas de docs/img: el workflow de Pages las copia
 # al ensamblar el sitio, en vez de versionarlas dos veces.
 landing/img/
+
+# La muestra del producto (diapositivas y pauta del expositor) se genera desde
+# docs/presentacion.md en cada publicacion: el HTML y los PDF son artefactos.
+presentacion/

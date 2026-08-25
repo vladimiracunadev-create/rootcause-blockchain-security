@@ -16,6 +16,8 @@ verifica.
 | `pnpm check:security` | Arranca la aplicación real y verifica los seis principios con peticiones hostiles. |
 | `pnpm check:rules` | Motor, catálogo, política y README describen el mismo conjunto de reglas. |
 | `pnpm check:docs` | Ningún documento enlaza a un archivo inexistente. |
+| `pnpm build:presentacion` | Genera las diapositivas y la pauta del expositor desde `docs/presentacion.md`, y los imprime en PDF. |
+| `pnpm check:presentacion` | La presentación publicada tiene las láminas, los minutos y los anexos que anuncia el README. |
 | `pnpm generate:data-key` | Genera una clave AES-256 para la persistencia cifrada. |
 | `pnpm seed:demo` | Vuelca el estado de demostración. |
 | `pnpm package:windows` | Genera el icono y empaqueta la edición portable. |

@@ -24,7 +24,7 @@
 [![Claves](https://img.shields.io/badge/claves%20privadas-nunca-success.svg)](SECURITY.md)
 [![Versión](https://img.shields.io/badge/versi%C3%B3n-0.3.0-brightgreen.svg)](CHANGELOG.md)
 
-🌐 **[Página del producto →](https://vladimiracunadev-create.github.io/rootcause-blockchain-security/)**  ·  ⬇️ **[Descargar para Windows →](https://github.com/vladimiracunadev-create/rootcause-blockchain-security/releases/latest)**  ·  📘 **[Índice de documentación →](docs/INDEX.md)**
+🌐 **[Página del producto →](https://vladimiracunadev-create.github.io/rootcause-blockchain-security/)**  ·  ⬇️ **[Descargar para Windows →](https://github.com/vladimiracunadev-create/rootcause-blockchain-security/releases/latest)**  ·  🎤 **[Presentación y pauta →](#-presenta-el-producto-hoy-diapositivas-demo-y-pauta)**  ·  📘 **[Índice de documentación →](docs/INDEX.md)**
 
 ---
 
@@ -152,6 +152,64 @@ Estos seis puntos **no son una declaración de intenciones**:
 golpeándola con peticiones hostiles —claves privadas, mnemónicos, keystores,
 tokens de proveedor, mutaciones sin cabecera y peticiones cross-site—, y CI no
 deja pasar un cambio que los incumpla.
+
+---
+
+## 🎤 Presenta el producto hoy: diapositivas, demo y pauta
+
+¿Tienes que **mostrar esto** esta tarde —a un comité, a un equipo de seguridad o
+en una charla— y no quieres preparar nada? Está todo hecho y listo para proyectar:
+
+- **8 diapositivas** con letra grande y lo esencial en pantalla, en 16:9, con las
+  capturas reales del panel incrustadas en el propio archivo.
+- Una **demo en vivo de 90 segundos** (`pnpm check:local-only` y
+  `pnpm check:security`) **con sus resultados impresos en la lámina**: si la
+  terminal falla delante del público, señalas la tabla y sigues. Y esa salida no
+  está transcrita a mano — se captura **ejecutando los dos comandos** al generar
+  las diapositivas.
+- Una **pauta del expositor escrita como un libreto de televisión**: en cada
+  lámina, **lo que dices** va aparte —palabra por palabra, en intervenciones
+  numeradas para no perder el sitio al levantar la vista— y **lo que haces** va
+  aparte —qué abrir, dónde detenerte, qué recortar—, en un bloque gris que no se
+  pronuncia nunca. Son dos cosas distintas y no se leen igual.
+- Y **4 anexos**, que son los que salvan una exposición: la comprobación de los
+  diez minutos previos, qué recortar si tienes 10, 20 o 50 minutos, las preguntas
+  que te va a hacer la sala con la respuesta ya redactada, y —en un producto de
+  seguridad, el más importante— **lo que no hay que prometer**.
+
+La charla completa dura ≈**32 minutos**, así que cabe holgada en una franja de 45
+con preguntas.
+
+| Documento | Descarga | Para qué sirve |
+| --- | --- | --- |
+| 🎞️ **Diapositivas (PDF)** | [PRESENTACION.pdf (8 diapositivas)](https://vladimiracunadev-create.github.io/rootcause-blockchain-security/presentacion/PRESENTACION.pdf) | Proyectar sin conexión y repartir como material |
+| 🧾 **Pauta del expositor (PDF)** | [PAUTA.pdf](https://vladimiracunadev-create.github.io/rootcause-blockchain-security/presentacion/PAUTA.pdf) | Guion, tiempos, anexos y qué decir en cada diapositiva |
+| 🖥️ **Diapositivas en el navegador** | [Ver online](https://vladimiracunadev-create.github.io/rootcause-blockchain-security/presentacion/presentacion.html) | Proyectar desde el navegador, sin instalar nada |
+| ✍️ **Guion editable** | [`docs/presentacion.md`](docs/presentacion.md) | La fuente: edítala y regenera los tres formatos |
+
+**Diez minutos antes de exponer:** descarga los dos PDF; proyecta
+`PRESENTACION.pdf` a pantalla completa y deja `PAUTA.pdf` impreso o en el segundo
+monitor; abre una terminal en el repositorio con letra grande y **ejecuta una
+vez** `pnpm check:local-only` y `pnpm check:security` antes de que entre el
+público —la primera ejecución siempre tarda más, y ese silencio se hace largo—.
+El resto está en el primer anexo de la pauta.
+
+Los tres formatos salen del **mismo archivo**
+([`docs/presentacion.md`](docs/presentacion.md)), así que el guion y las láminas
+no se separan a la segunda edición; y **ninguna cifra de las láminas se escribe a
+mano**: los controles, las detecciones, los indicadores, las pruebas y los
+invariantes se cuentan del repositorio al generar la presentación, igual que
+`pnpm check:rules` impide que el catálogo y el README se desincronicen. Para
+regenerarlo todo:
+
+~~~bash
+pnpm build:presentacion
+pnpm check:presentacion
+~~~
+
+Requiere un Chrome o un Edge instalado —se usa para imprimir los PDF, por el
+protocolo DevTools y sin ninguna dependencia npm—. Si está en una ruta poco
+habitual, indícala en `ROOTCAUSE_CHROME`.
 
 ---
 
@@ -345,6 +403,7 @@ test/                    Pruebas unitarias e integración
 | --- | --- |
 | [`docs/INDEX.md`](docs/INDEX.md) | **Índice completo**, con la puerta de CI que verifica cada afirmación |
 | [`docs/MANUAL_USUARIO.md`](docs/MANUAL_USUARIO.md) | Qué es cada cosa del panel, en claro |
+| [`docs/presentacion.md`](docs/presentacion.md) | **Fuente única de la muestra**: las 8 láminas y el guion hablado |
 | [`docs/HEURISTICAS.md`](docs/HEURISTICAS.md) | Especificación exacta de las 22 reglas |
 | [`docs/WALLET-SECURITY-BOUNDARIES.md`](docs/WALLET-SECURITY-BOUNDARIES.md) | Fronteras de la postura de wallets y matriz de la familia |
 | [`docs/ONCHAIN-ANALYTICS.md`](docs/ONCHAIN-ANALYTICS.md) | Los 15 indicadores de inteligencia, con umbrales y falsos positivos |
