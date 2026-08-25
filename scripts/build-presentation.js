@@ -115,10 +115,23 @@ if (!controles || !detecciones || !indicadores || !escenarios) {
 
 // La suite completa, no un grep: el número de pruebas que anuncia la lámina es
 // el que node imprime al terminar de ejecutarlas.
-const suite = spawnSync(process.execPath, ["--test"], { cwd: PROJECT_ROOT, encoding: "utf8", timeout: 300000 });
-const pasadas = /^\s*(?:ℹ\s*)?pass\s+(\d+)\s*$/m.exec(suite.stdout || "");
+//
+// El reporter se fija a TAP a propósito. Sin fijarlo, node elige `spec` cuando
+// hay terminal y `tap` cuando no la hay, y el resumen cambia de forma ("ℹ pass
+// 144" contra "# pass 144"): la lámina se generaba en un portátil y fallaba en
+// CI por el formato de una línea, no por una prueba en rojo.
+const suite = spawnSync(process.execPath, ["--test", "--test-reporter=tap"], {
+  cwd: PROJECT_ROOT,
+  encoding: "utf8",
+  timeout: 300000
+});
+const pasadas = /^\s*(?:#|ℹ)?\s*pass\s+(\d+)\s*$/m.exec(suite.stdout || "");
 if (suite.status !== 0 || !pasadas) {
-  fallar("La suite de pruebas no terminó en verde: la presentación no anuncia una cifra que no se cumple.");
+  fallar(
+    "La suite de pruebas no terminó en verde: la presentación no anuncia una cifra que no se cumple.\n" +
+      String(suite.stdout || "").split("\n").slice(-25).join("\n") +
+      String(suite.stderr || "").trim()
+  );
 }
 const pruebas = Number(pasadas[1]);
 
