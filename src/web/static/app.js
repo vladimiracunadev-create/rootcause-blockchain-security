@@ -1,3 +1,18 @@
+// Panel local: renderiza el estado y dispara acciones. Sin framework.
+//
+// La regla más importante de este archivo: TODO dato que venga del servidor pasa
+// por escapeHtml antes de insertarse en el DOM. El panel construye HTML por
+// plantillas de cadena, así que una plantilla nueva que interpole un valor sin
+// escapar abre un fallo de inyección —aunque los datos sean locales, un nombre
+// de proyecto o una etiqueta de registro son entrada del usuario—. La
+// Content-Security-Policy servida es la segunda barrera, no la primera.
+//
+// La cabecera de mutación se añade en un único sitio, dentro de `api`: es lo que
+// hace que el panel funcione y que una página ajena no.
+//
+// El panel es de solo lectura respecto de la cadena: muestra, explica y permite
+// reconocer o resolver un incidente. No conecta cuentas ni ejecuta operaciones
+// on-chain, y un gate comprueba en caliente que no aparezcan esos controles.
 const model = {
   summary: null,
   controls: [],

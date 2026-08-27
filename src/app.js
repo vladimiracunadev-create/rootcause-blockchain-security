@@ -1,3 +1,21 @@
+// Superficie HTTP: la única puerta de entrada al sistema.
+//
+// El orden de este archivo es su contenido más importante. Las cabeceras de
+// seguridad se aplican ANTES de cualquier validación, para que también viajen
+// en las respuestas de error; el límite de ritmo se comprueba antes de leer el
+// cuerpo, para que nadie pueda forzar lecturas de 128 KB a ritmo libre; y los
+// archivos estáticos se resuelven contra un mapa cerrado, de modo que salir del
+// directorio servido es imposible por construcción y no por saneamiento.
+//
+// El manejo de errores es deliberadamente asimétrico: un 4xx describe lo que el
+// cliente hizo mal —es útil y no filtra nada—, mientras que un 5xx registra el
+// detalle en local y devuelve una frase genérica, porque el mensaje interno
+// puede contener rutas del sistema de archivos.
+//
+// Varios invariantes de scripts/check-security-claims.js y de
+// scripts/check-local-only.js comprueban este archivo directamente: la
+// Content-Security-Policy y la cabecera de mutación no se pueden relajar sin
+// que el build falle.
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";

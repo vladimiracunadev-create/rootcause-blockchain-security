@@ -1,3 +1,17 @@
+// Punto de composición del sistema y arranque del servidor local.
+//
+// Es el único archivo que decide QUÉ se usa: almacén en memoria o cifrado en
+// disco, qué conectores se registran, qué routers se montan y si se precargan
+// los escenarios de demostración. Todo lo demás recibe sus dependencias ya
+// construidas, y por eso el resto del código se puede probar sin levantar un
+// servidor.
+//
+// `buildRuntime` compone y devuelve; `startServer` escucha. Están separados a
+// propósito: las pruebas y los gates de seguridad usan el primero sin publicar
+// ningún puerto.
+//
+// El bloque final solo arranca si este archivo es el punto de entrada del
+// proceso, de modo que importarlo nunca levanta un servidor por sorpresa.
 import fs from "node:fs/promises";
 import http from "node:http";
 import { spawn } from "node:child_process";

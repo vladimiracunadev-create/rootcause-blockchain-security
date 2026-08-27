@@ -1,3 +1,13 @@
+// Puntaje de POSTURA: cuánto riesgo de configuración hay ahora mismo.
+//
+// No confundir con src/domain/intelligence/risk-score.js, que mide algo
+// distinto —exposición a señales investigables sobre movimientos de fondos— y
+// devuelve una explicación completa. Este es un agregado breve para el panel.
+//
+// La fórmula toma el hallazgo más grave y suma solo un 8 % de cada uno de los
+// demás. La intención es que la acumulación de ruido no eclipse la gravedad: un
+// hallazgo crítico ya satura la escala, y veinte hallazgos bajos no deben
+// parecer una crisis.
 export const SEVERITY_WEIGHT = Object.freeze({
   critical: 100,
   high: 75,

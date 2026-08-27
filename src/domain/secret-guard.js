@@ -1,3 +1,20 @@
+// Guardián de material secreto: la promesa central del producto, en código.
+//
+// Este módulo existe para que "no custodiamos claves" no sea una declaración de
+// intenciones sino una propiedad del sistema. Rechaza por NOMBRE de campo —tras
+// compactar el nombre a solo alfanuméricos, de modo que las variantes con guion,
+// guion bajo o mayúsculas colapsen al mismo token— y por CONTENIDO, con patrones
+// de los formatos codificados más habituales.
+//
+// La estrategia es rechazar, no sanear: un dato limpiado es un dato distinto del
+// observado, y este sistema conserva evidencia.
+//
+// `redactForAudit` es la segunda red: si algo sensible llegara por otra vía, la
+// entrada de auditoría guarda [REDACTED] en lugar del valor, y lo hace ANTES de
+// hashear, para que no exista en ninguna parte una versión sin redactar.
+//
+// Siete invariantes de scripts/check-security-claims.js atacan este módulo con
+// peticiones hostiles en cada ejecución de CI.
 const EXTENDED_PRIVATE_KEY = /\b(?:xprv|tprv)[1-9A-HJ-NP-Za-km-z]{40,}\b/;
 const WIF_PRIVATE_KEY = /\b[5KL][1-9A-HJ-NP-Za-km-z]{50,51}\b/;
 const PEM_PRIVATE_KEY = /-----BEGIN (?:EC |RSA )?PRIVATE KEY-----/;

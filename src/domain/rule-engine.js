@@ -1,3 +1,18 @@
+// Motor de reglas de defensa: convierte un estado en hallazgos.
+//
+// Es una función pura. No lee disco, no llama a la red y no muta el estado que
+// recibe: las mismas entradas producen exactamente los mismos hallazgos, en el
+// mismo orden. Ese determinismo no es un lujo, es lo que permite que un
+// incidente conserve su identidad entre ejecuciones.
+//
+// La pieza que lo sostiene es `findingId`, que deriva el identificador del
+// hallazgo por hash de (código, entidad, discriminador). Cambiar cualquiera de
+// esos tres campos en una regla existente ROMPE la continuidad del incidente:
+// el anterior se marcará como resuelto y aparecerá uno nuevo con historia
+// vacía. Si hay que cambiarlo, conviene anunciarlo con un cambio de versión.
+//
+// Ante un dato ausente, las reglas eligen la lectura segura: un oráculo del que
+// no sabemos si está vivo cuenta como vencido, no como sano.
 import crypto from "node:crypto";
 import { evaluateWalletPosture } from "./wallet-rules.js";
 

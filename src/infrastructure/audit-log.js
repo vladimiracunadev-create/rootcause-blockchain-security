@@ -1,3 +1,19 @@
+// Cadena de auditoría: qué pasó, en qué orden y sin poder reescribirlo.
+//
+// Cada entrada guarda el hash de la anterior, y su propio hash se calcula sobre
+// la entrada completa incluido ese enlace. Modificar o eliminar una entrada
+// intermedia invalida esa y todas las posteriores.
+//
+// `canonicalize` ordena las claves antes de hashear porque JSON.stringify
+// conserva el orden de inserción: sin ese paso, el mismo contenido escrito en
+// otro orden produciría otro hash y la verificación fallaría sin que nadie
+// hubiera manipulado nada. Cambiar esta función o el algoritmo invalida todas
+// las cadenas ya escritas.
+//
+// Lo que esto garantiza y lo que no: detecta manipulación accidental o poco
+// sofisticada. NO detecta el truncado del final de la cadena, ni impide que
+// alguien con acceso de escritura al archivo y a la clave la reconstruya entera.
+// El modelo de amenazas lo declara así explícitamente.
 import crypto from "node:crypto";
 import { redactForAudit } from "../domain/secret-guard.js";
 

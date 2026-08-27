@@ -1,3 +1,12 @@
+// Service Worker: la consola sigue abriéndose aunque el proceso no esté vivo.
+//
+// Cachea únicamente los archivos estáticos y DESCARTA de forma explícita todo lo
+// que empiece por /api/. Sin esa condición, una respuesta con el inventario
+// completo quedaría guardada en el navegador y podría servirse obsoleta —o
+// sobrevivir al cierre de la aplicación—.
+//
+// La estrategia es red primero con respaldo en caché: mientras el proceso
+// responde, siempre se sirve la versión actual.
 const CACHE = "rootcause-chain-v3";
 const ASSETS = ["/", "/styles.css", "/app.js", "/icon.svg", "/manifest.webmanifest"];
 

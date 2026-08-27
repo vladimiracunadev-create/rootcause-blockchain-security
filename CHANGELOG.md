@@ -2,6 +2,25 @@
 
 ## Sin publicar
 
+- **Documentación de sistema**: veinte documentos nuevos en
+  `docs/system-documentation/` que recorren el repositorio de arriba abajo —mapa
+  del código con el estado real de cada símbolo, referencia técnica, explicación
+  módulo a módulo, flujo del dato, persistencia, seguridad, matriz de
+  trazabilidad y registro de riesgos—. Enlazan a los documentos existentes como
+  fuente canónica en vez de duplicarlos: dos versiones del mismo contenido
+  divergen a la segunda edición.
+- Cada afirmación lleva su evidencia —archivo y símbolo— o su marca de
+  incertidumbre. Las cifras no se escriben a mano: salen de ejecutar las pruebas,
+  los gates y la propia aplicación. Ese método produjo hallazgos que una lectura
+  no habría dado, como que el estado de demostración activa 19 de las 22 reglas y
+  que `BLK-ACCESS-002` no tiene ni prueba ni escenario.
+- `scripts/build-system-docs.js`: genera los PDF desde esos mismos Markdown, sin
+  dependencias —el Markdown lo convierte `scripts/lib/markdown.js` y la impresión
+  la hace un Chrome o un Edge del sistema por el protocolo DevTools—. Los PDF no
+  se versionan: se rehacen enteros en cada cambio del texto.
+- Comentario de cabecera de módulo en los quince archivos de `src/` que no lo
+  tenían, explicando por qué existe cada uno y qué riesgo tiene modificarlo. **No
+  cambia ninguna línea de código.**
 - **Muestra del producto lista para proyectar**: `docs/presentacion.md` es la
   fuente única de la que salen las **8 diapositivas** en 16:9, la **pauta del
   expositor** y sus **4 anexos**, en HTML y en PDF (`pnpm build:presentacion`).

@@ -425,6 +425,33 @@ test/                    Pruebas unitarias e integración
 | [`docs/POLITICA_DE_PRIVACIDAD_LOCAL.md`](docs/POLITICA_DE_PRIVACIDAD_LOCAL.md) | Qué datos toca y cómo comprobarlo |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Qué falta y en qué orden |
 
+### Documentación del sistema (análisis completo del repositorio)
+
+Veinte documentos que recorren el repositorio de arriba abajo: mapa del código,
+referencia técnica símbolo a símbolo, explicación profunda módulo a módulo,
+matriz de trazabilidad y registro de riesgos con su evidencia.
+
+| Documento | Contenido |
+| --- | --- |
+| [`docs/system-documentation/README.md`](docs/system-documentation/README.md) | **Portada e índice**, con las convenciones y lo que queda por validar |
+| [`docs/system-documentation/01-system-overview.md`](docs/system-documentation/01-system-overview.md) | Qué es el sistema, también para quien no es técnico |
+| [`docs/system-documentation/03-architecture.md`](docs/system-documentation/03-architecture.md) | Capas, dependencias y diagramas |
+| [`docs/system-documentation/04-code-map.md`](docs/system-documentation/04-code-map.md) | Inventario de cada archivo, símbolo y su estado |
+| [`docs/system-documentation/05-technical-reference.md`](docs/system-documentation/05-technical-reference.md) | Constantes, funciones, rutas y códigos de error |
+| [`docs/system-documentation/06-deep-code-explanation.md`](docs/system-documentation/06-deep-code-explanation.md) | Cómo funciona por dentro, bloque a bloque |
+| [`docs/system-documentation/07-database.md`](docs/system-documentation/07-database.md) | Persistencia cifrada y diccionario de datos |
+| [`docs/system-documentation/11-security.md`](docs/system-documentation/11-security.md) | Postura de seguridad y controles ausentes |
+| [`docs/system-documentation/15-risks-and-technical-debt.md`](docs/system-documentation/15-risks-and-technical-debt.md) | **25 hallazgos** con severidad, evidencia y recomendación |
+| [`docs/system-documentation/17-executive-summary.md`](docs/system-documentation/17-executive-summary.md) | Resumen para decidir, sin jerga |
+| [`docs/system-documentation/18-new-developer-guide.md`](docs/system-documentation/18-new-developer-guide.md) | Itinerario de incorporación y primeras tareas |
+| [`docs/system-documentation/19-traceability-matrix.md`](docs/system-documentation/19-traceability-matrix.md) | De la interfaz al dato y a su prueba |
+
+Los PDF equivalentes se generan desde esos mismos Markdown, sin dependencias:
+
+~~~bash
+node scripts/build-system-docs.js
+~~~
+
 ---
 
 ## ⚠️ Limitaciones honestas

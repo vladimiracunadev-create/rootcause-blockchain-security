@@ -1,3 +1,21 @@
+// Persistencia del estado: un único archivo JSON cifrado, o memoria pura.
+//
+// Los dos almacenes cumplen el mismo contrato implícito —load() y save()— y por
+// eso elegir entre uno y otro es una decisión de una línea en el arranque.
+//
+// La escritura es atómica: se cifra en memoria, se escribe en un temporal cuyo
+// nombre incluye el PID —para que dos procesos no colisionen en él— y el último
+// paso es un rename, que en el mismo sistema de archivos no se interrumpe a
+// medias. Si el proceso muere durante la escritura, sobrevive el estado anterior
+// íntegro.
+//
+// En la lectura, la ÚNICA condición que se convierte en "empieza de cero" es que
+// el archivo no exista. Un fallo de descifrado o un JSON corrupto se propagan y
+// detienen el arranque: caer a un estado vacío tras un fallo de descifrado
+// equivaldría a borrar el inventario del operador en silencio.
+//
+// MemoryStore clona en ambas direcciones para que el modo de demostración se
+// comporte igual que el persistente y las pruebas signifiquen lo mismo.
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";

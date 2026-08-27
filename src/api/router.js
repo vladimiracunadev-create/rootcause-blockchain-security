@@ -1,3 +1,16 @@
+// Enrutado de la API de defensa: inventario, incidentes y auditoría.
+//
+// Traduce HTTP a llamadas de servicio y nada más. La lógica de negocio vive en
+// DefenseService; aquí solo se decide qué método y qué ruta corresponden a qué
+// caso de uso, y con qué código de estado se responde.
+//
+// La API de inteligencia se resuelve PRIMERO, bajo /api/v1. Cuando no reconoce
+// una ruta devuelve null y el control vuelve aquí: es lo que permite componer
+// dos routers sin acoplarlos ni introducir un framework de middleware.
+//
+// El actor que llega en la cabecera es una ETIQUETA de auditoría, no una
+// credencial. Se valida su forma para que un valor con caracteres de control no
+// acabe escrito en la cadena de auditoría, pero no acredita a nadie.
 function actorFrom(request) {
   const value = String(request.headers["x-rootcause-actor"] || "local-user");
   return /^[a-z0-9._@-]{1,80}$/i.test(value) ? value : "local-user";

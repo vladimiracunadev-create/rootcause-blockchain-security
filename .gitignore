@@ -17,3 +17,9 @@ landing/img/
 # La muestra del producto (diapositivas y pauta del expositor) se genera desde
 # docs/presentacion.md en cada publicacion: el HTML y los PDF son artefactos.
 presentacion/
+
+# La documentacion del sistema se genera desde docs/system-documentation/*.md
+# con `node scripts/build-system-docs.js`. Los PDF pesan varios megas y se
+# rehacen enteros en cada cambio del texto: son artefactos, no fuentes.
+docs/system-documentation/pdf/*.pdf
+docs/system-documentation/pdf/*.html

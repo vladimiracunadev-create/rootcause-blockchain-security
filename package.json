@@ -18,6 +18,7 @@
     "check:security": "node scripts/check-security-claims.js",
     "check:rules": "node scripts/check-rule-coverage.js",
     "check:docs": "node scripts/check-docs.js",
+    "build:docs": "node scripts/build-system-docs.js",
     "build:presentacion": "node scripts/build-presentation.js && node scripts/render-presentation-pdf.js",
     "check:presentacion": "node scripts/check-presentation.js",
     "generate:data-key": "node scripts/generate-key.js",

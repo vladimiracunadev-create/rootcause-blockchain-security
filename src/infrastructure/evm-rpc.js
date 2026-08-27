@@ -1,3 +1,19 @@
+// Observador de cadena: cliente JSON-RPC de SOLO LECTURA.
+//
+// La allowlist es una lista blanca, no una lista negra: un método nuevo no está
+// permitido por omisión. Es la diferencia entre un observador y algo capaz de
+// mutar estado, y por eso la vigilan dos mecanismos independientes —un gate que
+// comprueba su contenido y ejercita la función real, y una búsqueda
+// deliberadamente tosca en el workflow de CI—.
+//
+// El endpoint se valida en el CONSTRUCTOR, no en la primera llamada: una URL
+// inválida, con credenciales embebidas o remota sin permiso explícito impide
+// arrancar la aplicación. Un observador mal configurado es peor que ninguno,
+// porque produce hechos falsos con apariencia de verificados.
+//
+// La respuesta se corta MIENTRAS llega: un nodo averiado o malicioso podría
+// devolver algo enorme, y comprobar su tamaño después de materializarlo ya
+// habría consumido la memoria.
 const READ_ONLY_METHODS = new Set([
   "eth_chainId",
   "eth_blockNumber",

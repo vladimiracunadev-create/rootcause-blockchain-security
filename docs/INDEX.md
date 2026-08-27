@@ -18,6 +18,37 @@ ejecutable; los documentos explican el porqué.
 | [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) | Antes de usarla con datos reales |
 | [`BLOCKCHAIN-Y-BITCOIN.md`](BLOCKCHAIN-Y-BITCOIN.md) | Qué es cada cosa y por qué existen dos productos |
 
+## Análisis completo del repositorio
+
+Veinte documentos que estudian el repositorio desde cero: pensados para
+incorporarse al proyecto, auditarlo o usarlos como contexto de trabajo. Enlazan
+a los documentos de esta carpeta como fuente canónica en vez de duplicarlos.
+
+| Documento | Contenido |
+|---|---|
+| [`system-documentation/README.md`](system-documentation/README.md) | **Portada, índice, convenciones y pendientes de validar** |
+| [`system-documentation/01-system-overview.md`](system-documentation/01-system-overview.md) | El sistema explicado, incluso para quien no es técnico |
+| [`system-documentation/02-installation-and-execution.md`](system-documentation/02-installation-and-execution.md) | Requisitos, arranque, pruebas y empaquetado |
+| [`system-documentation/03-architecture.md`](system-documentation/03-architecture.md) | Capas, patrones y diagramas, con su explicación |
+| [`system-documentation/04-code-map.md`](system-documentation/04-code-map.md) | Cada archivo y símbolo, con su estado real |
+| [`system-documentation/05-technical-reference.md`](system-documentation/05-technical-reference.md) | Catálogo de constantes, funciones, rutas y errores |
+| [`system-documentation/06-deep-code-explanation.md`](system-documentation/06-deep-code-explanation.md) | Cómo funciona cada módulo por dentro |
+| [`system-documentation/07-database.md`](system-documentation/07-database.md) | Persistencia cifrada, diccionario de datos y modelo entidad-relación |
+| [`system-documentation/08-data-flow.md`](system-documentation/08-data-flow.md) | De dónde viene el dato, cómo se valida y dónde puede perderse |
+| [`system-documentation/09-apis-and-integrations.md`](system-documentation/09-apis-and-integrations.md) | Las 40 rutas y las integraciones que existen de verdad |
+| [`system-documentation/10-configuration.md`](system-documentation/10-configuration.md) | Cada variable y qué pasa si se configura mal |
+| [`system-documentation/11-security.md`](system-documentation/11-security.md) | Controles implementados y **controles ausentes** |
+| [`system-documentation/12-testing-and-quality.md`](system-documentation/12-testing-and-quality.md) | Cobertura observable y pruebas que faltan, priorizadas |
+| [`system-documentation/13-deployment-and-operations.md`](system-documentation/13-deployment-and-operations.md) | Empaquetado, CI/CD, respaldo y mantenimiento |
+| [`system-documentation/14-troubleshooting.md`](system-documentation/14-troubleshooting.md) | Diagnóstico desde el código, con el módulo responsable |
+| [`system-documentation/15-risks-and-technical-debt.md`](system-documentation/15-risks-and-technical-debt.md) | **25 hallazgos** con severidad, evidencia y recomendación |
+| [`system-documentation/16-glossary.md`](system-documentation/16-glossary.md) | Los términos, explicados sin jerga |
+| [`system-documentation/17-executive-summary.md`](system-documentation/17-executive-summary.md) | Resumen para decidir |
+| [`system-documentation/18-new-developer-guide.md`](system-documentation/18-new-developer-guide.md) | Itinerario de incorporación y primeras tareas |
+| [`system-documentation/19-traceability-matrix.md`](system-documentation/19-traceability-matrix.md) | De la funcionalidad a la prueba, en ambos sentidos |
+
+Los PDF equivalentes se generan con `node scripts/build-system-docs.js`.
+
 ## Para desarrolladores
 
 | Documento | Contenido |

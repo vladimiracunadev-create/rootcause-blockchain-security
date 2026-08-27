@@ -1,3 +1,16 @@
+// Vigilancia periódica opcional: refrescar el observador y volver a analizar.
+//
+// Cuarenta líneas con tres decisiones que conviene no perder al tocarlas.
+//
+// La guarda de reentrada descarta un ciclo si el anterior sigue en marcha: sin
+// ella, un nodo lento acumularía ciclos solapados escribiendo estado a la vez.
+// El temporizador se desreferencia para que no impida que el proceso termine. Y
+// el primer ciclo se ejecuta de inmediato, sin esperar al intervalo, para que la
+// consola tenga datos desde el arranque.
+//
+// Los errores se registran y NUNCA derriban el proceso: un observador caído no
+// debe apagar la consola —además, quedarse sin observador ya es un incidente que
+// el propio motor de reglas detecta.
 export class Watchtower {
   constructor(service, options) {
     this.service = service;

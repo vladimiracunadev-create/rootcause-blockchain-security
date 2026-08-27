@@ -1,3 +1,22 @@
+// Casos de uso de defensa: validar, mutar, auditar.
+//
+// Este archivo es la frontera entre la entrada libre del exterior y el dominio,
+// que asume datos ya válidos. Los normalizadores no copian el objeto recibido:
+// lo RECONSTRUYEN campo a campo, de modo que cualquier propiedad que no esté
+// contemplada sencillamente no llega al estado. Es lo que hace que la cuenta
+// vigilada no pueda contener datos personales aunque alguien los envíe.
+//
+// `mutate` serializa toda escritura sobre una cola. Sin ella, dos peticiones
+// concurrentes harían leer-modificar-guardar de forma solapada y la segunda
+// perdería los cambios de la primera. La cola se limpia con un catch para que un
+// error no deje inutilizado el servicio; el fallo se propaga solo a quien llamó.
+// Esa serialización es intra-proceso: dos procesos sobre el mismo directorio de
+// datos sí pueden pisarse.
+//
+// `mergeIncidents` gobierna el ciclo de vida completo: un hallazgo que reaparece
+// conserva su fecha de creación y su estado reconocido; uno que deja de
+// detectarse se resuelve solo. Leerla antes de tocarla evita romper el triaje del
+// operador en cada análisis.
 import crypto from "node:crypto";
 import { appendAuditEntry, verifyAuditChain } from "../infrastructure/audit-log.js";
 import { assertNoSecretMaterial } from "../domain/secret-guard.js";

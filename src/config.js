@@ -1,3 +1,14 @@
+// Configuración efectiva del proceso, resuelta una sola vez al arrancar.
+//
+// Dos decisiones gobiernan este archivo. La primera: los valores numéricos se
+// ACOTAN en lugar de rechazarse, porque una consola de escritorio no debe
+// negarse a arrancar por un puerto mal escrito —pero tampoco aceptar un límite
+// de cuerpo de cuatro gigas—. La segunda: el objeto devuelto va congelado, para
+// que ningún módulo pueda reescribir la configuración de otro en caliente.
+//
+// `assertProductionConfig` es la única guarda que impide arrancar en modo
+// persistente sin clave de cifrado: quitarla dejaría el inventario del operador
+// en claro sobre el disco.
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 

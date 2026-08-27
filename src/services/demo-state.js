@@ -1,3 +1,16 @@
+// Estado de demostración: escenarios reproducibles, todos ficticios.
+//
+// No es material de relleno. Cada escenario está construido para activar
+// exactamente una regla, y hay además una cuenta sana que no debe activar
+// ninguna. Esa combinación es lo que permite que una prueba compruebe a la vez
+// que el motor detecta lo que debe y que se mantiene callado donde no debe: una
+// regla que grita siempre acaba ignorándose, y entonces deja de proteger.
+//
+// Todas las direcciones y hashes se generan por patrón. Aquí no hay ninguna
+// dirección real, ni siquiera de ejemplos públicos.
+//
+// `createEmptyState` sí se usa en producción: es el estado inicial del modo
+// persistente.
 function hoursAgo(hours) {
   return new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
 }
