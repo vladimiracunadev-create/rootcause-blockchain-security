@@ -76,7 +76,7 @@ function validateMutationRequest(request) {
   }
 }
 
-export function createApplication({ service, config, staticRoot, intelligenceRouter = null }) {
+export function createApplication({ service, config, staticRoot, intelligenceRouter = null, forensicsRouter = null }) {
   const allowRequest = createRateLimiter(config.rateLimitPerMinute);
 
   async function readJson(request) {
@@ -106,7 +106,7 @@ export function createApplication({ service, config, staticRoot, intelligenceRou
     }
   }
 
-  const apiRouter = createApiRouter({ service, readJson, intelligenceRouter });
+  const apiRouter = createApiRouter({ service, readJson, intelligenceRouter, forensicsRouter });
 
   return async function application(request, response) {
     applySecurityHeaders(response);

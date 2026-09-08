@@ -2,6 +2,18 @@
 
 ## Sin publicar
 
+- **Blockchain Forensics y Root Cause Analysis**: contrato normalizado
+  `BlockchainTransaction` con procedencia por campo y hash SHA-256, soporte
+  inicial de Bitcoin, Ethereum y Polygon, providers intercambiables de sólo
+  lectura, análisis de direcciones y grafo bipartito acotado.
+- CLI y API v1 para consultar transacciones/direcciones, reconciliar un ledger,
+  construir timelines y producir JSON, CSV, Markdown o GraphML. El caso
+  determinístico incluido demuestra `MATCH`, diferencias y ausencias en ambos
+  sentidos, y termina en un informe verificable.
+- Ocho laboratorios guiados y una página de producto actualizada. Los informes
+  rechazan explícitamente entradas marcadas como generadas por IA y nunca
+  atribuyen automáticamente una dirección a una persona.
+
 - **Documentación de sistema**: veinte documentos nuevos en
   `docs/system-documentation/` que recorren el repositorio de arriba abajo —mapa
   del código con el estado real de cada símbolo, referencia técnica, explicación

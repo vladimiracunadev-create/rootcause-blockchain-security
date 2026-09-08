@@ -5,6 +5,24 @@ responder sobre él y —más importante— cuáles no.
 
 Fuente de verdad: `src/domain/intelligence/graph.js`.
 
+## Implementación ejecutable
+
+El módulo `src/forensics/` implementa `BlockchainTransaction`, providers
+intercambiables para fixtures, nodos EVM (Ethereum/Polygon) y Bitcoin Core,
+análisis de direcciones, reconciliación, timeline e informes. Todos son de solo
+lectura. Los providers RPC rechazan credenciales embebidas y destinos remotos
+por defecto.
+
+Un nodo EVM estándar no enumera el historial completo de una dirección y
+Bitcoin Core sin índice tampoco: para esas consultas se necesita importar un
+dataset/indexador con procedencia o configurar infraestructura propia. La CLI
+usa fixtures determinísticos por defecto, así los laboratorios no filtran qué
+dirección se investiga.
+
+Salidas: JSON; CSV para reconciliación; Markdown para informes; y GraphML para
+grafos `Address -> Transaction -> Address`. Límites duros: profundidad 6, 500
+nodos y 1000 aristas. Prácticas: [`labs/README.md`](labs/README.md).
+
 ## El grafo
 
 - **Nodo:** una dirección pública, en su forma canónica (`red:dirección`).

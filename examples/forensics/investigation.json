@@ -1,0 +1,35 @@
+{
+  "title": "Caso demostrativo RootCause Blockchain Forensics",
+  "scope": "Tres redes, ledger interno y registros operacionales ficticios",
+  "transactions": [
+    {
+      "chain": "ethereum", "network": "mainnet", "tx_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "block": 21000001, "timestamp": "2026-01-15T12:00:00.000Z", "from": "0x1111111111111111111111111111111111111111",
+      "to": "0x2222222222222222222222222222222222222222", "asset": "USDC", "amount": "250000000", "fee": "21000000000000",
+      "status": "confirmed", "input_data": "0xa9059cbb", "contract": "0x3333333333333333333333333333333333333333", "confirmations": 120,
+      "provenance": { "source": { "kind": "local-dataset", "id": "fixture-ethereum", "retrievedAt": "2026-01-16T00:00:00.000Z" } }
+    },
+    {
+      "chain": "polygon", "network": "mainnet", "tx_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "block": 68000001, "timestamp": "2026-01-15T12:05:00.000Z", "from": "0x2222222222222222222222222222222222222222",
+      "to": "0x4444444444444444444444444444444444444444", "asset": "POL", "amount": "5000000000000000000", "fee": "30000000000000000",
+      "status": "confirmed", "input_data": "0x", "contract": null, "confirmations": 300,
+      "provenance": { "source": { "kind": "local-dataset", "id": "fixture-polygon", "retrievedAt": "2026-01-16T00:00:00.000Z" } }
+    },
+    {
+      "chain": "bitcoin", "network": "mainnet", "tx_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "block": 880001, "timestamp": "2026-01-15T12:10:00.000Z", "from": "1BoatSLRHtKNngkdXEeobR76b53LETtpyT",
+      "to": "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy", "asset": "BTC", "amount": "12500000", "fee": "1500",
+      "status": "confirmed", "input_data": "", "contract": null, "confirmations": 42,
+      "provenance": { "source": { "kind": "local-dataset", "id": "fixture-bitcoin", "retrievedAt": "2026-01-16T00:00:00.000Z" } }
+    }
+  ],
+  "ledger": [
+    { "internal_id": "PAY-001", "tx_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "timestamp": "2026-01-15T12:02:00.000Z", "from": "0x1111111111111111111111111111111111111111", "to": "0x2222222222222222222222222222222222222222", "amount": "250000000" },
+    { "internal_id": "PAY-002", "tx_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "timestamp": "2026-01-15T12:05:00.000Z", "from": "0x2222222222222222222222222222222222222222", "to": "0x4444444444444444444444444444444444444444", "amount": "4000000000000000000" },
+    { "internal_id": "PAY-003", "tx_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "timestamp": "2026-01-15T12:20:00.000Z", "from": "0x1111111111111111111111111111111111111111", "to": "0x5555555555555555555555555555555555555555", "amount": "1" }
+  ],
+  "applicationEvents": [{ "id": "APP-001", "timestamp": "2026-01-15T11:59:50.000Z", "event": "withdrawal.requested", "description": "Solicitud registrada por RootCause Server" }],
+  "exchangeEvents": [{ "id": "EX-001", "timestamp": "2026-01-15T12:06:00.000Z", "event": "withdrawal.completed", "description": "Registro aportado por exchange" }],
+  "hypotheses": ["La salida en Bitcoin podría corresponder al mismo incidente; no existe evidencia suficiente para atribuir control común."]
+}

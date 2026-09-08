@@ -33,7 +33,7 @@ dependencias, consumidores y estado aparente de cada elemento.
 | `presentacion/` | Diapositivas y pauta generadas (ignorada por git) | Artefacto |
 | `scripts/` | 9 scripts de validación, gates y utilidades | Herramienta |
 | `src/` | 24 archivos JavaScript: la aplicación | Activo |
-| `test/` | 13 archivos de prueba, 144 pruebas | Herramienta |
+| `test/` | 15 archivos de prueba, 158 pruebas | Herramienta |
 
 Archivos sueltos de la raíz: `package.json`, `pnpm-lock.yaml`,
 `pnpm-workspace.yaml`, `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`,
@@ -451,7 +451,7 @@ Cambiarlos exige reiniciar el proceso. **Hecho verificado.**
 | `test/secret-guard.test.js` | 3 | Rechazo y redacción |
 | `test/wallet-rules.test.js` | 33 | Las 8 reglas de wallet y sus negativos |
 
-Total ejecutado: **144 pruebas** (los archivos contienen pruebas anidadas además
+Total ejecutado: **158 pruebas** (los archivos contienen pruebas anidadas además
 de las de primer nivel).
 
 ---

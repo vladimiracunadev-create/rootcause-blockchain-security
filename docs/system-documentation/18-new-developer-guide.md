@@ -61,7 +61,7 @@ Necesitas **Node 22.12 o superior**. Y ya está: **no hay paso de instalación**
 node --test
 ~~~
 
-Deberías ver 144 pruebas pasando en unos 10 segundos. Si las ves, tu entorno está
+Deberías ver 158 pruebas pasando en unos 15 segundos. Si las ves, tu entorno está
 listo.
 
 ~~~bash
@@ -94,7 +94,7 @@ src/
   web/static/            ← el panel, sin framework
 config/                  ← políticas y catálogos (se leen al arrancar)
 scripts/                 ← validadores, gates y herramientas
-test/                    ← 13 archivos, 144 pruebas
+test/                    ← 15 archivos, 158 pruebas
 examples/datasets/       ← 10 escenarios con su resultado esperado
 ~~~
 

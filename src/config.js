@@ -46,6 +46,12 @@ export function loadConfig(env = process.env) {
       timeoutMs: parseInteger(env.EVM_RPC_TIMEOUT_MS, 5000, 500, 60000),
       responseLimitBytes: parseInteger(env.EVM_RPC_RESPONSE_LIMIT_BYTES, 2097152, 1024, 16777216)
     }),
+    forensics: Object.freeze({
+      polygonRpcUrl: env.POLYGON_RPC_URL || "",
+      bitcoinRpcUrl: env.BITCOIN_RPC_URL || "",
+      allowRemote: parseBoolean(env.FORENSICS_ALLOW_REMOTE_RPC, false),
+      timeoutMs: parseInteger(env.FORENSICS_RPC_TIMEOUT_MS, 5000, 500, 60000)
+    }),
     watchtower: Object.freeze({
       enabled: parseBoolean(env.WATCHTOWER_ENABLED, false),
       intervalMs: parseInteger(env.WATCHTOWER_INTERVAL_MS, 15000, 5000, 3600000)

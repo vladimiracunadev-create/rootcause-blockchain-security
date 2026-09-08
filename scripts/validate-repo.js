@@ -14,10 +14,16 @@ const requiredFiles = [
   "config/control-catalog.json",
   "config/policies.json",
   "src/server.js",
+  "src/cli.js",
+  "src/forensics/model.js",
+  "src/forensics/reconciliation.js",
+  "src/forensics/report.js",
   "src/web/static/index.html",
   "test/rule-engine.test.js",
   "docs/ADR-0001-plataforma-y-lenguaje.md",
   "docs/WINDOWS-APP.md",
+  "docs/labs/README.md",
+  "docs/openapi-forensics.yaml",
   "docs/BLOCKCHAIN-Y-BITCOIN.md",
   "packaging/windows/build-portable.ps1",
   "packaging/windows/make-icon.ps1",
@@ -27,7 +33,9 @@ const requiredFiles = [
   "docs/FAMILIA_ROOTCAUSE.md",
   "docs/img/panel-resumen.png",
   "landing/index.html",
-  "landing/assets/style.css"
+  "landing/assets/style.css",
+  "examples/forensics/investigation.json",
+  "examples/forensics/internal-ledger.csv"
 ];
 
 const errors = [];

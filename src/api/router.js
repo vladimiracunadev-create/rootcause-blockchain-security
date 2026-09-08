@@ -27,11 +27,16 @@ export function jsonResponse(response, status, body, extraHeaders = {}) {
   response.end(payload);
 }
 
-export function createApiRouter({ service, readJson, intelligenceRouter = null }) {
+export function createApiRouter({ service, readJson, intelligenceRouter = null, forensicsRouter = null }) {
   return async function routeApi(request, response, url) {
     const method = request.method || "GET";
     const path = url.pathname;
     const actor = actorFrom(request);
+
+    if (forensicsRouter && path.startsWith("/api/v1/forensics/")) {
+      const handled = await forensicsRouter(request, response, url, { actor, readJson });
+      if (handled !== null) return handled;
+    }
 
     // La API de inteligencia está versionada bajo /api/v1 y se resuelve antes
     // que las rutas heredadas: si no reconoce la ruta devuelve null y el

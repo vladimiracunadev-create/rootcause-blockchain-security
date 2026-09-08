@@ -130,6 +130,29 @@ bloquea fondos. Cada resultado separa **hecho observado**, **indicador**,
 Detalle en [`docs/ONCHAIN-ANALYTICS.md`](docs/ONCHAIN-ANALYTICS.md) y
 [`docs/RISK-MODEL.md`](docs/RISK-MODEL.md).
 
+### Blockchain Forensics: de una TX a un informe verificable
+
+El laboratorio forense añade soporte normalizado para **Bitcoin, Ethereum y
+Polygon** mediante providers intercambiables de solo lectura. Responde qué
+ocurrió, cuándo, desde/hacia qué dirección, cuánto, en qué red y con qué hash;
+analiza direcciones, genera grafos `Address → Transaction → Address`, reconcilia
+`internal-ledger.csv` y construye un timeline entre blockchain, aplicación,
+ledger y exchange.
+
+~~~bash
+node src/cli.js blockchain tx aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --chain ethereum
+node src/cli.js blockchain address 0x1111111111111111111111111111111111111111 --chain ethereum
+node src/cli.js reconcile examples/forensics/internal-ledger.csv
+node src/cli.js graph 0x1111111111111111111111111111111111111111 --chain ethereum --format graphml
+node src/cli.js report examples/forensics/investigation.json --output evidence-report.md
+~~~
+
+Cada `BlockchainTransaction` conserva procedencia por campo y un hash de
+evidencia. Los informes separan hechos comprobables, registros aportados,
+inferencias e hipótesis; **la IA nunca se presenta como evidencia blockchain**.
+Recorre los [ocho laboratorios reproducibles](docs/labs/README.md) o consulta el
+[contrato de la API](docs/API.md#api-v1-de-blockchain-forensics).
+
 ### Trece controles, veintidós detecciones
 
 ![Catálogo de trece controles de defensa, de la procedencia de bytecode a la actividad de wallets, y el núcleo RootCause compartido con Bitcoin Defense](docs/img/panel-controles.png)
@@ -305,7 +328,9 @@ que consultes ve qué contratos estás vigilando.**
 Solana, Cosmos, Substrate y otras redes pueden enviar hechos ya normalizados a
 `POST /api/observe/event` sin acoplar el motor de reglas a ningún SDK. Esas
 redes **no se declaran soportadas** mientras no existan adaptadores y pruebas
-reales: hoy el soporte implementado es EVM.
+reales. El observador preventivo implementado es EVM; el laboratorio forense
+soporta Bitcoin, Ethereum y Polygon, con las limitaciones de indexación
+documentadas en [`docs/BLOCKCHAIN-FORENSICS.md`](docs/BLOCKCHAIN-FORENSICS.md).
 
 El mismo endpoint acepta los siete eventos wallet normalizados
 (`wallet.allowance.changed`, `wallet.operator.changed`, `wallet.permit.used`,

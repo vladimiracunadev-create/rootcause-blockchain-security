@@ -26,7 +26,7 @@ en [`../REQUIREMENTS.md`](../REQUIREMENTS.md) y la de comandos en
 `.github/workflows/ci.yml` documenta explícitamente que CI **no ejecuta**
 `npm ci` ni `pnpm install`.
 
-**Verificado en este análisis** con Node `v24.11.1`: las 144 pruebas pasan.
+**Verificado en este análisis** con Node `v24.11.1`: las 158 pruebas pasan.
 CI cubre además Node 22 y 24 sobre Windows, Ubuntu y macOS.
 
 ### Para usar la aplicación de escritorio ya empaquetada
@@ -238,7 +238,7 @@ son artefactos, no fuentes.
 
 | Comando | Qué cubre |
 |---|---|
-| `node --test` | Las 144 pruebas unitarias y de integración |
+| `node --test` | Las 158 pruebas unitarias y de integración |
 | `node scripts/validate-repo.js` | Archivos obligatorios, JSON válido, sintaxis de todos los `.js`, material privado incrustado, pruebas enfocadas |
 | `node scripts/check-local-only.js` | Cero dependencias, cero orígenes remotos, CSP intacta |
 | `node scripts/check-security-claims.js` | 51 invariantes, arrancando la aplicación real |
@@ -255,7 +255,7 @@ pnpm check
 
 | Comando | Resultado |
 |---|---|
-| `node --test` | 144 pruebas, 144 pasan, 0 fallan (9,2 s) |
+| `node --test` | 158 pruebas, 158 pasan, 0 fallan (≈11 s) |
 | `node scripts/validate-repo.js` | `Repository validation passed for 153 files.` |
 | `node scripts/check-local-only.js` | `Claim solo-local verificado: cero dependencias, cero orígenes remotos, cero proveedores alojados.` |
 | `node scripts/check-security-claims.js` | `Invariantes de seguridad verificados: 51 comprobaciones.` |

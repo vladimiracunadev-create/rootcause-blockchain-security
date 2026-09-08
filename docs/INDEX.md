@@ -74,6 +74,7 @@ Los PDF equivalentes se generan con `node scripts/build-system-docs.js`.
 | [`ONCHAIN-ANALYTICS.md`](ONCHAIN-ANALYTICS.md) | **Los 15 indicadores de inteligencia**: umbral, evidencia y falsos positivos |
 | [`RISK-MODEL.md`](RISK-MODEL.md) | Cómo se calcula el puntaje explicable y qué no significa |
 | [`BLOCKCHAIN-FORENSICS.md`](BLOCKCHAIN-FORENSICS.md) | Grafo, seguimiento de fondos y límites del análisis |
+| [`labs/README.md`](labs/README.md) | Ocho laboratorios forenses reproducibles |
 | [`INVESTIGATION-GUIDE.md`](INVESTIGATION-GUIDE.md) | Flujo de trabajo del analista, de la ingesta al informe |
 | [`DATA-GOVERNANCE.md`](DATA-GOVERNANCE.md) | Qué datos entran, cuánto se conservan y cómo se gobiernan |
 | [`THREAT_MODEL.md`](THREAT_MODEL.md) | Amenazas consideradas y explícitamente fuera de alcance |

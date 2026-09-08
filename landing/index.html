@@ -5,10 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
-    content="RootCause Blockchain Security — consola local watch-only para aplicaciones blockchain: contratos, proxies, oráculos, puentes, gobernanza, dependencias y postura de wallets. Aplicación de escritorio para Windows, cero dependencias, cero telemetría, nunca claves privadas." />
+    content="RootCause Blockchain Security — laboratorio local watch-only para forensics, reconciliación y causa raíz en Bitcoin, Ethereum y Polygon. CLI, API, grafos e informes verificables; cero telemetría, nunca claves privadas." />
   <meta property="og:title" content="RootCause Blockchain Security — consola watch-only multi-chain" />
   <meta property="og:description"
-    content="Puedes tener las claves perfectas y perderlo todo igual. Inventario de controles, motor causal determinista y evidencia exportable. Todo local. Telemetría: cero." />
+    content="Forensics y causa raíz en Bitcoin, Ethereum y Polygon: transacciones normalizadas, reconciliación, timeline y evidencia exportable. Todo local. Telemetría: cero." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://vladimiracunadev-create.github.io/rootcause-blockchain-security/" />
   <meta property="og:image"
@@ -34,6 +34,7 @@
       </span>
       <nav class="nav-links">
         <a href="#que-ve">Qué ve</a>
+        <a href="#forensics">Forensics</a>
         <a href="#reglas">Reglas</a>
         <a href="#prueba">La prueba</a>
         <a href="#honestidad">Honestidad</a>
@@ -158,6 +159,30 @@
             normalizados a la API. El motor causal <strong>no depende de ningún SDK de cadena</strong>.</p>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <section id="forensics" class="section alt">
+    <div class="container">
+      <h2 class="section-title">🧭 Blockchain Forensics con procedencia verificable</h2>
+      <p class="section-sub">De una transacción aislada a un informe de causa raíz: Bitcoin, Ethereum y Polygon,
+        providers intercambiables y una frontera explícita entre lo comprobado y lo hipotético.</p>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="feature-icon">🔎</div><h3>TX y direcciones</h3><p>Hash, bloque, tiempo,
+          origen, destino, activo, monto, fee, estado y confirmaciones; balance, flujos, contrapartes y rango temporal.</p></div>
+        <div class="feature-card"><div class="feature-icon">⚖️</div><h3>Reconciliación</h3><p>Compara
+          <code>internal-ledger.csv</code> con los hechos on-chain y clasifica matches, ausencias, duplicados y diferencias.</p></div>
+        <div class="feature-card"><div class="feature-icon">🕸️</div><h3>Grafo acotado</h3><p>
+          <code>Address → Transaction → Address</code>, profundidad configurable y límites duros contra la explosión combinatoria.</p></div>
+        <div class="feature-card"><div class="feature-icon">🧾</div><h3>Evidence report</h3><p>JSON, CSV,
+          Markdown y GraphML, hashes SHA-256 y procedencia por campo. Una hipótesis nunca se presenta como evidencia.</p></div>
+      </div>
+      <div class="install-block" style="margin-top:1.2rem">
+        <h3>Laboratorio reproducible incluido</h3>
+        <pre><code>node src/cli.js reconcile examples/forensics/internal-ledger.csv
+node src/cli.js report examples/forensics/investigation.json --output evidence-report.md</code></pre>
+        <p style="margin-top:.7rem"><a class="btn-ghost" href="https://github.com/vladimiracunadev-create/rootcause-blockchain-security/tree/main/docs/labs">Abrir los 8 laboratorios</a></p>
       </div>
     </div>
   </section>

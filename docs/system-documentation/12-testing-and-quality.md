@@ -78,8 +78,8 @@ node --test test/wallet-rules.test.js
 **Resultado del 27 de agosto de 2026** (commit `6d96e71`, Node v24.11.1):
 
 ~~~text
-ℹ tests 144
-ℹ pass 144
+ℹ tests 158
+ℹ pass 158
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
@@ -208,7 +208,7 @@ Cuatro workflows. El detalle está en [`../CI_GITHUB.md`](../CI_GITHUB.md).
 
 | Job | Plataforma | Qué protege |
 |---|---|---|
-| `calidad` | **Matriz 3 × 2**: Windows, Ubuntu, macOS × Node 22, 24 | Validación del repositorio y las 144 pruebas |
+| `calidad` | **Matriz 3 × 2**: Windows, Ubuntu, macOS × Node 22, 24 | Validación del repositorio y las 158 pruebas |
 | `solo-local` | Ubuntu | Cero dependencias, cero orígenes remotos, CSP intacta. **Con una segunda comprobación independiente** del árbol de dependencias |
 | `invariantes` | Ubuntu | Los 51 invariantes en caliente **más** un `grep` propio contra métodos RPC de firma |
 | `reglas` | Ubuntu | Coherencia motor ↔ catálogo ↔ política ↔ README |

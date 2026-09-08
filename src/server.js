@@ -25,7 +25,10 @@ import { createDemoState, createEmptyState } from "./services/demo-state.js";
 import { DefenseService } from "./services/defense-service.js";
 import { Watchtower } from "./services/watchtower.js";
 import { createIntelligenceRouter } from "./api/intelligence-router.js";
+import { createForensicsRouter } from "./api/forensics-router.js";
 import { IntelligenceService } from "./services/intelligence-service.js";
+import { ForensicsService } from "./forensics/service.js";
+import { BitcoinForensicsProvider, EvmForensicsProvider, FixtureProvider, ProviderRegistry } from "./forensics/providers.js";
 import { ingestDataset } from "./services/intelligence-datasets.js";
 import {
   ConnectorRegistry,
@@ -67,6 +70,33 @@ export async function buildRuntime(env = process.env) {
     policies: intelligencePolicies,
     connectors
   });
+  const forensicProviders = new ProviderRegistry();
+  forensicProviders.register(new EvmForensicsProvider({
+    id: "ethereum-rpc",
+    chain: "ethereum",
+    endpoint: config.evm.url,
+    allowRemote: config.evm.allowRemote,
+    timeoutMs: config.evm.timeoutMs
+  }));
+  if (config.forensics.polygonRpcUrl) forensicProviders.register(new EvmForensicsProvider({
+    id: "polygon-rpc",
+    chain: "polygon",
+    endpoint: config.forensics.polygonRpcUrl,
+    allowRemote: config.forensics.allowRemote,
+    timeoutMs: config.forensics.timeoutMs
+  }));
+  if (config.forensics.bitcoinRpcUrl) forensicProviders.register(new BitcoinForensicsProvider({
+    id: "bitcoin-rpc",
+    endpoint: config.forensics.bitcoinRpcUrl,
+    allowRemote: config.forensics.allowRemote,
+    timeoutMs: config.forensics.timeoutMs
+  }));
+  if (config.demoMode) forensicProviders.register(new FixtureProvider({
+    id: "forensic-demo",
+    chain: null,
+    document: await readJson(path.join(PROJECT_ROOT, "examples", "forensics", "investigation.json"))
+  }));
+  const forensics = new ForensicsService({ intelligence, providers: forensicProviders });
 
   // La demo arranca con escenarios reproducibles cargados: una consola de
   // inteligencia vacía no permite comprobar nada.
@@ -88,10 +118,11 @@ export async function buildRuntime(env = process.env) {
     service,
     config,
     staticRoot: path.join(PROJECT_ROOT, "src", "web", "static"),
-    intelligenceRouter: createIntelligenceRouter({ intelligence })
+    intelligenceRouter: createIntelligenceRouter({ intelligence }),
+    forensicsRouter: createForensicsRouter({ forensics })
   });
   const watchtower = new Watchtower(service, config.watchtower);
-  return { application, config, service, intelligence, connectors, watchtower };
+  return { application, config, service, intelligence, connectors, forensics, forensicProviders, watchtower };
 }
 
 // La edicion de escritorio necesita que el panel aparezca solo al arrancar.

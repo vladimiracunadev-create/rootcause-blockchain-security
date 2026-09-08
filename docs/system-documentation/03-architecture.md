@@ -54,7 +54,7 @@ flowchart TB
     subgraph A["API"]
         A1["src/app.js<br/>cabeceras · rate limit · body · estáticos"]
         A2["src/api/router.js<br/>15 rutas /api"]
-        A3["src/api/intelligence-router.js<br/>25 rutas /api/v1"]
+        A3["Routers intelligence + forensics<br/>32 rutas /api/v1"]
     end
     subgraph S["Servicios · casos de uso"]
         S1["DefenseService"]

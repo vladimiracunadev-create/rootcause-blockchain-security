@@ -3,6 +3,20 @@
 Todo lo que se puede ejecutar en este repositorio, con lo que hace y lo que
 verifica.
 
+## CLI forense
+
+```bash
+node src/cli.js blockchain tx <hash> --chain ethereum
+node src/cli.js blockchain address <address> --chain polygon
+node src/cli.js reconcile examples/forensics/internal-ledger.csv --format csv
+node src/cli.js graph <address> --chain ethereum --depth 2 --format graphml
+node src/cli.js report examples/forensics/investigation.json --format markdown
+node src/cli.js lab 1
+```
+
+Usa `--evidence <archivo>` para cambiar el fixture y `--output <archivo>` para
+guardar la salida. Formatos: JSON, CSV, Markdown y GraphML según el comando.
+
 ## Scripts del repositorio
 
 | Comando | Qué hace |

@@ -309,7 +309,7 @@ flowchart TB
         A["Puerto HTTP local 8790"]
         B["7 rutas estáticas"]
         C["15 rutas /api"]
-        D["25 rutas /api/v1"]
+        D["32 rutas /api/v1"]
     end
     subgraph EN["Entradas de datos"]
         E["Cuerpos JSON (≤128 KB)"]

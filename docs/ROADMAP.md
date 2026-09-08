@@ -16,6 +16,14 @@
 
 ## 0.4 — siguiente incremento
 
+### Incremento forense entregado (2026-09-07)
+
+- `BlockchainTransaction`, providers read-only para Bitcoin/Ethereum/Polygon,
+  análisis de dirección, grafo Address-Transaction-Address, reconciliación,
+  timeline, CLI/API, cuatro formatos y ocho laboratorios reproducibles.
+
+El resto de 0.4 continúa como siguiente incremento:
+
 Etapa 3 del dominio de inteligencia, **explícitamente no implementada hoy**:
 
 - anomalías estadísticas sobre la línea base de cada dirección, con su tasa de

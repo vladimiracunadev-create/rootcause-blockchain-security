@@ -194,7 +194,7 @@ RPC alojados en `src/`.
 | Servidor y arranque | `src/server.js` | Compone el runtime completo y publica el puerto local |
 | Aplicación HTTP | `src/app.js` | Cabeceras, límite de ritmo, cuerpo JSON, estáticos y errores |
 | Router de defensa | `src/api/router.js` | 15 rutas de inventario, incidentes y auditoría |
-| Router de inteligencia | `src/api/intelligence-router.js` | 25 rutas versionadas `/api/v1` |
+| Routers versionados | `src/api/intelligence-router.js`, `src/api/forensics-router.js` | 32 rutas `/api/v1` (25 intelligence + 7 forensics) |
 | Motor de reglas | `src/domain/rule-engine.js` | 14 reglas `BLK-*` de proyecto, evento y nodo |
 | Reglas de wallet | `src/domain/wallet-rules.js` | 8 reglas `BLK-WALLET-*` sobre cuentas públicas |
 | Guardián de secretos | `src/domain/secret-guard.js` | Rechaza y redacta material privado |
@@ -225,7 +225,7 @@ código.
 | Servidor HTTP | `node:http` de la biblioteca estándar | Sin Express ni framework |
 | Criptografía | `node:crypto` (AES-256-GCM, SHA-256, `randomUUID`) | Sin librerías criptográficas de terceros |
 | Cliente HTTP | `fetch` global de Node | Sin axios ni SDK de cadena |
-| Pruebas | `node --test` de la biblioteca estándar | 144 pruebas |
+| Pruebas | `node --test` de la biblioteca estándar | 158 pruebas |
 | Frontend | HTML, CSS y JavaScript sin framework + Service Worker | PWA local |
 | Empaquetado Windows | PowerShell + Inno Setup | `packaging/windows/` |
 | CI | GitHub Actions con acciones pinneadas a SHA | 4 workflows |
@@ -301,7 +301,7 @@ commit `6d96e71`:
 |---|---|---|
 | Archivos JavaScript en `src/` | 24 | `find src -name '*.js'` |
 | Líneas de código en `src/`, `test/` y `scripts/` | ≈ 12 200 | `wc -l` |
-| Pruebas | 144 pasan, 0 fallan | `node --test` |
+| Pruebas | 158 pasan, 0 fallan | `node --test` |
 | Archivos validados por el linter propio | 153 | `node scripts/validate-repo.js` |
 | Reglas `BLK-*` | 22, mapeadas a 13 controles | `node scripts/check-rule-coverage.js` |
 | Indicadores `INT-*` | 15, en 6 familias | `node scripts/check-rule-coverage.js` |

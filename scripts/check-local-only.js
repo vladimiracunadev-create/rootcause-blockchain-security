@@ -55,8 +55,18 @@ for (const field of [
 }
 
 // ── 2. Cero árbol instalado y cero lockfiles de otros gestores ──────────────
-for (const forbidden of ["node_modules", "package-lock.json", "yarn.lock", "npm-shrinkwrap.json"]) {
+for (const forbidden of ["package-lock.json", "yarn.lock", "npm-shrinkwrap.json"]) {
   if (await exists(forbidden)) fail("Artefacto de dependencias presente: " + forbidden);
+}
+
+// pnpm 11 puede crear dos archivos de metadatos aunque el árbol siga vacío.
+// Se toleran sólo esos nombres exactos; cualquier paquete, symlink o archivo
+// adicional mantiene el fallo. CI además ejecuta este gate sin invocar pnpm.
+if (await exists("node_modules")) {
+  const entries = await fs.readdir(path.join(PROJECT_ROOT, "node_modules"), { withFileTypes: true });
+  const allowedMetadata = new Set([".package-map.json", ".pnpm-workspace-state-v1.json"]);
+  const installed = entries.filter((entry) => !allowedMetadata.has(entry.name));
+  if (installed.length) fail("Árbol de dependencias presente: " + installed.map((entry) => entry.name).join(", "));
 }
 
 if (await exists("pnpm-lock.yaml")) {

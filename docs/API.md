@@ -60,6 +60,26 @@ bajo `/api/` siguen funcionando sin cambios.
 | POST | `/api/v1/intelligence/registry/{contracts\|drainers\|bridges}` | Registro **local** del operador |
 | POST | `/api/v1/intelligence/exploits` | Registrar un incidente conocido |
 
+## API v1 de Blockchain Forensics
+
+Contrato JSON, local y de sólo lectura sobre hechos normalizados. Especificación:
+[`openapi-forensics.yaml`](openapi-forensics.yaml).
+
+| Método | Ruta | Resultado |
+| --- | --- | --- |
+| `GET` | `/api/v1/forensics/providers` | Providers disponibles y capacidades |
+| `GET` | `/api/v1/forensics/transactions/:chain/:hash` | `BlockchainTransaction` con procedencia |
+| `GET` | `/api/v1/forensics/addresses/:chain/:address` | Balance, flujos, contrapartes y rango temporal |
+| `GET` | `/api/v1/forensics/graph/:chain/:address?depth=2` | Grafo bipartito acotado |
+| `POST` | `/api/v1/forensics/reconcile` | Ledger frente a hechos on-chain |
+| `POST` | `/api/v1/forensics/timeline` | Timeline multi-fuente |
+| `POST` | `/api/v1/forensics/report` | Informe estructurado y hasheado |
+
+Chains: `bitcoin`, `ethereum`, `polygon`. Los `POST` requieren
+`x-rootcause-request: 1`. No existen operaciones de firma, transmisión,
+transferencia ni custodia. Reconciliación recibe
+`{"ledger":[...],"options":{"timestampToleranceSeconds":300}}`.
+
 ### Garantías de la API de riesgo
 
 - **Nunca** solicita claves privadas, frases semilla, keystores ni autorización

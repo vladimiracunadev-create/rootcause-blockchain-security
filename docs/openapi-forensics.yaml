@@ -1,0 +1,79 @@
+openapi: 3.1.0
+info:
+  title: RootCause Blockchain Forensics API
+  version: 0.3.0
+  description: API local y read-only. Nunca solicita claves ni firma o transmite transacciones.
+servers:
+  - url: http://127.0.0.1:8790
+paths:
+  /api/v1/forensics/providers:
+    get:
+      summary: Lista providers y capacidades de solo lectura
+      responses: { "200": { description: Providers disponibles } }
+  /api/v1/forensics/transactions/{chain}/{hash}:
+    get:
+      summary: Obtiene una transacción normalizada y su procedencia
+      parameters:
+        - $ref: "#/components/parameters/Chain"
+        - { name: hash, in: path, required: true, schema: { type: string, pattern: "^[a-fA-F0-9x]{64,66}$" } }
+      responses:
+        "200":
+          description: Transacción localizada
+          content: { application/json: { schema: { type: object, properties: { transaction: { $ref: "#/components/schemas/BlockchainTransaction" } } } } }
+        "404": { description: Transacción no localizada }
+  /api/v1/forensics/addresses/{chain}/{address}:
+    get:
+      summary: Analiza una dirección pública
+      parameters:
+        - $ref: "#/components/parameters/Chain"
+        - { name: address, in: path, required: true, schema: { type: string } }
+      responses: { "200": { description: Balance, flujos, contrapartes y rango temporal } }
+  /api/v1/forensics/graph/{chain}/{address}:
+    get:
+      summary: Genera un grafo Address-Transaction-Address acotado
+      parameters:
+        - $ref: "#/components/parameters/Chain"
+        - { name: address, in: path, required: true, schema: { type: string } }
+        - { name: depth, in: query, schema: { type: integer, minimum: 1, maximum: 6, default: 2 } }
+      responses: { "200": { description: Nodos, aristas, límites y truncamiento } }
+  /api/v1/forensics/reconcile:
+    post:
+      summary: Reconcilia un ledger con evidencia on-chain
+      responses: { "200": { description: Clasificaciones y diferencias } }
+  /api/v1/forensics/timeline:
+    post:
+      summary: Combina relojes de ledger, aplicación, exchange y blockchain
+      responses: { "200": { description: Timeline con fuente por evento } }
+  /api/v1/forensics/report:
+    post:
+      summary: Produce un informe estructurado con hash
+      responses: { "200": { description: Hechos, hipótesis, evidencia y limitaciones } }
+components:
+  parameters:
+    Chain:
+      name: chain
+      in: path
+      required: true
+      schema: { type: string, enum: [bitcoin, ethereum, polygon] }
+  schemas:
+    BlockchainTransaction:
+      type: object
+      required: [chain, network, tx_hash, block, timestamp, from, to, asset, amount, fee, status, input_data, contract, confirmations, provenance, epistemic_level, evidence_hash]
+      properties:
+        chain: { type: string, enum: [bitcoin, ethereum, polygon] }
+        network: { type: string }
+        tx_hash: { type: string, pattern: "^[a-f0-9]{64}$" }
+        block: { type: [integer, "null"] }
+        timestamp: { type: string, format: date-time }
+        from: { type: [string, "null"] }
+        to: { type: [string, "null"] }
+        asset: { type: string }
+        amount: { type: string, pattern: "^[0-9]+$", description: Entero exacto en unidad mínima }
+        fee: { type: string, pattern: "^[0-9]+$" }
+        status: { type: string, enum: [confirmed, pending, failed, orphaned, unknown] }
+        input_data: { type: string }
+        contract: { type: [string, "null"] }
+        confirmations: { type: integer, minimum: 0 }
+        provenance: { type: object }
+        epistemic_level: { const: observed-fact }
+        evidence_hash: { type: string, pattern: "^[a-f0-9]{64}$" }

@@ -74,11 +74,12 @@ El producto cubre exactamente esa ventana.
 | **Postura de wallets** | **8 reglas** sobre cuentas públicas: allowances, operadores NFT, permits, smart accounts, delegaciones EIP-7702 y actividad |
 | **Vigilancia del observador** | 3 reglas: si el nodo cae, apunta a otra red o se atrasa, eso es un incidente |
 | **Inteligencia on-chain** | **15 indicadores** en 6 familias, sobre Bitcoin y Ethereum |
+| **Blockchain Forensics** | TX, direcciones, reconciliación, timeline e informe sobre Bitcoin, Ethereum y Polygon |
 | **Puntaje explicable** | Nunca viaja sin sus factores, su confianza y sus limitaciones |
 | **Grafo de fondos** | Seguimiento, caminos, ciclos, comunidades y proximidad, siempre acotado |
 | **Casos y evidencia** | Expediente con evidencia sellada por hash e informe exportable |
 | **Auditoría verificable** | Cadena de hashes que detecta manipulación |
-| **API local** | 15 rutas internas + **25 rutas versionadas** `/api/v1` |
+| **API local** | 15 rutas internas + **32 rutas versionadas** `/api/v1` |
 
 ---
 
@@ -122,7 +123,7 @@ Todo lo siguiente se ejecutó sobre el commit analizado el 27 de agosto de 2026:
 
 | Indicador | Resultado |
 |---|---|
-| Pruebas automatizadas | **144 pasan, 0 fallan, 0 omitidas** |
+| Pruebas automatizadas | **158 pasan, 0 fallan, 0 omitidas** |
 | Invariantes de seguridad comprobados **arrancando la aplicación real** | **51** |
 | Archivos validados por el linter propio | 153 |
 | Reglas coherentes entre motor, catálogo, política y README | 22 · 13 controles |
